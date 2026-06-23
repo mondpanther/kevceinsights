@@ -47,6 +47,14 @@
   <label><input type="checkbox" id="byRegion"> Colour by world region</label>
   <span style="color:#a6abb5">|</span>
   <label><input type="checkbox" id="bySector"> Colour by sector</label>
+  <span style="color:#a6abb5">|</span>
+  <label>Pipeline:
+   <select id="srcFilter">
+    <option value="both">Both pipelines</option>
+    <option value="scoreboard">Scoreboard firms only</option>
+    <option value="holder">Patent-holder pipeline only</option>
+   </select>
+  </label>
  </div>
 </header>
 <div id="map"></div>
@@ -114,24 +122,30 @@ function tip(d){ if(d.type==='flagged') return '<div class="lab-tip"><b>'+esc(d.
 function popup(d){let dev=d.devshare==null?'n/a':d.devshare;
  let src=(d.sources||[]).map(u=>'<a href="'+u+'" target="_blank" rel="noopener">'+u.replace(/^https?:\/\//,'').slice(0,52)+'…</a>').join('');
  let head=d.type==='flagged'?'<b>'+esc(d.firm)+'</b><br><span style="color:#69707d">'+esc(d.country)+'</span><br>'+esc(d.note):'<b>'+esc(d.firm)+'</b> — '+esc(d.lab)+'<br><span style="color:#69707d">'+esc(d.city)+', '+esc(d.country)+(d.year?(' · est. '+esc(d.year)):'')+'</span>'+sz(d)+'<br>'+esc(d.note);
- return head+'<br><span style="color:#69707d;font-size:11.5px">Parent dev-country (ex-China) innovator share: <b>'+dev+'</b></span>'+(src?('<div class="src" style="margin-top:6px">'+src+'</div>'):'');}
+ let meta=(d.source==='holder')
+   ?'<span style="color:#8a6d1a;font-size:11.5px">Found via the <b>patent-holder pipeline</b>'+(d.xcnin_fams?(' · owns <b>'+d.xcnin_fams+'</b> developing-country (ex-China/India) innovations'):'')+'</span>'
+   :'<span style="color:#69707d;font-size:11.5px">Parent dev-country (ex-China) innovator share: <b>'+dev+'</b></span>';
+ return head+'<br>'+meta+(src?('<div class="src" style="margin-top:6px">'+src+'</div>'):'');}
 let layer=[];
-function draw(){const showF=document.getElementById('showFlagged').checked,onlyO=document.getElementById('onlyOther').checked,byR=document.getElementById('byRegion').checked,byS=document.getElementById('bySector').checked;const mode=byS?'sector':(byR?'region':'hub');
+function draw(){const showF=document.getElementById('showFlagged').checked,onlyO=document.getElementById('onlyOther').checked,byR=document.getElementById('byRegion').checked,byS=document.getElementById('bySector').checked,src=document.getElementById('srcFilter').value;const mode=byS?'sector':(byR?'region':'hub');
  layer.forEach(m=>map.removeLayer(m));layer=[];
- RECS.forEach(d=>{ if(d.type==='flagged'&&!showF)return; if(onlyO&&d.hub!=='Other')return; const ver=d.type==='verified';
-  const m=L.circleMarker([d.lat,d.lon],{radius:ver?7:3.7,color:ver?'#33373f':colorFor(d,mode),weight:ver?1:1.2,fillColor:ver?colorFor(d,mode):'#ffffff',fillOpacity:ver?0.9:0.45,opacity:ver?1:0.8});
+ RECS.forEach(d=>{ const hold=d.source==='holder';
+  if(src==='scoreboard'&&hold)return; if(src==='holder'&&!hold)return;
+  if(d.type==='flagged'&&!showF)return; if(onlyO&&d.hub!=='Other')return; const ver=d.type==='verified';
+  const stroke=ver?(hold?'#b8860b':'#33373f'):colorFor(d,mode);
+  const m=L.circleMarker([d.lat,d.lon],{radius:ver?7:3.7,color:stroke,weight:ver?(hold?2.2:1):1.2,fillColor:ver?colorFor(d,mode):'#ffffff',fillOpacity:ver?0.9:0.45,opacity:1,dashArray:hold?'2,1.6':null});
   m.bindTooltip(tip(d),{direction:'top',sticky:true,opacity:.97}); m.bindPopup(popup(d),{maxWidth:330});
-  m.on('mouseover',function(){this.setStyle({radius:ver?9:6,weight:2});this.bringToFront();});
-  m.on('mouseout',function(){this.setStyle({radius:ver?7:3.7,weight:ver?1:1.2});});
+  m.on('mouseover',function(){this.setStyle({radius:ver?9:6,weight:hold?3:2});this.bringToFront();});
+  m.on('mouseout',function(){this.setStyle({radius:ver?7:3.7,weight:ver?(hold?2.2:1):1.2});});
   m.addTo(map);layer.push(m);});
  buildLegend(mode);}
 function _excl(a,b){document.getElementById(a).addEventListener('change',function(){if(this.checked)document.getElementById(b).checked=false;});}
 _excl('bySector','byRegion');_excl('byRegion','bySector');
-['showFlagged','onlyOther','byRegion','bySector'].forEach(id=>document.getElementById(id).addEventListener('change',draw));
+['showFlagged','onlyOther','byRegion','bySector','srcFilter'].forEach(id=>document.getElementById(id).addEventListener('change',draw));
 let legend=L.control({position:'bottomright'}),legendDiv=null;
 legend.onAdd=function(){legendDiv=L.DomUtil.create('div','legend');return legendDiv;};legend.addTo(map);
 function buildLegend(mode){let h;if(mode==='sector'){var pres=SECTORS.filter(function(s){return RECS.some(function(d){return d.type==='verified'&&sectorBucket(d.sector)===s;});});h='<div style="font-weight:600;margin-bottom:3px">Sector</div>'+pres.map(function(s){return '<div><i style="background:'+SECTC[s]+'"></i>'+esc(s)+'</div>';}).join('');}else if(mode==='region'){h='<div style="font-weight:600;margin-bottom:3px">World region</div>'+REGIONS.map(r=>'<div><i style="background:'+REGC[r]+'"></i>'+esc(r)+'</div>').join('');}else{h='<div style="font-weight:600;margin-bottom:3px">Host hub</div>'+['China','India','Other'].map(x=>'<div><i style="background:'+HUBC[x]+'"></i>'+(x==='Other'?'Other EMDE':x)+'</div>').join('');}
- h+='<div style="font-weight:600;margin:6px 0 3px;border-top:1px solid #eee;padding-top:5px">Marker</div><div><i style="background:#777"></i>Verified named lab</div><div><i class="hollow"></i>Patent-flagged firm</div>';legendDiv.innerHTML=h;}
+ h+='<div style="font-weight:600;margin:6px 0 3px;border-top:1px solid #eee;padding-top:5px">Marker</div><div><i style="background:#777"></i>Scoreboard-firm lab</div><div><i style="background:#777;box-shadow:0 0 0 2px #b8860b inset;border:1px solid #b8860b"></i>Holder-pipeline lab</div><div><i class="hollow"></i>Patent-flagged firm</div>';legendDiv.innerHTML=h;}
 draw();
 // ---- distribution charts (computed live from the verified records) ----
 (function(){
