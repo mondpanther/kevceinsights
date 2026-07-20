@@ -143,7 +143,9 @@ function colorFor(d,mode){
  if(mode==='quality'){const r=d[QK]/QW;let i=0;while(i<5&&r>QTH[i])i++;return QCOLS[i];}
  if(mode==='sector')return SECTC[sectorBucket(d.sector)]||'#aaaaaa';if(mode==='region')return REGC[d.region]||'#9aa1ab';return HUBC[d.hub];}
 function sz(d){if(d.size_value===''||d.size_value==null)return '';let v=Number(d.size_value);return '<br><b>~'+(isNaN(v)?d.size_value:v.toLocaleString())+'</b> '+esc(d.size_metric||'');}
-function tip(d){ const q=(QUAL!=='none'&&d[QK]!=null)?('<br><b>'+d[QK]+'</b> '+(QUAL==='cites'?'avg citations':'avg value (ev_global)')+(d.pat_scope==='country'?'':' (whole firm)')):'';
+function tip(d){ let q='';
+ if(QUAL!=='none'){ if(d[QK]!=null&&QW!=null) q='<br><b>'+d[QK]+'</b> '+(QSCOPE==='green'?'green-tech ':'')+(QUAL==='cites'?'avg citations':'avg value (ev_global)')+(d.pat_scope==='country'?'':' (whole firm)')+' &middot; <b>'+(d[QK]/QW).toFixed(2)+'&times;</b> world avg';
+  else q='<br><i>No matched '+(QSCOPE==='green'?'green-tech ':'')+'innovations</i>'; }
  return '<div class="lab-tip"><b>'+esc(d.firm)+'</b> — '+esc(d.lab)+'<br><span style="color:#69707d">'+esc(d.city)+', '+esc(d.country)+' · '+esc(d.sector)+'</span>'+sz(d)+q+'<br>'+esc(d.note)+'</div>';}
 function popup(d){let dev=d.devshare==null?'n/a':d.devshare;
  let src=(d.sources||[]).map(u=>'<a href="'+u+'" target="_blank" rel="noopener">'+u.replace(/^https?:\/\//,'').slice(0,52)+'…</a>').join('');
