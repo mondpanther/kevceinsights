@@ -53,8 +53,9 @@
  </ol>
  <p style="margin-top:8px">Every dot is a named lab verified from public sources (hover for what it does, click for
  sources). Where the institution can be matched to the patent data, its popup links to an <b>Espacenet search of its
- patents</b>, and dots can be <b>coloured by patent quality</b> &mdash; average forward citations or the ev_global
- economic-value index, computed only over the patents that can be mapped to the lab's host country (an inventor or
+ patents</b>, and dots can be <b>coloured by patent quality</b> &mdash; average forward citations or average
+ <b>Patent Rank</b><a href="#fn-patentrank" style="text-decoration:none"><sup>1</sup></a>,
+ computed only over the patents that can be mapped to the lab's host country (an inventor or
  the patent holder is located there), shown relative to the world-average innovation
  (<span style="color:#c0392b">red = above</span>, <span style="color:#2471a3">blue = below</span>), for
  all innovations or <b>green technologies</b> only.</p>
@@ -82,7 +83,7 @@
    <select id="qualSel">
     <option value="none">Off</option>
     <option value="cites">Avg citations</option>
-    <option value="ev">Avg value (ev_global)</option>
+    <option value="ev">Avg Patent Rank</option>
    </select>
   </label>
   <label>for
@@ -123,6 +124,14 @@
  global R&amp;D budget, and each is checked once. Verified labs are hand-curated and source-backed, placed at their real
  city (co-located labs are spread slightly to avoid overlap). Size figures mix scientist
  and engineering headcounts and are not comparable across labs.
+ <p id="fn-patentrank" style="margin:10px 0 0"><sup>1</sup> <b>Patent Rank</b> measures the economic value of a
+ patented innovation by adapting Google's PageRank algorithm to the global patent citation network: a patent's rank
+ combines its own estimated private value with the ranks of the patents that cite it, so a citation from an
+ important patent counts for more than one from a marginal patent, and value propagates along whole chains of
+ follow-on innovation. The measure is developed in
+ <a href="https://cep.lse.ac.uk/pubs/download/dp1813.pdf" target="_blank" rel="noopener">Guillard, Martin, Mohnen,
+ Thomas &amp; Verhoeven (2021), &ldquo;Efficient Industrial Policy for Innovation: Standing on the Shoulders of
+ Hidden Giants&rdquo;, CEP Discussion Paper 1813</a>.</p>
 </footer>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -160,7 +169,7 @@ function colorFor(d,mode){
  if(mode==='sector')return SECTC[sectorBucket(d.sector)]||'#aaaaaa';if(mode==='region')return REGC[d.region]||'#9aa1ab';return HUBC[d.hub];}
 function sz(d){if(d.size_value===''||d.size_value==null)return '';let v=Number(d.size_value);return '<br><b>~'+(isNaN(v)?d.size_value:v.toLocaleString())+'</b> '+esc(d.size_metric||'');}
 function tip(d){ let q='';
- if(QUAL!=='none'){ if(d[QK]!=null&&QW!=null) q='<br><b>'+d[QK]+'</b> '+(QSCOPE==='green'?'green-tech ':'')+(QUAL==='cites'?'avg citations':'avg value (ev_global)')+' &middot; <b>'+(d[QK]/QW).toFixed(2)+'&times;</b> world avg';
+ if(QUAL!=='none'){ if(d[QK]!=null&&QW!=null) q='<br><b>'+d[QK]+'</b> '+(QSCOPE==='green'?'green-tech ':'')+(QUAL==='cites'?'avg citations':'avg Patent Rank')+' &middot; <b>'+(d[QK]/QW).toFixed(2)+'&times;</b> world avg';
   else q='<br><i>No '+(QSCOPE==='green'?'green-tech ':'')+'innovations mapped to '+esc(d.country)+'</i>'; }
  return '<div class="lab-tip"><b>'+esc(d.firm)+'</b> — '+esc(d.lab)+'<br><span style="color:#69707d">'+esc(d.city)+', '+esc(d.country)+' · '+esc(d.sector)+'</span>'+sz(d)+q+'<br>'+esc(d.note)+'</div>';}
 function popup(d){let dev=d.devshare==null?'n/a':d.devshare;
@@ -171,8 +180,8 @@ function popup(d){let dev=d.devshare==null?'n/a':d.devshare;
    :'<span style="color:#69707d;font-size:11.5px">Parent dev-country (ex-China) innovator share: <b>'+dev+'</b></span>';
  let patq='';
  if(d.pat_n){
-  patq='<br><span style="color:#69707d;font-size:11.5px">Patent quality ('+d.pat_n.toLocaleString()+' families with inventors or holders in '+esc(d.country)+'): <b>'+d.pat_cites+'</b> avg citations · <b>'+d.pat_ev+'</b> avg value (ev_global)</span>';
-  if(d.pat_g_n) patq+='<br><span style="color:#2e7d32;font-size:11.5px">Green tech ('+d.pat_g_n.toLocaleString()+' of these families): <b>'+d.pat_g_cites+'</b> avg citations · <b>'+d.pat_g_ev+'</b> avg value</span>';}
+  patq='<br><span style="color:#69707d;font-size:11.5px">Patent quality ('+d.pat_n.toLocaleString()+' families with inventors or holders in '+esc(d.country)+'): <b>'+d.pat_cites+'</b> avg citations · <b>'+d.pat_ev+'</b> avg Patent Rank</span>';
+  if(d.pat_g_n) patq+='<br><span style="color:#2e7d32;font-size:11.5px">Green tech ('+d.pat_g_n.toLocaleString()+' of these families): <b>'+d.pat_g_cites+'</b> avg citations · <b>'+d.pat_g_ev+'</b> avg Patent Rank</span>';}
  let esp=d.pa_name?('<div style="margin-top:5px;font-size:12px"><a href="https://worldwide.espacenet.com/patent/search?q='+encodeURIComponent('pa="'+d.pa_name+'"')+'" target="_blank" rel="noopener">Search this institution&#39;s patents on Espacenet ↗</a></div>'):'';
  return head+'<br>'+meta+patq+esp+(src?('<div class="src" style="margin-top:6px">'+src+'</div>'):'');}
 let layer=[];
@@ -202,7 +211,7 @@ document.getElementById('qualSel').addEventListener('change',function(){if(this.
 let legend=L.control({position:'bottomright'}),legendDiv=null;
 legend.onAdd=function(){legendDiv=L.DomUtil.create('div','legend');return legendDiv;};legend.addTo(map);
 function buildLegend(mode){let h;
- if(mode==='quality'){const nm=(QSCOPE==='green'?'Green-tech ':'')+(QUAL==='cites'?'avg forward citations':'avg value (ev_global)');
+ if(mode==='quality'){const nm=(QSCOPE==='green'?'Green-tech ':'')+(QUAL==='cites'?'avg forward citations':'avg Patent Rank');
   h='<div style="font-weight:600;margin-bottom:3px">'+nm+'<br><span style="font-weight:400;color:#69707d">relative to the world average over all '+(QSCOPE==='green'?'green ':'')+'innovations'+(QW!=null?(' ('+QW+')'):'')+'</span></div>';
   const LBL=['&lt; &frac14;&times; world avg','&frac14;&ndash;&frac12;&times;','&frac12;&ndash;1&times;','1&ndash;2&times;','2&ndash;4&times;','&gt; 4&times; world avg'];
   for(let i=0;i<6;i++) h+='<div><i style="background:'+QCOLS[i]+'"></i>'+LBL[i]+'</div>';
