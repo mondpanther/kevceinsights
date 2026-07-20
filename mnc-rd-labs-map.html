@@ -252,7 +252,7 @@ function draw(){const exCN=document.getElementById('exclCN').checked,exIN=docume
   m.on('mouseover',function(){this.setStyle({radius:hollowQ?7:9,weight:hollowQ?2:(hold?3:2)});this.bringToFront();});
   m.on('mouseout',function(){this.setStyle({radius:hollowQ?5.5:7,weight:hollowQ?1.3:(hold?2.2:1)});});
   m.addTo(map);layer.push(m);});
- buildLegend(mode);updateQualRank();}
+ buildLegend(mode);updateQualRank();syncURL();}
 // ---- top-n institute ranking (shown only in patent-quality mode) ----
 function updateQualRank(){
  const sec=document.getElementById('qualrank');
@@ -278,7 +278,7 @@ function updateQualRank(){
    '<div class="btrack"><div class="bfill" style="width:'+Math.max(2,100*e.v/max).toFixed(1)+'%;background:'+colorFor(e.d,'quality')+'"></div></div>'+
    '<div class="bval">'+val+' <span style="color:#8a8f98;font-weight:400">('+e.n+')</span></div></div>';}).join('');
 }
-document.getElementById('qualrankN').addEventListener('change',updateQualRank);
+document.getElementById('qualrankN').addEventListener('change',function(){updateQualRank();syncURL();});
 function _excl(a,b){document.getElementById(a).addEventListener('change',function(){if(this.checked)document.getElementById(b).checked=false;});}
 _excl('bySector','byRegion');_excl('byRegion','bySector');
 document.getElementById('qualSel').addEventListener('change',function(){if(this.value!=='none'){document.getElementById('bySector').checked=false;document.getElementById('byRegion').checked=false;}});
@@ -308,6 +308,29 @@ function buildLegend(mode){let h;
   h+='<div><i style="background:#fff;border:1.5px solid #333"></i>No '+(QSCOPE==='green'?'green ':'')+'innovations mapped to host country</div>';
  }else if(mode==='sector'){var pres=SECTORS.filter(function(s){return RECS.some(function(d){return d.type==='verified'&&sectorBucket(d.sector)===s;});});h='<div style="font-weight:600;margin-bottom:3px">Sector</div>'+pres.map(function(s){return '<div><i style="background:'+SECTC[s]+'"></i>'+esc(s)+'</div>';}).join('');}else if(mode==='region'){h='<div style="font-weight:600;margin-bottom:3px">World region</div>'+REGIONS.map(r=>'<div><i style="background:'+REGC[r]+'"></i>'+esc(r)+'</div>').join('');}else{h='<div style="font-weight:600;margin-bottom:3px">Host hub</div>'+['China','India','Other'].map(x=>'<div><i style="background:'+HUBC[x]+'"></i>'+(x==='Other'?'Other EMDE':x)+'</div>').join('');}
  h+='<div style="font-weight:600;margin:6px 0 3px;border-top:1px solid #eee;padding-top:5px">Marker</div><div><i style="background:#777"></i>Scoreboard-firm lab</div><div><i style="background:#777;box-shadow:0 0 0 2px #b8860b inset;border:1px solid #b8860b"></i>Assignee-pipeline lab</div>';legendDiv.innerHTML=h;}
+// ---- shareable URLs: controls (+ map view) <-> query parameters ----
+const URLCTL=[['cn','exclCN','chk'],['in','exclIN','chk'],['region','byRegion','chk'],['sector','bySector','chk'],
+ ['pipeline','srcFilter','sel','both'],['quality','qualSel','sel','none'],['scope','qualScope','sel','all'],['top','qualrankN','sel','20']];
+const VIEW0={lat:20,lng:55,z:2};
+function applyURLParams(){const p=new URLSearchParams(location.search);
+ URLCTL.forEach(function(c){const k=c[0],id=c[1],t=c[2];if(!p.has(k))return;
+  const el=document.getElementById(id);let v=p.get(k);
+  if(t==='chk'){el.checked=(v==='1');}
+  else{if(k==='pipeline'&&v==='assignee')v='holder';el.value=v;if(el.selectedIndex<0)el.selectedIndex=0;}});
+ if(document.getElementById('qualSel').value!=='none'){document.getElementById('bySector').checked=false;document.getElementById('byRegion').checked=false;}
+ const v=(p.get('view')||'').split(',');
+ if(v.length===3){const la=+v[0],lo=+v[1],z=+v[2];
+  if(isFinite(la)&&isFinite(lo)&&isFinite(z))map.setView([la,lo],z);}}
+function syncURL(){const p=new URLSearchParams();
+ URLCTL.forEach(function(c){const k=c[0],id=c[1],t=c[2],def=c[3];const el=document.getElementById(id);
+  if(t==='chk'){if(el.checked)p.set(k,'1');}
+  else if(el.value!==def){p.set(k,(k==='pipeline'&&el.value==='holder')?'assignee':el.value);}});
+ const ce=map.getCenter(),z=map.getZoom();
+ if(Math.abs(ce.lat-VIEW0.lat)>0.01||Math.abs(ce.lng-VIEW0.lng)>0.01||z!==VIEW0.z)
+  p.set('view',ce.lat.toFixed(3)+','+ce.lng.toFixed(3)+','+z);
+ history.replaceState(null,'',location.pathname+(p.toString()?('?'+p.toString()):'')+location.hash);}
+map.on('moveend',syncURL);
+applyURLParams();
 draw();
 // ---- distribution charts (computed live from the verified records) ----
 (function(){
