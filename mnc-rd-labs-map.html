@@ -49,19 +49,20 @@
   by its developing-country patent activity and then by its global R&amp;D budget (the latter catches big R&amp;D
   spenders that patent little, e.g. Maruti Suzuki, Ubisoft, NetEase). Firms headquartered in developing countries
   themselves are included (Huawei, BYD, Alibaba, TCS, Embraer, Reliance Jio &hellip;).</li>
-  <li><b>The patent-data pipeline.</b> Starting from the patent data itself, we rank all patent-holding
-  institutions &mdash; companies, universities, national research councils &mdash; by the number of innovations
-  they own that were invented in a developing country, and verify the research labs behind them. This surfaces the
-  domestic owners of EMDE innovation that a list of global R&amp;D spenders misses.</li>
+  <li><b>The patent-assignee pipeline.</b> Starting from the patent data itself, we rank all patent assignees
+  &mdash; the companies, universities and national research councils that own the patents &mdash; by the number of
+  innovations they own that were invented in a developing country, and verify the research labs behind them. This
+  surfaces the domestic owners of EMDE innovation that a list of global R&amp;D spenders misses.</li>
  </ol>
  <p style="margin-top:8px">Every dot is a named lab verified from public sources (hover for what it does, click for
  sources). Where the institution can be matched to the patent data, its popup links to an <b>Espacenet search of its
  patents</b>, and dots can be <b>coloured by patent quality</b> &mdash; average forward citations or average
  <b>Patent Rank</b><a href="#fn-patentrank" style="text-decoration:none"><sup>1</sup></a>,
  computed only over the patents that can be mapped to the lab's host country (an inventor or
- the patent holder is located there), shown relative to the world-average innovation
+ the patent assignee is located there), shown relative to the world-average innovation
  (<span style="color:#c0392b">red = above</span>, <span style="color:#2471a3">blue = below</span>), for
- all innovations or <b>green technologies</b> only.</p>
+ all innovations or <b>green technologies</b> only. <b>Note that these are live data pipelines that get
+ updated daily.</b></p>
  <div class="stats">
   <div class="stat"><b>1677</b><span>Verified labs</span></div>
   <div class="stat"><b>951</b><span>Verified outside China &amp; India</span></div>
@@ -78,7 +79,7 @@
    <select id="srcFilter">
     <option value="both">Both pipelines</option>
     <option value="scoreboard">Scoreboard firms only</option>
-    <option value="holder">Patent-holder pipeline only</option>
+    <option value="holder">Patent-assignee pipeline only</option>
    </select>
   </label>
   <span style="color:#a6abb5">|</span>
@@ -127,7 +128,8 @@
  global R&amp;D budget, and each is checked once. Verified labs are hand-curated and source-backed, placed at their real
  city (co-located labs are spread slightly to avoid overlap). Size figures mix scientist
  and engineering headcounts and are not comparable across labs. Patent-quality indicators are computed only over
- families with an inventor or holder located in the lab's host country (PATSTAT residence data). The per-lab
+ families with an inventor or assignee located in the lab's host country (PATSTAT residence data); Patent Rank is
+ expressed in million US dollars ($M). The per-lab
  &ldquo;patents linked to &hellip;&rdquo; Espacenet searches list the same location-mapped families &mdash; the top
  (up to 20) by Patent Rank, each linked via a country-verified document (a publication of an application in the
  family on which an inventor or applicant carries the host-country code), the same convention used in other KEVCE
@@ -169,6 +171,7 @@ function sectorBucket(s){s=(s||'').toLowerCase();
 const map=L.map('map',{worldCopyJump:true}).setView([20,55],2);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'&copy; OpenStreetMap &copy; CARTO',subdomains:'abcd',maxZoom:11}).addTo(map);
 function esc(s){return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function fmtM(v){v=Number(v);return '$'+(v>=100?v.toFixed(0):v>=10?v.toFixed(1):v.toFixed(2))+'m';}  // Patent Rank in million USD
 const QCOLS=['#08306b','#2171b5','#9ecae1','#fcae91','#fb6a4a','#99000d'];  // blue = below world avg, red = above
 const QTH=[0.25,0.5,1,2,4];         // bin edges as ratio to the world average
 let QUAL='none',QSCOPE='all',QK=null,QW=null;  // metric, scope, record key, world-average anchor
@@ -177,19 +180,19 @@ function colorFor(d,mode){
  if(mode==='sector')return SECTC[sectorBucket(d.sector)]||'#aaaaaa';if(mode==='region')return REGC[d.region]||'#9aa1ab';return HUBC[d.hub];}
 function sz(d){if(d.size_value===''||d.size_value==null)return '';let v=Number(d.size_value);return '<br><b>~'+(isNaN(v)?d.size_value:v.toLocaleString())+'</b> '+esc(d.size_metric||'');}
 function tip(d){ let q='';
- if(QUAL!=='none'){ if(d[QK]!=null&&QW!=null) q='<br><b>'+d[QK]+'</b> '+(QSCOPE==='green'?'green-tech ':'')+(QUAL==='cites'?'avg citations':'avg Patent Rank')+' &middot; <b>'+(d[QK]/QW).toFixed(2)+'&times;</b> world avg';
+ if(QUAL!=='none'){ if(d[QK]!=null&&QW!=null) q='<br><b>'+(QUAL==='cites'?d[QK]:fmtM(d[QK]))+'</b> '+(QSCOPE==='green'?'green-tech ':'')+(QUAL==='cites'?'avg citations':'avg Patent Rank')+' &middot; <b>'+(d[QK]/QW).toFixed(2)+'&times;</b> world avg';
   else q='<br><i>No '+(QSCOPE==='green'?'green-tech ':'')+'innovations mapped to '+esc(d.country)+'</i>'; }
  return '<div class="lab-tip"><b>'+esc(d.firm)+'</b> — '+esc(d.lab)+'<br><span style="color:#69707d">'+esc(d.city)+', '+esc(d.country)+' · '+esc(d.sector)+'</span>'+sz(d)+q+'<br>'+esc(d.note)+'</div>';}
 function popup(d){let dev=d.devshare==null?'n/a':d.devshare;
  let src=(d.sources||[]).map(u=>'<a href="'+u+'" target="_blank" rel="noopener">'+u.replace(/^https?:\/\//,'').slice(0,52)+'…</a>').join('');
  let head='<b>'+esc(d.firm)+'</b> — '+esc(d.lab)+'<br><span style="color:#69707d">'+esc(d.city)+', '+esc(d.country)+(d.year?(' · est. '+esc(d.year)):'')+'</span>'+sz(d)+'<br>'+esc(d.note);
  let meta=(d.source==='holder')
-   ?'<span style="color:#8a6d1a;font-size:11.5px">Found via the <b>patent-holder pipeline</b>'+(d.xcnin_fams?(' · owns <b>'+d.xcnin_fams+'</b> developing-country (ex-China/India) innovations'):'')+'</span>'
+   ?'<span style="color:#8a6d1a;font-size:11.5px">Found via the <b>patent-assignee pipeline</b>'+(d.xcnin_fams?(' · owns <b>'+d.xcnin_fams+'</b> developing-country (ex-China/India) innovations'):'')+'</span>'
    :'<span style="color:#69707d;font-size:11.5px">Parent dev-country (ex-China) innovator share: <b>'+dev+'</b></span>';
  let patq='';
  if(d.pat_n){
-  patq='<br><span style="color:#69707d;font-size:11.5px">Patent quality ('+d.pat_n.toLocaleString()+' families with inventors or holders in '+esc(d.country)+'): <b>'+d.pat_cites+'</b> avg citations · <b>'+d.pat_ev+'</b> avg Patent Rank</span>';
-  if(d.pat_g_n) patq+='<br><span style="color:#2e7d32;font-size:11.5px">Green tech ('+d.pat_g_n.toLocaleString()+' of these families): <b>'+d.pat_g_cites+'</b> avg citations · <b>'+d.pat_g_ev+'</b> avg Patent Rank</span>';}
+  patq='<br><span style="color:#69707d;font-size:11.5px">Patent quality ('+d.pat_n.toLocaleString()+' families with inventors or assignees in '+esc(d.country)+'): <b>'+d.pat_cites+'</b> avg citations · <b>'+fmtM(d.pat_ev)+'</b> avg Patent Rank</span>';
+  if(d.pat_g_n) patq+='<br><span style="color:#2e7d32;font-size:11.5px">Green tech ('+d.pat_g_n.toLocaleString()+' of these families): <b>'+d.pat_g_cites+'</b> avg citations · <b>'+fmtM(d.pat_g_ev)+'</b> avg Patent Rank</span>';}
  let esp='';
  if(d.pa_name||d.pat_pns){
   const parts=[];
@@ -229,13 +232,13 @@ document.getElementById('qualSel').addEventListener('change',function(){if(this.
 let legend=L.control({position:'bottomright'}),legendDiv=null;
 legend.onAdd=function(){legendDiv=L.DomUtil.create('div','legend');return legendDiv;};legend.addTo(map);
 function buildLegend(mode){let h;
- if(mode==='quality'){const nm=(QSCOPE==='green'?'Green-tech ':'')+(QUAL==='cites'?'avg forward citations':'avg Patent Rank');
-  h='<div style="font-weight:600;margin-bottom:3px">'+nm+'<br><span style="font-weight:400;color:#69707d">relative to the world average over all '+(QSCOPE==='green'?'green ':'')+'innovations'+(QW!=null?(' ('+QW+')'):'')+'</span></div>';
+ if(mode==='quality'){const nm=(QSCOPE==='green'?'Green-tech ':'')+(QUAL==='cites'?'avg forward citations':'avg Patent Rank ($M)');
+  h='<div style="font-weight:600;margin-bottom:3px">'+nm+'<br><span style="font-weight:400;color:#69707d">relative to the world average over all '+(QSCOPE==='green'?'green ':'')+'innovations'+(QW!=null?(' ('+(QUAL==='cites'?QW:fmtM(QW))+')'):'')+'</span></div>';
   const LBL=['&lt; &frac14;&times; world avg','&frac14;&ndash;&frac12;&times;','&frac12;&ndash;1&times;','1&ndash;2&times;','2&ndash;4&times;','&gt; 4&times; world avg'];
   for(let i=0;i<6;i++) h+='<div><i style="background:'+QCOLS[i]+'"></i>'+LBL[i]+'</div>';
   h+='<div><i style="background:#fff;border:1.5px solid #333"></i>No '+(QSCOPE==='green'?'green ':'')+'innovations mapped to host country</div>';
  }else if(mode==='sector'){var pres=SECTORS.filter(function(s){return RECS.some(function(d){return d.type==='verified'&&sectorBucket(d.sector)===s;});});h='<div style="font-weight:600;margin-bottom:3px">Sector</div>'+pres.map(function(s){return '<div><i style="background:'+SECTC[s]+'"></i>'+esc(s)+'</div>';}).join('');}else if(mode==='region'){h='<div style="font-weight:600;margin-bottom:3px">World region</div>'+REGIONS.map(r=>'<div><i style="background:'+REGC[r]+'"></i>'+esc(r)+'</div>').join('');}else{h='<div style="font-weight:600;margin-bottom:3px">Host hub</div>'+['China','India','Other'].map(x=>'<div><i style="background:'+HUBC[x]+'"></i>'+(x==='Other'?'Other EMDE':x)+'</div>').join('');}
- h+='<div style="font-weight:600;margin:6px 0 3px;border-top:1px solid #eee;padding-top:5px">Marker</div><div><i style="background:#777"></i>Scoreboard-firm lab</div><div><i style="background:#777;box-shadow:0 0 0 2px #b8860b inset;border:1px solid #b8860b"></i>Holder-pipeline lab</div>';legendDiv.innerHTML=h;}
+ h+='<div style="font-weight:600;margin:6px 0 3px;border-top:1px solid #eee;padding-top:5px">Marker</div><div><i style="background:#777"></i>Scoreboard-firm lab</div><div><i style="background:#777;box-shadow:0 0 0 2px #b8860b inset;border:1px solid #b8860b"></i>Assignee-pipeline lab</div>';legendDiv.innerHTML=h;}
 draw();
 // ---- distribution charts (computed live from the verified records) ----
 (function(){
