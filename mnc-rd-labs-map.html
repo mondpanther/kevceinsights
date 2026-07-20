@@ -13,11 +13,13 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <style>
- :root{--cn:#d95f02;--in:#7570b3;--ot:#1b9e77;--ink:#1d2330}
- *{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:#fff}
- header{padding:22px 26px 14px;border-bottom:1px solid #eceef2}
- header h1{margin:0 0 6px;font-size:22px;font-weight:680}
- header p{margin:0;font-size:14px;line-height:1.5;color:#48505e;max-width:1060px}
+ :root{--cn:#d95f02;--in:#7570b3;--ot:#1b9e77;--ink:#1d1d1d}
+ *{box-sizing:border-box} body{margin:0;font-family:Georgia,"Iowan Old Style","Source Serif Pro",serif;color:var(--ink);background:#fff}
+ .stats,.controls,.legend,.lab-tip,.leaflet-popup-content,.leaflet-container,.barchart{font-family:"Lato","Helvetica Neue",Helvetica,Arial,sans-serif}
+ header{padding:30px 26px 16px;border-bottom:1px solid #eceef2}
+ header h1{margin:0;font-family:"Source Sans Pro","Helvetica Neue",Helvetica,Arial,sans-serif;font-size:clamp(46px,7vw,5.85rem);font-weight:300;line-height:1.08;letter-spacing:-.015em}
+ header .subtitle{margin:2px 0 16px;font-size:clamp(17px,2.4vw,24px);line-height:1.3;color:#555;font-weight:400}
+ header p{margin:0 0 6px;font-size:16.5px;line-height:1.6;color:#1d1d1d;max-width:1060px}
  .stats{display:flex;flex-wrap:wrap;gap:18px;margin-top:12px}
  .stat{background:#f6f8fa;border:1px solid #eceef2;border-radius:10px;padding:8px 14px}
  .stat b{font-size:19px;display:block;line-height:1.1} .stat span{font-size:11.5px;color:#69707d;text-transform:uppercase;letter-spacing:.04em}
@@ -32,7 +34,8 @@
  footer{padding:14px 26px 30px;font-size:12px;color:#79808d;border-top:1px solid #eceef2;max-width:1100px} a{color:#1668c4}
 </style></head><body>
 <header>
- <h1>EMDERLT &mdash; the Emerging and Developing Economies Research Lab Tracker</h1>
+ <h1>EMDERLT</h1>
+ <p class="subtitle">the Emerging and Developing Economies Research Lab Tracker</p>
  <p><b>Most innovation happens in high-income countries (HICs).</b> But this does not mean that there is no
  innovation happening in emerging markets and developing economies (EMDEs) &mdash; and it certainly does not mean
  that such innovation is not economically meaningful. For instance, we find that
@@ -40,7 +43,7 @@
  In this tool we gather information on the <b>research institutions &mdash; both private and public &mdash; behind
  this research and innovation</b>. We report the results of an extensive and ongoing data-gathering exercise in
  which we collect and cross-reference labs from multiple pipelines:</p>
- <ol style="font-size:14px;line-height:1.5;color:#48505e;max-width:1060px;margin:8px 0 0;padding-left:22px">
+ <ol style="font-size:16.5px;line-height:1.6;color:#1d1d1d;max-width:1060px;margin:8px 0 0;padding-left:24px">
   <li><b>The Scoreboard pipeline.</b> Every firm in the EU Industrial R&amp;D Scoreboard &mdash; the world's
   &sim;2,000 largest R&amp;D-investing companies &mdash; is screened for named research labs in EMDEs, prioritised
   by its developing-country patent activity and then by its global R&amp;D budget (the latter catches big R&amp;D
@@ -102,8 +105,8 @@
   .barchart .btrack{flex:1;background:#f0f2f5;border-radius:3px;height:15px;min-width:40px}
   .barchart .bfill{height:15px;border-radius:3px}
   .barchart .bval{width:34px;color:#1d2330;font-weight:600;flex:none;text-align:left}
-  #charts h2{font-size:16px;margin:2px 0 4px}
-  #charts .sub{font-size:12.5px;color:#69707d;margin:0 0 16px}
+  #charts h2{font-size:18px;font-weight:700;color:#555;margin:2px 0 4px}
+  #charts .sub{font-size:13px;color:#666;margin:0 0 16px}
  </style>
  <h2>How the verified labs break down</h2>
  <p class="sub">Counts of verified named labs (each dot on the map). China and India dominate by volume, but labs reach 20+ developing economies and every major R&amp;D-intensive sector.</p>
