@@ -41,7 +41,8 @@
  from public sources (hover for what it does, click for sources). Where the institution can be matched to the patent
  data, its popup links to an <b>Espacenet search of its patents</b>, and dots can be <b>coloured by patent quality</b>
  &mdash; average forward citations or the ev_global economic-value index of the patents invented in the lab's host
- country.</p>
+ country, shown relative to the world-average innovation (<span style="color:#c0392b">red = above</span>,
+ <span style="color:#2471a3">blue = below</span>), for all innovations or <b>green technologies</b> only.</p>
  <div class="stats">
   <div class="stat"><b>1677</b><span>Verified labs</span></div>
   <div class="stat"><b>951</b><span>Verified outside China &amp; India</span></div>
@@ -155,7 +156,8 @@ function popup(d){let dev=d.devshare==null?'n/a':d.devshare;
    :'<span style="color:#69707d;font-size:11.5px">Parent dev-country (ex-China) innovator share: <b>'+dev+'</b></span>';
  let patq='';
  if(d.pat_n){const sc=d.pat_scope==='country'?('invented in '+esc(d.country)):'whole firm';
-  patq='<br><span style="color:#69707d;font-size:11.5px">Patent quality ('+sc+', '+d.pat_n.toLocaleString()+' families): <b>'+d.pat_cites+'</b> avg citations · <b>'+d.pat_ev+'</b> avg value (ev_global)</span>';}
+  patq='<br><span style="color:#69707d;font-size:11.5px">Patent quality ('+sc+', '+d.pat_n.toLocaleString()+' families): <b>'+d.pat_cites+'</b> avg citations · <b>'+d.pat_ev+'</b> avg value (ev_global)</span>';
+  if(d.pat_g_n) patq+='<br><span style="color:#2e7d32;font-size:11.5px">Green tech ('+d.pat_g_n.toLocaleString()+' families): <b>'+d.pat_g_cites+'</b> avg citations · <b>'+d.pat_g_ev+'</b> avg value</span>';}
  let esp=d.pa_name?('<div style="margin-top:5px;font-size:12px"><a href="https://worldwide.espacenet.com/patent/search?q='+encodeURIComponent('pa="'+d.pa_name+'"')+'" target="_blank" rel="noopener">Search this institution&#39;s patents on Espacenet ↗</a></div>'):'';
  return head+'<br>'+meta+patq+esp+(src?('<div class="src" style="margin-top:6px">'+src+'</div>'):'');}
 let layer=[];
@@ -181,7 +183,7 @@ function _excl(a,b){document.getElementById(a).addEventListener('change',functio
 _excl('bySector','byRegion');_excl('byRegion','bySector');
 document.getElementById('qualSel').addEventListener('change',function(){if(this.value!=='none'){document.getElementById('bySector').checked=false;document.getElementById('byRegion').checked=false;}});
 ['bySector','byRegion'].forEach(id=>document.getElementById(id).addEventListener('change',function(){if(this.checked)document.getElementById('qualSel').value='none';}));
-['onlyOther','byRegion','bySector','srcFilter','qualSel'].forEach(id=>document.getElementById(id).addEventListener('change',draw));
+['onlyOther','byRegion','bySector','srcFilter','qualSel','qualScope'].forEach(id=>document.getElementById(id).addEventListener('change',draw));
 let legend=L.control({position:'bottomright'}),legendDiv=null;
 legend.onAdd=function(){legendDiv=L.DomUtil.create('div','legend');return legendDiv;};legend.addTo(map);
 function buildLegend(mode){let h;
