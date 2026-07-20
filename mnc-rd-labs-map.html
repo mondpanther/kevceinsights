@@ -98,10 +98,27 @@
     <option value="green">Green tech only</option>
    </select>
   </label>
-  <button id="dlBtn" class="dl" type="button" title="One row per research institute with all indicators shown on this map.">&#11015;&nbsp;Download the database (CSV)</button>
+  <button id="dlBtn" class="dl" type="button" title="One row per research institute with all indicators shown on this map. Free to download and reuse (CC BY 4.0) — please acknowledge the source.">&#11015;&nbsp;Download the database (CSV)</button>
+ </div>
+ <div style="margin-top:7px;font-size:11.5px;color:#69707d;font-family:'Lato','Helvetica Neue',Helvetica,Arial,sans-serif">
+  The database is free to download and reuse under a <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC&nbsp;BY&nbsp;4.0</a> licence
+  &mdash; please acknowledge the source when using the data (suggested citation in the <a href="#fn-license">footer</a>).
  </div>
 </header>
 <div id="map"></div>
+<section id="qualrank" style="display:none;padding:18px 26px 4px;border-top:1px solid #eceef2">
+ <style>#qr-chart .blab{width:280px} #qr-chart .bval{width:120px}</style>
+ <div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap">
+  <h2 id="qr-title" style="font-size:18px;font-weight:700;color:#555;margin:2px 0 4px">Top institutes</h2>
+  <label style="font-size:13px;font-family:'Lato','Helvetica Neue',Helvetica,Arial,sans-serif;color:#48505e">show top
+   <select id="qualrankN">
+    <option>10</option><option selected>20</option><option>30</option><option>50</option><option>100</option>
+   </select>
+  </label>
+ </div>
+ <p id="qr-sub" style="font-size:13px;color:#666;margin:0 0 12px"></p>
+ <div id="qr-chart" class="barchart"></div>
+</section>
 <section id="charts" style="padding:20px 26px 6px;border-top:1px solid #eceef2">
  <style>
   .barchart .brow{display:flex;align-items:center;gap:8px;font-size:12px;margin:3px 0}
@@ -137,6 +154,14 @@
  (up to 20) by Patent Rank, each linked via a country-verified document (a publication of an application in the
  family on which an inventor or applicant carries the host-country code), the same convention used in other KEVCE
  Insights posts.
+ <p id="fn-license" style="margin:10px 0 0"><b>Data licence &amp; citation.</b> The EMDERLT database may be freely
+ downloaded and reused under a
+ <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution
+ 4.0 (CC&nbsp;BY&nbsp;4.0)</a> licence: you can share and adapt the data for any purpose, provided the source is
+ acknowledged. Suggested citation: <i>KEVCE Insights (2026), &ldquo;EMDERLT &mdash; The Emerging and Developing
+ Economies Research Lab Tracker&rdquo;,
+ <a href="https://mondpanther.github.io/kevceinsights/mnc-rd-labs-map.html">https://mondpanther.github.io/kevceinsights/mnc-rd-labs-map.html</a>
+ (accessed [date]).</i></p>
  <p id="fn-patentrank" style="margin:10px 0 0"><sup>1</sup> <b>Patent Rank</b> measures the economic value of a
  patented innovation by adapting Google's PageRank algorithm to the global patent citation network: a patent's rank
  combines its own estimated private value with the ranks of the patents that cite it, so a citation from an
@@ -226,7 +251,32 @@ function draw(){const onlyO=document.getElementById('onlyOther').checked,byR=doc
   m.on('mouseover',function(){this.setStyle({radius:hollowQ?7:9,weight:hollowQ?2:(hold?3:2)});this.bringToFront();});
   m.on('mouseout',function(){this.setStyle({radius:hollowQ?5.5:7,weight:hollowQ?1.3:(hold?2.2:1)});});
   m.addTo(map);layer.push(m);});
- buildLegend(mode);}
+ buildLegend(mode);updateQualRank();}
+// ---- top-n institute ranking (shown only in patent-quality mode) ----
+function updateQualRank(){
+ const sec=document.getElementById('qualrank');
+ if(QUAL==='none'||QW==null){sec.style.display='none';return;}
+ sec.style.display='';
+ const N=parseInt(document.getElementById('qualrankN').value,10);
+ const src=document.getElementById('srcFilter').value,onlyO=document.getElementById('onlyOther').checked;
+ const seen=new Map();
+ RECS.forEach(d=>{const hold=d.source==='holder';
+  if(src==='scoreboard'&&hold)return; if(src==='holder'&&!hold)return; if(onlyO&&d.hub!=='Other')return;
+  if(d[QK]==null)return;
+  const key=d.firm+'|'+d.country;
+  if(!seen.has(key))seen.set(key,{firm:d.firm,country:d.country,v:d[QK],n:(QSCOPE==='green'?d.pat_g_n:d.pat_n),d:d});});
+ const top=[...seen.values()].sort((a,b)=>(b.v-a.v)||(b.n-a.n)).slice(0,N);
+ const metric=(QSCOPE==='green'?'green-tech ':'')+(QUAL==='cites'?'average forward citations':'average Patent Rank ($M)');
+ document.getElementById('qr-title').textContent='Top '+top.length+' institutes by '+metric;
+ document.getElementById('qr-sub').textContent='Ranked by '+metric+' over patent families with inventors or assignees in the lab’s host country. Bar colour uses the same world-average bins as the map; brackets give the number of families behind each average.';
+ const max=(top.length&&top[0].v>0)?top[0].v:1;
+ document.getElementById('qr-chart').innerHTML=top.map(e=>{
+  const val=QUAL==='cites'?Number(e.v).toFixed(2):fmtM(e.v);
+  return '<div class="brow"><div class="blab" title="'+esc(e.firm)+' — '+esc(e.country)+'">'+esc(e.firm)+' — '+esc(e.country)+'</div>'+
+   '<div class="btrack"><div class="bfill" style="width:'+Math.max(2,100*e.v/max).toFixed(1)+'%;background:'+colorFor(e.d,'quality')+'"></div></div>'+
+   '<div class="bval">'+val+' <span style="color:#8a8f98;font-weight:400">('+e.n+')</span></div></div>';}).join('');
+}
+document.getElementById('qualrankN').addEventListener('change',updateQualRank);
 function _excl(a,b){document.getElementById(a).addEventListener('change',function(){if(this.checked)document.getElementById(b).checked=false;});}
 _excl('bySector','byRegion');_excl('byRegion','bySector');
 document.getElementById('qualSel').addEventListener('change',function(){if(this.value!=='none'){document.getElementById('bySector').checked=false;document.getElementById('byRegion').checked=false;}});
