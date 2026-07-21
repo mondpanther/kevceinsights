@@ -109,8 +109,12 @@
 <div id="map"></div>
 <section id="qualrank" style="display:none;padding:18px 26px 4px;border-top:1px solid #eceef2">
  <style>#qr-chart .blab{width:280px} #qr-chart .bval{width:120px}
-  #qr-chart a.brow:hover .blab{text-decoration:underline;color:#1668c4}
-  #qr-chart a.brow:hover .bfill{filter:brightness(1.15)}</style>
+  #qr-chart .brow{cursor:pointer}
+  #qr-chart .brow:hover .blab{text-decoration:underline;color:#1668c4}
+  #qr-chart .brow:hover .bfill{filter:brightness(1.15)}
+  #qr-pop{position:absolute;z-index:2500;display:none;background:#fff;border-radius:9px;box-shadow:0 3px 16px rgba(0,0,0,.25);
+   padding:11px 13px;max-width:350px;font-family:'Lato','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;line-height:1.5}
+  #qr-pop .src a{display:block;font-size:11.5px;margin-top:2px;word-break:break-all}</style>
  <div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap">
   <h2 id="qr-title" style="font-size:18px;font-weight:700;color:#555;margin:2px 0 4px">Top institutes</h2>
   <label style="font-size:13px;font-family:'Lato','Helvetica Neue',Helvetica,Arial,sans-serif;color:#48505e">show top
@@ -272,19 +276,37 @@ function updateQualRank(){
  const top=[...seen.values()].sort((a,b)=>(b.v-a.v)||(b.n-a.n)).slice(0,N);
  const metric=(QSCOPE==='green'?'green-tech ':'')+(QUAL==='cites'?'average forward citations':'average Patent Rank ($M)');
  document.getElementById('qr-title').textContent='Top '+top.length+' institutes by '+metric;
- document.getElementById('qr-sub').textContent='Ranked by '+metric+' over patent families with inventors or assignees in the lab’s host country. Bar colour uses the same world-average bins as the map; brackets give the number of families behind each average. Click a bar to open the underlying '+(QSCOPE==='green'?'green-tech ':'')+'patents on Espacenet.';
+ document.getElementById('qr-sub').textContent='Ranked by '+metric+' over patent families with inventors or assignees in the lab’s host country. Bar colour uses the same world-average bins as the map; brackets give the number of families behind each average. Hover over a bar for the lab’s details — with clickable sources and Espacenet searches, as on the map.';
  const max=(top.length&&top[0].v>0)?top[0].v:1;
- document.getElementById('qr-chart').innerHTML=top.map(e=>{
+ QRTOP=top;
+ document.getElementById('qr-chart').innerHTML=top.map((e,i)=>{
   const val=QUAL==='cites'?Number(e.v).toFixed(2):fmtM(e.v);
-  const pns=QSCOPE==='green'?(e.d.pat_g_pns||e.d.pat_pns):e.d.pat_pns;
-  const inner='<div class="blab" title="'+esc(e.firm)+' — '+esc(e.country)+'">'+esc(e.firm)+' — '+esc(e.country)+'</div>'+
+  return '<div class="brow" data-i="'+i+'"><div class="blab">'+esc(e.firm)+' — '+esc(e.country)+'</div>'+
    '<div class="btrack"><div class="bfill" style="width:'+Math.max(2,100*e.v/max).toFixed(1)+'%;background:'+colorFor(e.d,'quality')+'"></div></div>'+
-   '<div class="bval">'+val+' <span style="color:#8a8f98;font-weight:400">('+e.n+')</span></div>';
-  if(pns&&pns.length){
-   const url='https://worldwide.espacenet.com/patent/search?q='+pns.map(p=>'pn%3D'+p).join('%20OR%20');
-   return '<a class="brow" href="'+url+'" target="_blank" rel="noopener" style="text-decoration:none;color:inherit" title="Open the top '+(QSCOPE==='green'?'green-tech ':'')+'patents behind this bar on Espacenet ↗">'+inner+'</a>';}
-  return '<div class="brow">'+inner+'</div>';}).join('');
+   '<div class="bval">'+val+' <span style="color:#8a8f98;font-weight:400">('+e.n+')</span></div></div>';}).join('');
+ document.querySelectorAll('#qr-chart .brow').forEach(row=>{
+  row.addEventListener('mouseenter',function(){qrShow(this);});
+  row.addEventListener('mouseleave',qrHide);
+  row.addEventListener('click',function(ev){ev.stopPropagation();qrShow(this);});});
 }
+// hover card for the ranking bars: same content as the map popups (incl. source links)
+let QRTOP=[],qrHideT=null;
+const qrPop=document.createElement('div'); qrPop.id='qr-pop'; document.body.appendChild(qrPop);
+function qrShow(row){clearTimeout(qrHideT);
+ const e=QRTOP[+row.dataset.i]; if(!e)return;
+ qrPop.innerHTML=popup(e.d);
+ qrPop.style.display='block';
+ const r=row.getBoundingClientRect();
+ let x=r.left+window.scrollX+Math.min(300,r.width*0.25), y=r.bottom+window.scrollY+4;
+ qrPop.style.left='0px'; qrPop.style.top='0px';                      // reset before measuring
+ const w=qrPop.offsetWidth,h=qrPop.offsetHeight;
+ if(x+w>window.scrollX+document.documentElement.clientWidth-12) x=Math.max(window.scrollX+12,window.scrollX+document.documentElement.clientWidth-w-12);
+ if(r.bottom+4+h>document.documentElement.clientHeight) y=r.top+window.scrollY-h-4;  // flip above if no room below
+ qrPop.style.left=x+'px'; qrPop.style.top=y+'px';}
+function qrHide(){qrHideT=setTimeout(function(){qrPop.style.display='none';},280);}
+qrPop.addEventListener('mouseenter',function(){clearTimeout(qrHideT);});
+qrPop.addEventListener('mouseleave',qrHide);
+document.addEventListener('click',function(ev){if(!qrPop.contains(ev.target))qrPop.style.display='none';});
 document.getElementById('qualrankN').addEventListener('change',function(){updateQualRank();syncURL();});
 function _excl(a,b){document.getElementById(a).addEventListener('change',function(){if(this.checked)document.getElementById(b).checked=false;});}
 _excl('bySector','byRegion');_excl('byRegion','bySector');
