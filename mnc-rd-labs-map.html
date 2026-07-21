@@ -36,6 +36,33 @@
  .leaflet-popup-content{font-size:13px;line-height:1.5;max-width:320px}
  .leaflet-popup-content .src a{display:block;font-size:11.5px;margin-top:2px;word-break:break-all}
  footer{padding:16px 26px 40px;font-size:12px;color:#79808d;border-top:1px solid #eceef2} a{color:#1668c4}
+ #spotlight .sp-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;font-family:"Lato","Helvetica Neue",Helvetica,Arial,sans-serif}
+ #spotlight .sp-kicker{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#8a919b}
+ #spotlight .sp-kicker span{color:#c2c7cf}
+ #spotlight .sp-nav{display:flex;align-items:center;gap:8px}
+ #spotlight .sp-dots{display:flex;gap:6px}
+ #spotlight .sp-dot{width:8px;height:8px;border-radius:50%;background:#d3d8de;border:none;padding:0;cursor:pointer}
+ #spotlight .sp-dot.on{background:var(--sp-accent,#1b9e77)}
+ #spotlight .sp-arrow{background:#fff;border:1px solid #d7dbe0;border-radius:7px;width:30px;height:30px;cursor:pointer;font-size:17px;line-height:1;color:#555}
+ #spotlight .sp-arrow:hover{background:#f2f4f7}
+ #spotlight .sp-card{border:1px solid #cfe6dc;border-left:5px solid var(--sp-accent,#1b9e77);border-radius:12px;background:linear-gradient(100deg,#f6fbf9,#ffffff 62%);padding:18px 22px 20px}
+ #spotlight .sp-eyebrow{font-family:"Lato","Helvetica Neue",Helvetica,Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--sp-accent,#1b9e77)}
+ #spotlight h2.sp-title{font-size:20px;font-weight:700;color:#333;margin:5px 0 2px}
+ #spotlight .sp-sub{font-size:13px;color:#6a7178;margin-bottom:13px}
+ #spotlight .sp-sub .hub{color:var(--sp-accent,#1b9e77);font-weight:600}
+ #spotlight .sp-chips{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;font-family:"Lato","Helvetica Neue",Helvetica,Arial,sans-serif}
+ #spotlight .sp-chip{background:#f6f8fa;border:1px solid #eceef2;border-radius:10px;padding:7px 13px}
+ #spotlight .sp-chip b{font-size:17px;color:#1d1d1d}
+ #spotlight .sp-chip.accent b{color:var(--sp-accent,#1b9e77)}
+ #spotlight .sp-chip.status{background:#eaf6f0;border-color:#b8e0cd}
+ #spotlight .sp-chip.status b{font-size:13px;color:#1b7a53}
+ #spotlight .sp-chip .lbl{font-size:11.5px;color:#69707d}
+ #spotlight .sp-chip .muted{color:#a6abb5}
+ #spotlight p.sp-body{font-size:14px;line-height:1.62;margin:0 0 10px}
+ #spotlight p.sp-note{font-size:12.5px;color:#69707d;margin:0 0 13px}
+ #spotlight .sp-actions{display:flex;flex-wrap:wrap;align-items:center;gap:14px;font-family:"Lato","Helvetica Neue",Helvetica,Arial,sans-serif;font-size:12.5px}
+ #spotlight .sp-btn{background:var(--sp-accent,#1b9e77);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-weight:600;cursor:pointer;font-family:inherit}
+ #spotlight .sp-actions .ev{color:#a6abb5}
 </style></head><body>
 <header>
  <h1>EMDERLT</h1>
@@ -155,25 +182,15 @@
  </div>
 </section>
 <section id="spotlight" style="padding:22px 26px 8px;border-top:1px solid #eceef2">
- <div style="border:1px solid #cfe6dc;border-left:5px solid #1b9e77;border-radius:12px;background:linear-gradient(100deg,#f2faf6,#ffffff 62%);padding:18px 22px 20px">
-  <div style="font-family:'Lato','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#1b9e77">Spotlight &middot; from high-value science to a product in the field</div>
-  <h2 style="font-size:20px;font-weight:700;color:#333;margin:5px 0 2px">CONICET &mdash; and the HB4 drought-tolerance trait</h2>
-  <div style="font-size:13px;color:#6a7178;margin-bottom:13px">National Scientific &amp; Technical Research Council &middot; Buenos Aires, Argentina &middot; <span style="color:#1b9e77;font-weight:600">Other&nbsp;EMDE</span></div>
-  <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;font-family:'Lato','Helvetica Neue',Helvetica,Arial,sans-serif">
-   <div style="background:#f6f8fa;border:1px solid #eceef2;border-radius:10px;padding:7px 13px"><b style="font-size:17px;color:#1d1d1d">417</b><br><span style="font-size:11.5px;color:#69707d">developing-country patent families</span></div>
-   <div style="background:#f6f8fa;border:1px solid #eceef2;border-radius:10px;padding:7px 13px"><b style="font-size:17px;color:#1b9e77">$8.3M</b><br><span style="font-size:11.5px;color:#69707d">avg green-tech Patent&nbsp;Rank <span style="color:#a6abb5">(world avg&nbsp;$4.8M)</span></span></div>
-   <div style="background:#f6f8fa;border:1px solid #eceef2;border-radius:10px;padding:7px 13px"><b style="font-size:17px;color:#1b9e77">above&nbsp;avg</b><br><span style="font-size:11.5px;color:#69707d">green-tech citations &mdash; a proxy for knowledge&nbsp;spillovers</span></div>
-   <div style="background:#eaf6f0;border:1px solid #b8e0cd;border-radius:10px;padding:7px 13px"><b style="font-size:13px;color:#1b7a53">&#10003;&nbsp;DEPLOYED</b><br><span style="font-size:11.5px;color:#69707d">reached the market</span></div>
-  </div>
-  <p style="font-size:14px;line-height:1.62;margin:0 0 10px">CONICET is a case where both halves of the story line up. Its <b>green-technology</b> innovations attract above-average forward citations &mdash; this tool's proxy for <b>knowledge spillovers</b> &mdash; and carry an average <b>Patent Rank of $8.3M</b>, roughly 1.7&times; the global green-tech average. And at least one of them has travelled the whole way to a <b>market-ready product</b>: the <b>HB4</b> drought- and salinity-tolerance trait, built on a sunflower transcription-factor gene (<i>HaHB4</i>), was licensed to <b>Bioceres</b> and is now an approved, commercially grown seed trait in HB4 wheat and soybean across Argentina, Brazil and the United States.</p>
-  <p style="font-size:12.5px;color:#69707d;margin:0 0 13px">In short: high-spillover, high-value science from a developing-country public research council that did not stop at the lab bench. Some individual filings in the mapped family have since lapsed, but the licensed HB4 core is on the market.</p>
-  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:14px;font-family:'Lato','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12.5px">
-   <button type="button" onclick="spotlightShow()" style="background:#1b9e77;color:#fff;border:none;border-radius:7px;padding:8px 14px;font-weight:600;cursor:pointer;font-family:inherit">Show CONICET on the map &uarr;</button>
-   <span style="color:#a6abb5">Evidence:</span>
-   <a href="https://www.conicet.gov.ar/technology-against-drought-crosses-borders/" target="_blank" rel="noopener">CONICET &mdash; HB4 crosses borders</a>
-   <a href="https://www.ambito.com/negocios/con-patentes-del-conicet-se-crearon-26-startups-tres-anos-cinco-casos-disruptivos-n5825122" target="_blank" rel="noopener">26 CONICET spin-offs</a>
+ <div class="sp-head">
+  <div class="sp-kicker">Spotlight<span id="sp-count"></span></div>
+  <div class="sp-nav" id="sp-nav" style="display:none">
+   <div class="sp-dots" id="sp-dots"></div>
+   <button type="button" class="sp-arrow" id="sp-prev" aria-label="Previous spotlight">&lsaquo;</button>
+   <button type="button" class="sp-arrow" id="sp-next" aria-label="Next spotlight">&rsaquo;</button>
   </div>
  </div>
+ <div id="sp-slot"></div>
 </section>
 <footer>
  Method: every firm in the EU Industrial R&amp;D Investment Scoreboard is screened for a developing-country R&amp;D lab,
@@ -423,14 +440,74 @@ function syncURL(){const p=new URLSearchParams();
 map.on('moveend',syncURL);
 applyURLParams();
 draw();
-// ---- spotlight: recolour by green-tech Patent Rank and fly to CONICET (Buenos Aires) ----
-function spotlightShow(){
- var q=document.getElementById('qualSel'); if(q)q.value='ev';
- var s=document.getElementById('qualScope'); if(s)s.value='green';
- draw();
- var el=document.getElementById('map'); if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
- setTimeout(function(){try{map.setView([-34.5626,-58.4382],5);}catch(e){}},450);
+// ---- spotlights: a rotating showcase of standout labs. TO ADD ONE: append an object to SPOTLIGHTS.
+//      Each: {accent, eyebrow, title, sub, chips:[{v,label,accent?,status?}], body:[paragraphs],
+//      links:[{href,t}], map:{lat,lon,z,qual?,scope?}, mapLabel?}. Nav/auto-rotate appear once >1. ----
+const SPOTLIGHTS=[
+ {
+  accent:'#1b9e77',
+  eyebrow:'from high-value science to a product in the field',
+  title:'CONICET &mdash; and the HB4 drought-tolerance trait',
+  sub:'National Scientific &amp; Technical Research Council &middot; Buenos Aires, Argentina &middot; <span class="hub">Other&nbsp;EMDE</span>',
+  chips:[
+   {v:'417',label:'developing-country patent families'},
+   {v:'$8.3M',accent:true,label:'avg green-tech Patent&nbsp;Rank <span class="muted">(world avg&nbsp;$4.8M)</span>'},
+   {v:'above&nbsp;avg',accent:true,label:'green-tech citations &mdash; a proxy for knowledge&nbsp;spillovers'},
+   {v:'&#10003;&nbsp;DEPLOYED',status:true,label:'reached the market'}
+  ],
+  body:[
+   "CONICET is a case where both halves of the story line up. Its <b>green-technology</b> innovations attract above-average forward citations &mdash; this tool's proxy for <b>knowledge spillovers</b> &mdash; and carry an average <b>Patent Rank of $8.3M</b>, roughly 1.7&times; the global green-tech average. And at least one of them has travelled the whole way to a <b>market-ready product</b>: the <b>HB4</b> drought- and salinity-tolerance trait, built on a sunflower transcription-factor gene (<i>HaHB4</i>), was licensed to <b>Bioceres</b> and is now an approved, commercially grown seed trait in HB4 wheat and soybean across Argentina, Brazil and the United States.",
+   "In short: high-spillover, high-value science from a developing-country public research council that did not stop at the lab bench. Some individual filings in the mapped family have since lapsed, but the licensed HB4 core is on the market."
+  ],
+  links:[
+   {href:'https://www.conicet.gov.ar/technology-against-drought-crosses-borders/',t:'CONICET &mdash; HB4 crosses borders'},
+   {href:'https://www.ambito.com/negocios/con-patentes-del-conicet-se-crearon-26-startups-tres-anos-cinco-casos-disruptivos-n5825122',t:'26 CONICET spin-offs'}
+  ],
+  map:{lat:-34.5626,lon:-58.4382,z:5,qual:'ev',scope:'green'},
+  mapLabel:'Show CONICET on the map &uarr;'
+ }
+ // , { ...next spotlight here... }
+];
+let spIdx=0, spTimer=null;
+const spReduce=(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+function spRender(i){
+ if(!SPOTLIGHTS.length) return;
+ spIdx=((i%SPOTLIGHTS.length)+SPOTLIGHTS.length)%SPOTLIGHTS.length;
+ const s=SPOTLIGHTS[spIdx], multi=SPOTLIGHTS.length>1;
+ const chips=s.chips.map(c=>'<div class="sp-chip '+(c.status?'status':(c.accent?'accent':''))+'"><b>'+c.v+'</b><br><span class="lbl">'+c.label+'</span></div>').join('');
+ const body=s.body.map((p,k)=>'<p class="'+((s.body.length>1&&k===s.body.length-1)?'sp-note':'sp-body')+'">'+p+'</p>').join('');
+ const links=(s.links||[]).map(l=>'<a href="'+l.href+'" target="_blank" rel="noopener">'+l.t+'</a>').join(' ');
+ const btn=s.map?'<button type="button" class="sp-btn" onclick="spShowOnMap('+spIdx+')">'+(s.mapLabel||'Show on the map &uarr;')+'</button>':'';
+ document.getElementById('sp-slot').innerHTML=
+  '<div class="sp-card" style="--sp-accent:'+s.accent+'">'
+   +'<div class="sp-eyebrow">Spotlight &middot; '+s.eyebrow+'</div>'
+   +'<h2 class="sp-title">'+s.title+'</h2>'
+   +'<div class="sp-sub">'+s.sub+'</div>'
+   +'<div class="sp-chips">'+chips+'</div>'
+   +body
+   +'<div class="sp-actions">'+btn+(links?'<span class="ev">Evidence:</span> '+links:'')+'</div>'
+  +'</div>';
+ document.getElementById('sp-dots').innerHTML=multi?SPOTLIGHTS.map((_,k)=>'<button class="sp-dot '+(k===spIdx?'on':'')+'" onclick="spGo('+k+')" aria-label="Spotlight '+(k+1)+'"></button>').join(''):'';
+ document.getElementById('sp-count').textContent=multi?(' '+(spIdx+1)+' / '+SPOTLIGHTS.length):'';
+ const nav=document.getElementById('sp-nav'); if(nav) nav.style.display=multi?'':'none';
 }
+function spGo(i){spRender(i);spKick();}
+function spShowOnMap(i){
+ const s=SPOTLIGHTS[i]; if(!s||!s.map) return;
+ const q=document.getElementById('qualSel'); if(q&&s.map.qual)q.value=s.map.qual;
+ const sc=document.getElementById('qualScope'); if(sc&&s.map.scope)sc.value=s.map.scope;
+ draw();
+ const el=document.getElementById('map'); if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
+ setTimeout(function(){try{map.setView([s.map.lat,s.map.lon],s.map.z||5);}catch(e){}},450);
+}
+function spKick(){ if(spTimer){clearInterval(spTimer);spTimer=null;} if(SPOTLIGHTS.length>1&&!spReduce) spTimer=setInterval(function(){spRender(spIdx+1);},12000); }
+(function(){
+ const prev=document.getElementById('sp-prev'), next=document.getElementById('sp-next'), sec=document.getElementById('spotlight');
+ if(prev) prev.onclick=function(){spRender(spIdx-1);spKick();};
+ if(next) next.onclick=function(){spRender(spIdx+1);spKick();};
+ if(sec){ sec.addEventListener('mouseenter',function(){if(spTimer){clearInterval(spTimer);spTimer=null;}}); sec.addEventListener('mouseleave',spKick); }
+ spRender(0); spKick();
+})();
 // ---- distribution charts (computed live from the verified records) ----
 (function(){
  const VR=RECS.filter(d=>d.type==='verified');
