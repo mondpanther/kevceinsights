@@ -108,10 +108,10 @@
 </header>
 <div id="map"></div>
 <section id="qualrank" style="display:none;padding:18px 26px 4px;border-top:1px solid #eceef2">
- <style>#qr-chart .blab{width:280px} #qr-chart .bval{width:120px}
-  #qr-chart .brow{cursor:pointer}
-  #qr-chart .brow:hover .blab{text-decoration:underline;color:#1668c4}
-  #qr-chart .brow:hover .bfill{filter:brightness(1.15)}
+ <style>#qr-chart .blab{width:280px;cursor:pointer} #qr-chart .bval{width:120px}
+  #qr-chart .blab:hover{text-decoration:underline;color:#1668c4}
+  #qr-chart a.bbar{display:flex;flex:1;align-items:center;gap:8px;text-decoration:none;color:inherit;min-width:0}
+  #qr-chart a.bbar:hover .bfill{filter:brightness(1.2);box-shadow:0 0 0 1.5px #1668c4 inset}
   #qr-pop{position:absolute;z-index:2500;display:none;background:#fff;border-radius:9px;box-shadow:0 3px 16px rgba(0,0,0,.25);
    padding:11px 13px;max-width:350px;font-family:'Lato','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;line-height:1.5}
   #qr-pop .src a{display:block;font-size:11.5px;margin-top:2px;word-break:break-all}</style>
@@ -276,18 +276,22 @@ function updateQualRank(){
  const top=[...seen.values()].sort((a,b)=>(b.v-a.v)||(b.n-a.n)).slice(0,N);
  const metric=(QSCOPE==='green'?'green-tech ':'')+(QUAL==='cites'?'average forward citations':'average Patent Rank ($M)');
  document.getElementById('qr-title').textContent='Top '+top.length+' institutes by '+metric;
- document.getElementById('qr-sub').textContent='Ranked by '+metric+' over patent families with inventors or assignees in the lab’s host country. Bar colour uses the same world-average bins as the map; brackets give the number of families behind each average. Hover over a bar for the lab’s details — with clickable sources and Espacenet searches, as on the map.';
+ document.getElementById('qr-sub').textContent='Ranked by '+metric+' over patent families with inventors or assignees in the lab’s host country. Bar colour uses the same world-average bins as the map; brackets give the number of families behind each average. Hover over an institute’s name for the lab’s details (with clickable sources, as on the map); click a bar to open the '+(QSCOPE==='green'?'green-tech ':'')+'patents behind it on Espacenet.';
  const max=(top.length&&top[0].v>0)?top[0].v:1;
  QRTOP=top;
  document.getElementById('qr-chart').innerHTML=top.map((e,i)=>{
   const val=QUAL==='cites'?Number(e.v).toFixed(2):fmtM(e.v);
-  return '<div class="brow" data-i="'+i+'"><div class="blab">'+esc(e.firm)+' — '+esc(e.country)+'</div>'+
-   '<div class="btrack"><div class="bfill" style="width:'+Math.max(2,100*e.v/max).toFixed(1)+'%;background:'+colorFor(e.d,'quality')+'"></div></div>'+
-   '<div class="bval">'+val+' <span style="color:#8a8f98;font-weight:400">('+e.n+')</span></div></div>';}).join('');
- document.querySelectorAll('#qr-chart .brow').forEach(row=>{
-  row.addEventListener('mouseenter',function(ev){qrShow(this,ev);});
-  row.addEventListener('mouseleave',qrHide);
-  row.addEventListener('click',function(ev){ev.stopPropagation();qrShow(this,ev);});});
+  const bar='<div class="btrack"><div class="bfill" style="width:'+Math.max(2,100*e.v/max).toFixed(1)+'%;background:'+colorFor(e.d,'quality')+'"></div></div>'+
+   '<div class="bval">'+val+' <span style="color:#8a8f98;font-weight:400">('+e.n+')</span></div>';
+  const pns=QSCOPE==='green'?e.d.pat_g_pns:e.d.pat_pns;
+  const wrapped=(pns&&pns.length)
+   ?'<a class="bbar" href="https://worldwide.espacenet.com/patent/search?q='+pns.map(p=>'pn%3D'+p).join('%20OR%20')+'" target="_blank" rel="noopener" title="Open the '+(pns.length<e.n?('top '+pns.length+' of the '+e.n+' '):(e.n+' '))+(QSCOPE==='green'?'green-tech ':'')+'patents behind this bar on Espacenet ↗">'+bar+'</a>'
+   :'<div class="bbar" style="display:flex;flex:1;align-items:center;gap:8px;min-width:0">'+bar+'</div>';
+  return '<div class="brow" data-i="'+i+'"><div class="blab" title="Hover for the lab&#39;s details">'+esc(e.firm)+' — '+esc(e.country)+'</div>'+wrapped+'</div>';}).join('');
+ document.querySelectorAll('#qr-chart .blab').forEach(lab=>{
+  lab.addEventListener('mouseenter',function(ev){qrShow(this.closest('.brow'),ev);});
+  lab.addEventListener('mouseleave',qrHide);
+  lab.addEventListener('click',function(ev){ev.stopPropagation();qrShow(this.closest('.brow'),ev);});});
 }
 // hover card for the ranking bars: same content as the map popups (incl. source links)
 let QRTOP=[],qrHideT=null,qrSwitchT=null,QRCUR=-1;
