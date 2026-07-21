@@ -53,9 +53,10 @@
  #spotlight .sp-chips{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;font-family:"Lato","Helvetica Neue",Helvetica,Arial,sans-serif}
  #spotlight .sp-chip{background:#f6f8fa;border:1px solid #eceef2;border-radius:10px;padding:7px 13px}
  #spotlight .sp-chip b{font-size:17px;color:#1d1d1d}
- #spotlight .sp-chip.accent b{color:var(--sp-accent,#1b9e77)}
- #spotlight .sp-chip.status{background:#eaf6f0;border-color:#b8e0cd}
- #spotlight .sp-chip.status b{font-size:13px;color:#1b7a53}
+ #spotlight .sp-chip.green b{color:#1b9e77}
+ #spotlight .sp-chip.hi b{color:#1668c4}
+ #spotlight .sp-chip.status{background:#eef4fb;border-color:#cfe0f5}
+ #spotlight .sp-chip.status b{font-size:13px;color:#1668c4}
  #spotlight .sp-chip .lbl{font-size:11.5px;color:#69707d}
  #spotlight .sp-chip .muted{color:#a6abb5}
  #spotlight p.sp-body{font-size:14px;line-height:1.62;margin:0 0 10px}
@@ -441,7 +442,8 @@ map.on('moveend',syncURL);
 applyURLParams();
 draw();
 // ---- spotlights: a rotating showcase of standout labs. TO ADD ONE: append an object to SPOTLIGHTS.
-//      Each: {accent, eyebrow, title, sub, chips:[{v,label,accent?,status?}], body:[paragraphs],
+//      Each: {accent, eyebrow, title, sub, chips:[{v,label,green?,hi?,status?}], body:[paragraphs],
+//      chip colour: green? = green-tech metric (green); hi? = other notable number (blue); status? = deployed badge (blue).
 //      links:[{href,t}], map:{lat,lon,z,qual?,scope?}, mapLabel?}. Nav/auto-rotate appear once >1. ----
 const SPOTLIGHTS=[
  {
@@ -452,7 +454,7 @@ const SPOTLIGHTS=[
   chips:[
    {v:'417',label:'developing-country innovations <span class="muted">(44 of them green tech)</span>'},
    {v:'$2.8M',label:'avg Patent&nbsp;Rank, <b>all</b> innovations <span class="muted">(world&nbsp;$4.6M)</span>'},
-   {v:'$8.3M',accent:true,label:'avg Patent&nbsp;Rank, <b>green</b> tech <span class="muted">(world&nbsp;$4.8M &mdash; ~1.7&times;)</span>'},
+   {v:'$8.3M',green:true,label:'avg Patent&nbsp;Rank, <b>green</b> tech <span class="muted">(world&nbsp;$4.8M &mdash; ~1.7&times;)</span>'},
    {v:'&#10003;&nbsp;DEPLOYED',status:true,label:'reached the market'}
   ],
   body:[
@@ -473,8 +475,8 @@ const SPOTLIGHTS=[
   sub:'Braskem Technology &amp; Innovation Center &middot; Triunfo, Brazil &middot; <span class="hub">Other&nbsp;EMDE</span>',
   chips:[
    {v:'171',label:'developing-country innovations <span class="muted">(32 of them green tech)</span>'},
-   {v:'$5.6M',accent:true,label:'avg Patent&nbsp;Rank, <b>all</b> innovations <span class="muted">(world&nbsp;$4.6M)</span>'},
-   {v:'$12.0M',accent:true,label:'avg Patent&nbsp;Rank, <b>green</b> tech <span class="muted">(world&nbsp;$4.8M &mdash; ~2.5&times;)</span>'},
+   {v:'$5.6M',hi:true,label:'avg Patent&nbsp;Rank, <b>all</b> innovations <span class="muted">(world&nbsp;$4.6M)</span>'},
+   {v:'$12.0M',green:true,label:'avg Patent&nbsp;Rank, <b>green</b> tech <span class="muted">(world&nbsp;$4.8M &mdash; ~2.5&times;)</span>'},
    {v:'&#10003;&nbsp;DEPLOYED',status:true,label:'shipping since 2010'}
   ],
   body:[
@@ -495,8 +497,8 @@ const SPOTLIGHTS=[
   sub:'Infineon Malaysia (Kulim &amp; Melaka) &middot; Malaysia &middot; <span class="hub">Other&nbsp;EMDE</span>',
   chips:[
    {v:'167',label:'developing-country innovations <span class="muted">(just 2 green tech)</span>'},
-   {v:'~2.9&times;',accent:true,label:'forward citations vs the world average &mdash; exceptionally high knowledge&nbsp;spillovers'},
-   {v:'$5.0M',accent:true,label:'avg Patent&nbsp;Rank, <b>all</b> innovations <span class="muted">(world&nbsp;$4.6M)</span>'},
+   {v:'~2.9&times;',hi:true,label:'forward citations vs the world average &mdash; exceptionally high knowledge&nbsp;spillovers'},
+   {v:'$5.0M',hi:true,label:'avg Patent&nbsp;Rank, <b>all</b> innovations <span class="muted">(world&nbsp;$4.6M)</span>'},
    {v:'&#10003;&nbsp;DEPLOYED',status:true,label:'shipping from the Kulim/Melaka fabs'}
   ],
   body:[
@@ -517,7 +519,7 @@ function spRender(i){
  if(!SPOTLIGHTS.length) return;
  spIdx=((i%SPOTLIGHTS.length)+SPOTLIGHTS.length)%SPOTLIGHTS.length;
  const s=SPOTLIGHTS[spIdx], multi=SPOTLIGHTS.length>1;
- const chips=s.chips.map(c=>'<div class="sp-chip '+(c.status?'status':(c.accent?'accent':''))+'"><b>'+c.v+'</b><br><span class="lbl">'+c.label+'</span></div>').join('');
+ const chips=s.chips.map(c=>'<div class="sp-chip '+(c.status?'status':(c.green?'green':(c.hi?'hi':'')))+'"><b>'+c.v+'</b><br><span class="lbl">'+c.label+'</span></div>').join('');
  const body=s.body.map((p,k)=>'<p class="'+((s.body.length>1&&k===s.body.length-1)?'sp-note':'sp-body')+'">'+p+'</p>').join('');
  const links=(s.links||[]).map(l=>'<a href="'+l.href+'" target="_blank" rel="noopener">'+l.t+'</a>').join(' ');
  const btn=s.map?'<button type="button" class="sp-btn" onclick="spShowOnMap('+spIdx+')">'+(s.mapLabel||'Show on the map &uarr;')+'</button>':'';
