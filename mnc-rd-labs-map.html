@@ -74,10 +74,9 @@
  @media(max-width:900px){#pagenav{display:none}}
 </style></head><body>
 <nav id="pagenav" aria-label="Jump to section">
- <div class="nav-h">Jump to</div>
- <a href="#map" onclick="document.getElementById('map').scrollIntoView({behavior:'smooth',block:'start'});return false;">The map</a>
- <a href="#charts" onclick="document.getElementById('charts').scrollIntoView({behavior:'smooth',block:'start'});return false;">Lab breakdown</a>
- <a href="#spotlight" onclick="document.getElementById('spotlight').scrollIntoView({behavior:'smooth',block:'start'});return false;">Spotlights</a>
+ <a href="#map" title="The map" onclick="document.getElementById('map').scrollIntoView({behavior:'smooth',block:'start'});return false;"><span class="label">The map</span><span class="dot"></span></a>
+ <a href="#charts" title="Lab breakdown" onclick="document.getElementById('charts').scrollIntoView({behavior:'smooth',block:'start'});return false;"><span class="label">Lab breakdown</span><span class="dot"></span></a>
+ <a href="#spotlight" title="Spotlights" onclick="document.getElementById('spotlight').scrollIntoView({behavior:'smooth',block:'start'});return false;"><span class="label">Spotlights</span><span class="dot"></span></a>
 </nav>
 <header>
  <h1>EMDERLT</h1>
