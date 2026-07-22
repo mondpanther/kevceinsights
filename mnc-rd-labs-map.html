@@ -64,12 +64,12 @@
  #spotlight .sp-actions{display:flex;flex-wrap:wrap;align-items:center;gap:14px;font-family:"Lato","Helvetica Neue",Helvetica,Arial,sans-serif;font-size:12.5px}
  #spotlight .sp-btn{background:var(--sp-accent,#1b9e77);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-weight:600;cursor:pointer;font-family:inherit}
  #spotlight .sp-actions .ev{color:#a6abb5}
- #pagenav{position:fixed;right:15px;top:50%;transform:translateY(-50%);z-index:1500;display:flex;flex-direction:column;gap:11px;align-items:flex-end}
- #pagenav a{display:flex;align-items:center;gap:9px;text-decoration:none;cursor:pointer}
- #pagenav .label{background:#fff;border:1px solid #e3e7ec;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.13);padding:5px 11px;font:600 12.5px/1 "Lato","Helvetica Neue",Helvetica,Arial,sans-serif;color:#48505e;white-space:nowrap;opacity:0;transform:translateX(8px);transition:opacity .15s,transform .15s;pointer-events:none}
- #pagenav .dot{width:12px;height:12px;border-radius:50%;background:#c2c7cf;box-shadow:0 0 0 3px #fff,0 0 0 4px #d3d8de;flex:none;transition:background .15s}
+ #pagenav{position:fixed;right:15px;top:50%;transform:translateY(-50%);z-index:1500;display:flex;flex-direction:column;gap:13px;align-items:flex-end}
+ #pagenav a{position:relative;display:block;cursor:pointer;text-decoration:none;line-height:0}
+ #pagenav .dot{display:block;width:12px;height:12px;border-radius:50%;background:#c2c7cf;box-shadow:0 0 0 3px #fff,0 0 0 4px #d3d8de;transition:background .15s}
  #pagenav a:hover .dot{background:#1668c4}
- #pagenav:hover .label,#pagenav a:focus .label{opacity:1;transform:none}
+ #pagenav .label{position:absolute;right:100%;top:50%;margin-right:11px;transform:translateY(-50%) translateX(8px);background:#fff;border:1px solid #e3e7ec;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.13);padding:5px 11px;font:600 12.5px/1 "Lato","Helvetica Neue",Helvetica,Arial,sans-serif;color:#48505e;white-space:nowrap;opacity:0;transition:opacity .15s,transform .15s;pointer-events:none}
+ #pagenav:hover .label,#pagenav a:focus .label{opacity:1;transform:translateY(-50%)}
  #pagenav a:hover .label{color:#1668c4}
  @media(max-width:900px){#pagenav{display:none}}
 </style></head><body>
