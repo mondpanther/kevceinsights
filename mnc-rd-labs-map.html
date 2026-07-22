@@ -74,11 +74,12 @@
  #pagenav a:hover .dot{background:#1668c4}
  #pagenav .label{position:absolute;right:100%;top:50%;margin-right:11px;transform:translateY(-50%);background:#fff;border:1px solid #e3e7ec;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.13);padding:5px 11px;font:600 12.5px/1 "Lato","Helvetica Neue",Helvetica,Arial,sans-serif;color:#48505e;white-space:nowrap}
  #pagenav a:hover .label{color:#1668c4}
- #pagenav #pnHide{background:none;border:none;cursor:pointer;font:600 11px/1 "Lato","Helvetica Neue",Helvetica,Arial,sans-serif;color:#8a919b;padding:3px 4px;margin-top:2px}
+ #pagenav .label{transition:opacity .15s,transform .15s}
+ #pagenav.collapsed .label{opacity:0;transform:translateY(-50%) translateX(8px);pointer-events:none}
+ #pagenav.collapsed:hover .label,#pagenav.collapsed a:focus .label{opacity:1;transform:translateY(-50%)}
+ #pagenav #pnHide{background:none;border:none;cursor:pointer;font:600 11px/1 "Lato","Helvetica Neue",Helvetica,Arial,sans-serif;color:#8a919b;padding:3px 4px;margin-top:2px;white-space:nowrap}
  #pagenav #pnHide:hover{color:#1668c4}
- #pnShow{position:fixed;right:15px;top:50%;transform:translateY(-50%);z-index:1500;display:none;background:#fff;border:1px solid #e3e7ec;border-radius:9px;box-shadow:0 2px 10px rgba(0,0,0,.14);padding:8px 10px;font:600 14px/1 "Lato","Helvetica Neue",Helvetica,Arial,sans-serif;color:#48505e;cursor:pointer}
- #pnShow:hover{color:#1668c4}
- @media(max-width:900px){#pagenav,#pnShow{display:none !important}}
+ @media(max-width:900px){#pagenav{display:none !important}}
 </style></head><body>
 <nav id="pagenav" aria-label="Jump to section">
  <a href="#map" title="The map" onclick="document.getElementById('map').scrollIntoView({behavior:'smooth',block:'start'});return false;"><span class="label">The map</span><span class="dot"></span></a>
@@ -88,7 +89,6 @@
  <a href="#method" title="Method &amp; data" onclick="document.getElementById('method').scrollIntoView({behavior:'smooth',block:'start'});return false;"><span class="label">Method &amp; data</span><span class="dot"></span></a>
  <button id="pnHide" type="button" title="Hide this menu">Hide menu ✕</button>
 </nav>
-<button id="pnShow" type="button" title="Show the section menu">☰</button>
 <header>
  <div class="titlerow">
   <img class="sitelogo" src="emderlt-logo.svg" alt="EMDERLT logo">
@@ -439,13 +439,14 @@ function downloadCSV(){
  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='emderlt_labs.csv';
  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5000);}
 document.getElementById('dlBtn').addEventListener('click',downloadCSV);
-// ---- section menu (pagenav): shown by default, hide/show with persistence ----
+// ---- section menu (pagenav): labels shown by default; collapsing keeps the dots ----
 (function(){
- var nav=document.getElementById('pagenav'),show=document.getElementById('pnShow');
- function set(open){nav.style.display=open?'':'none';show.style.display=open?'none':'';
+ var nav=document.getElementById('pagenav'),btn=document.getElementById('pnHide');
+ function set(open){nav.classList.toggle('collapsed',!open);
+  btn.textContent=open?'Hide menu \u2715':'Pin menu';
+  btn.title=open?'Collapse to dots (labels reappear on hover)':'Keep the labels always visible';
   try{localStorage.setItem('emderlt-pagenav',open?'1':'0');}catch(e){}}
- document.getElementById('pnHide').addEventListener('click',function(){set(false);});
- show.addEventListener('click',function(){set(true);});
+ btn.addEventListener('click',function(){set(nav.classList.contains('collapsed'));});
  var pref=null; try{pref=localStorage.getItem('emderlt-pagenav');}catch(e){}
  set(pref==null?true:pref==='1');
  function pnSync(){var a=document.getElementById('pn-qualrank');if(!a)return;
