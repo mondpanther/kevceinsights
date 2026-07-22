@@ -234,22 +234,26 @@ const HUBC={China:'#d95f02',India:'#7570b3',Other:'#1b9e77'};
 const REGIONS=[...new Set(RECS.filter(d=>d.region).map(d=>d.region))].sort();
 const PAL=['#1b9e77','#d95f02','#7570b3','#e7298a','#66a61e','#e6ab02','#a6761d','#1f78b4','#b15928','#6a3d9a'];
 const REGC={};REGIONS.forEach((r,i)=>REGC[r]=PAL[i%PAL.length]);
-const SECTORS=['Software & IT','Pharma, biotech & medtech','Automotive','Semiconductors','Electronics & components','Energy & batteries','Industrial & machinery','Chemicals & materials','Telecom & networking','Consumer, food & agri','Aerospace & defence','University research institute','Other'];
-const SECTC={'Software & IT':'#1f77b4','Pharma, biotech & medtech':'#d62728','Automotive':'#2ca02c','Semiconductors':'#9467bd','Electronics & components':'#ff7f0e','Energy & batteries':'#bcbd22','Industrial & machinery':'#8c564b','Chemicals & materials':'#17becf','Telecom & networking':'#e377c2','Consumer, food & agri':'#7f7f7f','Aerospace & defence':'#393b79','University research institute':'#5254a3','Other':'#aaaaaa'};
+const SECTORS=['Software & IT','Pharma, biotech & medtech','Automotive','Semiconductors','Electronics & components','Energy & batteries','Industrial & machinery','Chemicals & materials','Telecom & networking','Consumer, food & agri','Aerospace & defence','University research institute','Financial services','Media & marketing','Other'];
+const SECTC={'Software & IT':'#1f77b4','Pharma, biotech & medtech':'#d62728','Automotive':'#2ca02c','Semiconductors':'#9467bd','Electronics & components':'#ff7f0e','Energy & batteries':'#bcbd22','Industrial & machinery':'#8c564b','Chemicals & materials':'#17becf','Telecom & networking':'#e377c2','Consumer, food & agri':'#7f7f7f','Aerospace & defence':'#393b79','University research institute':'#5254a3','Financial services':'#637939','Media & marketing':'#e7ba52','Other':'#aaaaaa'};
 function sectorBucket(s){s=(s||'').toLowerCase();
  if(/universi|public research|polytechn|academy|\bcollege\b|research council|research institute|national lab/.test(s))return 'University research institute';
+ if(/insurance|reinsur|banking|brokerage|wealth manage|asset manage|financial servic/.test(s))return 'Financial services';
+ if(/advertis|marketing|\bmedia\b|public relations|creative agenc|adtech/.test(s))return 'Media & marketing';
  if(/pharma|biotech|biolog|vaccine|medical|health|drug|life|diagnostic|eye care|medtech|tcm|genomic/.test(s))return 'Pharma, biotech & medtech';
- if(/semiconduct|chip|foundry|osat|wafer|\beda\b|silicon/.test(s))return 'Semiconductors';
- if(/software|saas|cloud|cyber|game|internet|analytics|fintech|financial|payment|\bit\b/.test(s))return 'Software & IT';
+ if(/semiconduct|chip|foundry|osat|wafer|\beda\b|silicon|integrated circuit|ic design|mixed-signal/.test(s))return 'Semiconductors';
+ if(/software|saas|cloud|cyber|game|internet|analytics|fintech|payment|\bit\b/.test(s))return 'Software & IT';
  if(/auto|vehicle|motor|truck|powertrain|tyre|tire|mobility|wheel/.test(s))return 'Automotive';
  if(/aerospace|defen|aviation|aircraft|helicopter/.test(s))return 'Aerospace & defence';
- if(/telecom|network|comms|communicat/.test(s))return 'Telecom & networking';
+ if(/telecom|network|comms|communicat|wireless|\biot\b/.test(s))return 'Telecom & networking';
  if(/energy|solar|oil|gas|nuclear|grid|power|wind|renewable|batter|fuel cell/.test(s))return 'Energy & batteries';
  if(/chemical|material|polymer|coating|silicone|glass|adhesive|ceramic/.test(s))return 'Chemicals & materials';
- if(/electronic|display|component|connector|optic|acoustic|thermal|sensor|appliance|imaging|printing|lighting|tech hardware|technology|hardware|storage|surveillance|instrument|measurement|infrastructure|electrical/.test(s))return 'Electronics & components';
- if(/industrial|machinery|automation|engineering|construction|steel|metal|mining|hydraulic|rail|elevator|filtration|bearing|robot|hvac|climate/.test(s))return 'Industrial & machinery';
- if(/food|beverage|nutrition|dairy|cosmetic|personal|flavor|fragrance|household|tools|goods|agri|consumer/.test(s))return 'Consumer, food & agri';
+ if(/electronic|display|component|connector|optic|acoustic|thermal|sensor|sensing|camera|appliance|imaging|printing|lighting|tech hardware|technology|hardware|storage|surveillance|instrument|measurement|infrastructure|electrical/.test(s))return 'Electronics & components';
+ if(/industrial|machinery|automation|engineering|construction|steel|metal|mining|hydraulic|rail|elevator|filtration|bearing|robot|hvac|climate|parking|attendance/.test(s))return 'Industrial & machinery';
+ if(/food|beverage|nutrition|dairy|cosmetic|personal|flavor|fragrance|household|tools|goods|agri|consumer|footwear|apparel|textile|garment|intimates|clothing|shoe/.test(s))return 'Consumer, food & agri';
  return 'Other';}
+// classify a record: use its sector field, else fall back to firm+lab+note text so placeholder/blank/newly-added entries still auto-classify
+function sectorOf(d){var b=sectorBucket(d.sector); if(b!=='Other')return b; return sectorBucket((d.firm||'')+' '+(d.lab||'')+' '+(d.note||''));}
 const map=L.map('map',{worldCopyJump:true,scrollWheelZoom:false}).setView([20,55],2);
 // wheel/trackpad scrolls the PAGE over the map; click the map to enable zoom, click away to release
 map.on('focus',function(){map.scrollWheelZoom.enable();});
@@ -262,7 +266,7 @@ const QTH=[0.25,0.5,1,2,4];         // bin edges as ratio to the world average
 let QUAL='none',QSCOPE='all',QK=null,QW=null;  // metric, scope, record key, world-average anchor
 function colorFor(d,mode){
  if(mode==='quality'){const r=d[QK]/QW;let i=0;while(i<5&&r>QTH[i])i++;return QCOLS[i];}
- if(mode==='sector')return SECTC[sectorBucket(d.sector)]||'#aaaaaa';if(mode==='region')return REGC[d.region]||'#9aa1ab';return HUBC[d.hub];}
+ if(mode==='sector')return SECTC[sectorOf(d)]||'#aaaaaa';if(mode==='region')return REGC[d.region]||'#9aa1ab';return HUBC[d.hub];}
 function sz(d){if(d.size_value===''||d.size_value==null)return '';let v=Number(d.size_value);return '<br><b>~'+(isNaN(v)?d.size_value:v.toLocaleString())+'</b> '+esc(d.size_metric||'');}
 function tip(d){ let q='';
  if(QUAL!=='none'){ if(d[QK]!=null&&QW!=null) q='<br><b>'+(QUAL==='cites'?d[QK]:fmtM(d[QK]))+'</b> '+(QSCOPE==='green'?'green-tech ':'')+(QUAL==='cites'?'avg citations':'avg Patent Rank')+' &middot; <b>'+(d[QK]/QW).toFixed(2)+'&times;</b> world avg';
@@ -415,7 +419,7 @@ function buildLegend(mode){let h;
   const LBL=['&lt; &frac14;&times; world avg','&frac14;&ndash;&frac12;&times;','&frac12;&ndash;1&times;','1&ndash;2&times;','2&ndash;4&times;','&gt; 4&times; world avg'];
   for(let i=0;i<6;i++) h+='<div><i style="background:'+QCOLS[i]+'"></i>'+LBL[i]+'</div>';
   h+='<div><i style="background:#fff;border:1.5px solid #333"></i>No '+(QSCOPE==='green'?'green ':'')+'innovations mapped to host country</div>';
- }else if(mode==='sector'){var pres=SECTORS.filter(function(s){return RECS.some(function(d){return d.type==='verified'&&sectorBucket(d.sector)===s;});});h='<div style="font-weight:600;margin-bottom:3px">Sector</div>'+pres.map(function(s){return '<div><i style="background:'+SECTC[s]+'"></i>'+esc(s)+'</div>';}).join('');}else if(mode==='region'){h='<div style="font-weight:600;margin-bottom:3px">World region</div>'+REGIONS.map(r=>'<div><i style="background:'+REGC[r]+'"></i>'+esc(r)+'</div>').join('');}else{h='<div style="font-weight:600;margin-bottom:3px">Host hub</div>'+['China','India','Other'].map(x=>'<div><i style="background:'+HUBC[x]+'"></i>'+(x==='Other'?'Other EMDE':x)+'</div>').join('');}
+ }else if(mode==='sector'){var pres=SECTORS.filter(function(s){return RECS.some(function(d){return d.type==='verified'&&sectorOf(d)===s;});});h='<div style="font-weight:600;margin-bottom:3px">Sector</div>'+pres.map(function(s){return '<div><i style="background:'+SECTC[s]+'"></i>'+esc(s)+'</div>';}).join('');}else if(mode==='region'){h='<div style="font-weight:600;margin-bottom:3px">World region</div>'+REGIONS.map(r=>'<div><i style="background:'+REGC[r]+'"></i>'+esc(r)+'</div>').join('');}else{h='<div style="font-weight:600;margin-bottom:3px">Host hub</div>'+['China','India','Other'].map(x=>'<div><i style="background:'+HUBC[x]+'"></i>'+(x==='Other'?'Other EMDE':x)+'</div>').join('');}
  h+='<div style="font-weight:600;margin:6px 0 3px;border-top:1px solid #eee;padding-top:5px">Marker</div><div><i style="background:#777"></i>Scoreboard-firm lab</div><div><i style="background:#777;box-shadow:0 0 0 2px #b8860b inset;border:1px solid #b8860b"></i>Assignee-pipeline lab</div>';legendDiv.innerHTML=h;}
 // ---- shareable URLs: controls (+ map view) <-> query parameters ----
 const URLCTL=[['cn','exclCN','chk'],['in','exclIN','chk'],['com','comOnly','chk'],['region','byRegion','chk'],['sector','bySector','chk'],
@@ -657,22 +661,7 @@ function spKick(){ if(spTimer){clearInterval(spTimer);spTimer=null;} if(SPOTLIGH
  }
  var cc={}; VR.forEach(function(d){cc[d.country]=(cc[d.country]||0)+1;});
  render('chart-country',cc,'#2c7fb8');
- function bucket(s){s=(s||'').toLowerCase();
-  if(/universi|public research|polytechn|academy|\bcollege\b|research council|research institute|national lab/.test(s))return 'University research institute';
-  if(/pharma|biotech|biolog|vaccine|medical|health|drug|life|diagnostic|eye care|medtech|tcm|genomic/.test(s))return 'Pharma, biotech & medtech';
-  if(/semiconduct|chip|foundry|osat|wafer|\beda\b|silicon/.test(s))return 'Semiconductors';
-  if(/software|saas|cloud|cyber|game|internet|analytics|fintech|financial|payment|\bit\b/.test(s))return 'Software & IT';
-  if(/auto|vehicle|motor|truck|powertrain|tyre|tire|mobility|wheel/.test(s))return 'Automotive';
-  if(/aerospace|defen|aviation|aircraft|helicopter/.test(s))return 'Aerospace & defence';
-  if(/telecom|network|comms|communicat/.test(s))return 'Telecom & networking';
-  if(/energy|solar|oil|gas|nuclear|grid|power|wind|renewable|battery|batteries|fuel cell/.test(s))return 'Energy & batteries';
-  if(/chemical|material|polymer|coating|silicone|glass|adhesive|ceramic/.test(s))return 'Chemicals & materials';
-  if(/electronic|display|component|connector|optic|acoustic|thermal|sensor|appliance|imaging|printing|lighting|tech hardware|technology|hardware|storage|surveillance|instrument|measurement|infrastructure|electrical/.test(s))return 'Electronics & components';
-  if(/industrial|machinery|automation|engineering|construction|steel|metal|mining|hydraulic|rail|elevator|filtration|bearing|robot|hvac|climate/.test(s))return 'Industrial & machinery';
-  if(/food|beverage|nutrition|dairy|cosmetic|personal|flavor|fragrance|household|tools|goods|agri|consumer/.test(s))return 'Consumer, food & agri';
-  return 'Other';
- }
- var sc={}; VR.forEach(function(d){var b=bucket(d.sector);sc[b]=(sc[b]||0)+1;});
+ var sc={}; VR.forEach(function(d){var b=sectorOf(d);sc[b]=(sc[b]||0)+1;});
  render('chart-sector',sc,'#1b9e77');
 })();
 </script></body></html>
