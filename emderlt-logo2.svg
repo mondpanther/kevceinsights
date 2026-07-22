@@ -1,49 +1,111 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 64" role="img" aria-label="EMDERLT logo — research symbols across the developing world">
-  <!-- EMDERLT mark v2: abstract world map, research glyphs placed in EMDE regions.
+  <!-- EMDERLT mark v2: dot-grid world map; research glyphs placed in EMDE regions.
        Glyph colours follow the map's hub palette: China #d95f02, India #7570b3, other EMDE #1b9e77 -->
-  <!-- ocean card -->
-  <rect x="2.5" y="5" width="91" height="54" rx="10" fill="#eef4f8" stroke="#1d1d1d" stroke-width="2.6"/>
-  <!-- abstract continents -->
-  <g fill="#d8dfd7">
-    <!-- North America -->
-    <path d="M10,15 C13,9.5 24,9 28.5,13 C32,16 30,20.5 26,23 C22,25.5 17.5,27.5 14.5,24.5 C11.5,21.5 8.5,18.5 10,15 Z"/>
-    <!-- South America -->
-    <path d="M25.5,30 C29.5,27 34,29 34,33 C34,39 32,46 29,50.5 C27,53.5 23.8,51.5 23.8,46.5 C23.8,40.5 23,33.5 25.5,30 Z"/>
-    <!-- Europe -->
-    <path d="M44,10.5 C48,8.5 53,9 54.3,12 C55.4,14.8 52,17 48.2,17 C44.8,17 42.2,13.2 44,10.5 Z"/>
-    <!-- Africa -->
-    <path d="M42,21.5 C47,18.5 55.5,19.5 57.3,23.5 C59,27.5 56,31 55,36 C54,41 51,45.3 47.8,44.3 C44.8,43.3 43,38 42.2,33 C41.5,29 40.5,24.5 42,21.5 Z"/>
-    <!-- Asia (with a subcontinental dip) -->
-    <path d="M57,9.5 C65,6.5 78,7 85,11 C90,14 90,20 86,23 C82,26 76.5,25 72.5,28 C69.5,30.5 68,35.5 64.8,33.5 C61.8,31.5 62.5,26.5 59.5,23.5 C56.5,20.5 53.5,12.5 57,9.5 Z"/>
-    <!-- Southeast-Asian islands -->
-    <ellipse cx="74.5" cy="35.5" rx="2.6" ry="1.5"/>
-    <ellipse cx="80"   cy="38"   rx="2.2" ry="1.3"/>
-    <!-- Australia -->
-    <path d="M78,44.5 C81.5,41.5 88,42.5 90,46 C91.3,49 88,52 83.5,52 C79.5,52 75.8,47.5 78,44.5 Z"/>
+  <rect x="2.5" y="4" width="91" height="56" rx="10" fill="#f4f8fb" stroke="#1d1d1d" stroke-width="2.6"/>
+  <g fill="#b9c2c9">
+    <circle cx="30" cy="9" r="1.45"/>
+    <circle cx="34" cy="9" r="1.45"/>
+    <circle cx="58" cy="9" r="1.45"/>
+    <circle cx="62" cy="9" r="1.45"/>
+    <circle cx="66" cy="9" r="1.45"/>
+    <circle cx="70" cy="9" r="1.45"/>
+    <circle cx="74" cy="9" r="1.45"/>
+    <circle cx="78" cy="9" r="1.45"/>
+    <circle cx="82" cy="9" r="1.45"/>
+    <circle cx="86" cy="9" r="1.45"/>
+    <circle cx="14" cy="13" r="1.45"/>
+    <circle cx="18" cy="13" r="1.45"/>
+    <circle cx="22" cy="13" r="1.45"/>
+    <circle cx="26" cy="13" r="1.45"/>
+    <circle cx="30" cy="13" r="1.45"/>
+    <circle cx="46" cy="13" r="1.45"/>
+    <circle cx="50" cy="13" r="1.45"/>
+    <circle cx="54" cy="13" r="1.45"/>
+    <circle cx="58" cy="13" r="1.45"/>
+    <circle cx="62" cy="13" r="1.45"/>
+    <circle cx="78" cy="13" r="1.45"/>
+    <circle cx="82" cy="13" r="1.45"/>
+    <circle cx="86" cy="13" r="1.45"/>
+    <circle cx="14" cy="17" r="1.45"/>
+    <circle cx="18" cy="17" r="1.45"/>
+    <circle cx="22" cy="17" r="1.45"/>
+    <circle cx="26" cy="17" r="1.45"/>
+    <circle cx="30" cy="17" r="1.45"/>
+    <circle cx="46" cy="17" r="1.45"/>
+    <circle cx="50" cy="17" r="1.45"/>
+    <circle cx="54" cy="17" r="1.45"/>
+    <circle cx="58" cy="17" r="1.45"/>
+    <circle cx="62" cy="17" r="1.45"/>
+    <circle cx="78" cy="17" r="1.45"/>
+    <circle cx="82" cy="17" r="1.45"/>
+    <circle cx="86" cy="17" r="1.45"/>
+    <circle cx="18" cy="21" r="1.45"/>
+    <circle cx="22" cy="21" r="1.45"/>
+    <circle cx="26" cy="21" r="1.45"/>
+    <circle cx="46" cy="21" r="1.45"/>
+    <circle cx="50" cy="21" r="1.45"/>
+    <circle cx="54" cy="21" r="1.45"/>
+    <circle cx="58" cy="21" r="1.45"/>
+    <circle cx="62" cy="21" r="1.45"/>
+    <circle cx="78" cy="21" r="1.45"/>
+    <circle cx="82" cy="21" r="1.45"/>
+    <circle cx="18" cy="25" r="1.45"/>
+    <circle cx="22" cy="25" r="1.45"/>
+    <circle cx="42" cy="25" r="1.45"/>
+    <circle cx="46" cy="25" r="1.45"/>
+    <circle cx="50" cy="25" r="1.45"/>
+    <circle cx="54" cy="25" r="1.45"/>
+    <circle cx="70" cy="25" r="1.45"/>
+    <circle cx="74" cy="25" r="1.45"/>
+    <circle cx="22" cy="29" r="1.45"/>
+    <circle cx="54" cy="29" r="1.45"/>
+    <circle cx="70" cy="29" r="1.45"/>
+    <circle cx="74" cy="29" r="1.45"/>
+    <circle cx="26" cy="33" r="1.45"/>
+    <circle cx="30" cy="33" r="1.45"/>
+    <circle cx="54" cy="33" r="1.45"/>
+    <circle cx="70" cy="33" r="1.45"/>
+    <circle cx="74" cy="33" r="1.45"/>
+    <circle cx="78" cy="33" r="1.45"/>
+    <circle cx="26" cy="37" r="1.45"/>
+    <circle cx="30" cy="37" r="1.45"/>
+    <circle cx="34" cy="37" r="1.45"/>
+    <circle cx="54" cy="37" r="1.45"/>
+    <circle cx="74" cy="37" r="1.45"/>
+    <circle cx="78" cy="37" r="1.45"/>
+    <circle cx="82" cy="37" r="1.45"/>
+    <circle cx="46" cy="41" r="1.45"/>
+    <circle cx="50" cy="41" r="1.45"/>
+    <circle cx="74" cy="45" r="1.45"/>
+    <circle cx="78" cy="45" r="1.45"/>
+    <circle cx="82" cy="45" r="1.45"/>
+    <circle cx="74" cy="49" r="1.45"/>
+    <circle cx="78" cy="49" r="1.45"/>
+    <circle cx="82" cy="49" r="1.45"/>
+    <circle cx="26" cy="53" r="1.45"/>
   </g>
-  <!-- research glyphs in the EMDE regions -->
   <!-- Erlenmeyer flask — South America -->
-  <g transform="translate(28.8,40.5)">
+  <g transform="translate(28,44)">
     <path d="M-1.5,-5.4 L-1.5,-1.6 L-4.6,4.1 A1.7,1.7 0 0 0 -3.1,6.2 L3.1,6.2 A1.7,1.7 0 0 0 4.6,4.1 L1.5,-1.6 L1.5,-5.4 Z"
           fill="#fff" stroke="#1d1d1d" stroke-width="1.35" stroke-linejoin="round"/>
     <path d="M-3.1,2.5 L3.1,2.5 L4.1,4.5 A1.2,1.2 0 0 1 3,6 L-3,6 A1.2,1.2 0 0 1 -4.1,4.5 Z" fill="#1b9e77"/>
     <line x1="-2.5" y1="-5.4" x2="2.5" y2="-5.4" stroke="#1d1d1d" stroke-width="1.35" stroke-linecap="round"/>
   </g>
   <!-- test tube — Africa -->
-  <g transform="translate(49,31.5) rotate(14)">
+  <g transform="translate(47,33) rotate(14)">
     <path d="M-1.8,-6 L1.8,-6 L1.8,3.4 A1.8,1.8 0 0 1 -1.8,3.4 Z" fill="#fff" stroke="#1d1d1d" stroke-width="1.35"/>
     <path d="M-1.8,-0.4 L1.8,-0.4 L1.8,3.4 A1.8,1.8 0 0 1 -1.8,3.4 Z" fill="#1b9e77"/>
     <line x1="-2.9" y1="-6" x2="2.9" y2="-6" stroke="#1d1d1d" stroke-width="1.35" stroke-linecap="round"/>
   </g>
   <!-- mortarboard — India -->
-  <g transform="translate(66.5,30.5)">
+  <g transform="translate(63.5,30.5)">
     <path d="M-2.9,0.4 Q0,3.4 2.9,0.4 L2.9,2.2 Q0,4.9 -2.9,2.2 Z" fill="#8f8bc0" stroke="#1d1d1d" stroke-width="1.1" stroke-linejoin="round"/>
     <path d="M0,-4.4 L6,-1.5 L0,1.5 L-6,-1.5 Z" fill="#7570b3" stroke="#1d1d1d" stroke-width="1.2" stroke-linejoin="round"/>
-    <path d="M6,-1.5 L6,2.4" stroke="#1d1d1d" stroke-width="1.1" stroke-linecap="round" fill="none"/>
-    <circle cx="6" cy="3.2" r="1" fill="#b8860b"/>
+    <path d="M6,-1.5 L6,2.2" stroke="#1d1d1d" stroke-width="1.1" stroke-linecap="round" fill="none"/>
+    <circle cx="6" cy="3" r="1" fill="#b8860b"/>
   </g>
   <!-- atom — China -->
-  <g transform="translate(77.5,16.5)">
+  <g transform="translate(71,17)">
     <g fill="none" stroke="#d95f02" stroke-width="1.25">
       <ellipse rx="6.2" ry="2.5" transform="rotate(28)"/>
       <ellipse rx="6.2" ry="2.5" transform="rotate(-28)"/>
