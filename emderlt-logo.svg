@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="EMDERLT logo">
+  <!-- EMDERLT mark: a globe of research labs, coloured like the map -->
+  <!-- globe -->
+  <circle cx="32" cy="32" r="28.5" fill="none" stroke="#1d1d1d" stroke-width="2.6"/>
+  <!-- equator hint -->
+  <path d="M 5.5 36 Q 32 44 58.5 36" fill="none" stroke="#c9ced6" stroke-width="1.6"/>
+  <!-- lab dots: diverging quality palette (red = above world avg, blue = below) -->
+  <circle cx="21.5" cy="41.5" r="7.6" fill="#99000d"/>
+  <circle cx="41"   cy="21.5" r="5.4" fill="#2171b5"/>
+  <circle cx="44"   cy="43"   r="4.6" fill="#fb6a4a"/>
+  <circle cx="24"   cy="22.5" r="3.9" fill="#9ecae1"/>
+  <circle cx="47.5" cy="32"   r="3.2" fill="#08306b"/>
+  <!-- assignee-pipeline lab: gold-ringed dot -->
+  <circle cx="33.5" cy="31.5" r="4.6" fill="#5a5f66" stroke="#b8860b" stroke-width="1.9"/>
+</svg>
