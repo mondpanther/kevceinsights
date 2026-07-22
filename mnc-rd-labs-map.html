@@ -478,7 +478,11 @@ function applyURLParams(){const p=new URLSearchParams(location.search);
  else if(document.getElementById('qualSel').value!=='none'){document.getElementById('bySector').checked=false;document.getElementById('byRegion').checked=false;}
  const v=(p.get('view')||'').split(',');
  if(v.length===3){const la=+v[0],lo=+v[1],z=+v[2];
-  if(isFinite(la)&&isFinite(lo)&&isFinite(z))map.setView([la,lo],z);}}
+  if(isFinite(la)&&isFinite(lo)&&isFinite(z))map.setView([la,lo],z);}
+ const sec=p.get('section');
+ if(sec&&SECTIONS.indexOf(sec)>=0){CURSEC=sec;
+  setTimeout(function(){var el=document.getElementById(sec==='method'?'method':sec);
+   if(el)el.scrollIntoView({block:'start'});},400);}}
 function syncURL(){const p=new URLSearchParams();
  URLCTL.forEach(function(c){const k=c[0],id=c[1],t=c[2],def=c[3];const el=document.getElementById(id);
   if(t==='chk'){if(el.checked)p.set(k,'1');}
@@ -486,8 +490,21 @@ function syncURL(){const p=new URLSearchParams();
  const ce=map.getCenter(),z=map.getZoom();
  if(Math.abs(ce.lat-VIEW0.lat)>0.01||Math.abs(ce.lng-VIEW0.lng)>0.01||z!==VIEW0.z)
   p.set('view',ce.lat.toFixed(3)+','+ce.lng.toFixed(3)+','+z);
+ if(CURSEC)p.set('section',CURSEC);
  history.replaceState(null,'',location.pathname+(p.toString()?('?'+p.toString()):'')+location.hash);}
 map.on('moveend',syncURL);
+// which page section is in view -> ?section= (intro/top = no parameter)
+const SECTIONS=['map','qualrank','charts','spotlight','method'];
+let CURSEC=null,secT=null;
+function computeSection(){
+ const yRef=window.scrollY+innerHeight*0.35; let cur=null;
+ SECTIONS.forEach(function(id){const el=document.getElementById(id);
+  if(!el||el.offsetParent===null)return;                    // skip hidden (e.g. qualrank when quality off)
+  const top=el.getBoundingClientRect().top+window.scrollY;
+  if(top<=yRef)cur=id;});
+ if(window.scrollY<40)cur=null;                             // at the very top: clean URL
+ if(cur!==CURSEC){CURSEC=cur;syncURL();}}
+window.addEventListener('scroll',function(){clearTimeout(secT);secT=setTimeout(computeSection,200);},{passive:true});
 applyURLParams();
 draw();
 // ---- spotlights: a rotating showcase of standout labs. TO ADD ONE: append an object to SPOTLIGHTS.
