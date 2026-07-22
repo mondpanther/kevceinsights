@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" role="img" aria-label="EMDERLT logo — a globe of continents; the developing regions carry research symbols">
+  <!-- EMDERLT mark v3: circular globe; continents drawn as circles. The EMDE
+       continent-circles contain research glyphs (flask, test tube, mortarboard,
+       atom) coloured in the map's hub palette: China #d95f02, India #7570b3,
+       other EMDE #1b9e77. HIC continents are plain muted dots. -->
+  <!-- globe -->
+  <circle cx="36" cy="36" r="33" fill="#f4f8fb" stroke="#1d1d1d" stroke-width="2.8"/>
+  <!-- plain continents (HIC): North America, Europe, Japan, Australia -->
+  <g fill="#c2cad1">
+    <circle cx="21.5" cy="21.5" r="4.6"/>   <!-- North America -->
+    <circle cx="29"   cy="15.5" r="2.4"/>
+    <circle cx="37.5" cy="16"   r="2.9"/>   <!-- Europe -->
+    <circle cx="60"   cy="33"   r="2.3"/>   <!-- Japan -->
+    <circle cx="55.5" cy="57" r="2.8"/>   <!-- Australia -->
+  </g>
+  <!-- South America: flask badge -->
+  <g transform="translate(21,46)">
+    <circle r="7.4" fill="#fff" stroke="#1b9e77" stroke-width="1.9"/>
+    <g transform="translate(0,0.4) scale(0.82)">
+      <path d="M-1.5,-5.4 L-1.5,-1.6 L-4.6,4.1 A1.7,1.7 0 0 0 -3.1,6.2 L3.1,6.2 A1.7,1.7 0 0 0 4.6,4.1 L1.5,-1.6 L1.5,-5.4 Z"
+            fill="#fff" stroke="#1d1d1d" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M-3.1,2.5 L3.1,2.5 L4.1,4.5 A1.2,1.2 0 0 1 3,6 L-3,6 A1.2,1.2 0 0 1 -4.1,4.5 Z" fill="#1b9e77"/>
+      <line x1="-2.5" y1="-5.4" x2="2.5" y2="-5.4" stroke="#1d1d1d" stroke-width="1.5" stroke-linecap="round"/>
+    </g>
+  </g>
+  <!-- Africa: test-tube badge -->
+  <g transform="translate(34.5,37.5)">
+    <circle r="7.4" fill="#fff" stroke="#1b9e77" stroke-width="1.9"/>
+    <g transform="translate(0.3,1) rotate(14) scale(0.82)">
+      <path d="M-1.8,-6 L1.8,-6 L1.8,3.4 A1.8,1.8 0 0 1 -1.8,3.4 Z" fill="#fff" stroke="#1d1d1d" stroke-width="1.5"/>
+      <path d="M-1.8,-0.4 L1.8,-0.4 L1.8,3.4 A1.8,1.8 0 0 1 -1.8,3.4 Z" fill="#1b9e77"/>
+      <line x1="-2.9" y1="-6" x2="2.9" y2="-6" stroke="#1d1d1d" stroke-width="1.5" stroke-linecap="round"/>
+    </g>
+  </g>
+  <!-- India: mortarboard badge -->
+  <g transform="translate(50,45.5)">
+    <circle r="7.4" fill="#fff" stroke="#7570b3" stroke-width="1.9"/>
+    <g transform="translate(-0.3,0.6) scale(0.78)">
+      <path d="M-2.9,0.4 Q0,3.4 2.9,0.4 L2.9,2.2 Q0,4.9 -2.9,2.2 Z" fill="#8f8bc0" stroke="#1d1d1d" stroke-width="1.3" stroke-linejoin="round"/>
+      <path d="M0,-4.4 L6,-1.5 L0,1.5 L-6,-1.5 Z" fill="#7570b3" stroke="#1d1d1d" stroke-width="1.35" stroke-linejoin="round"/>
+      <path d="M6,-1.5 L6,2.2" stroke="#1d1d1d" stroke-width="1.25" stroke-linecap="round" fill="none"/>
+      <circle cx="6" cy="3" r="1.05" fill="#b8860b"/>
+    </g>
+  </g>
+  <!-- China: atom badge -->
+  <g transform="translate(49.5,25)">
+    <circle r="7.4" fill="#fff" stroke="#d95f02" stroke-width="1.9"/>
+    <g transform="scale(0.9)">
+      <g fill="none" stroke="#d95f02" stroke-width="1.35">
+        <ellipse rx="6" ry="2.45" transform="rotate(28)"/>
+        <ellipse rx="6" ry="2.45" transform="rotate(-28)"/>
+      </g>
+      <circle r="1.5" fill="#d95f02"/>
+    </g>
+  </g>
+</svg>
