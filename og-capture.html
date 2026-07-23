@@ -2,60 +2,64 @@
 <html><head>
 <meta charset="utf-8"/>
 <title>EMDERLT OG capture</title>
-<!-- Renders the REAL map (same Leaflet tiles + dot styling as mnc-rd-labs-map.html)
-     at 1200x630 with the title panel, for the social share card.
-     Regenerate with:
+<!-- Renders the REAL map exactly as on mnc-rd-labs-map.html (same tiles, dot
+     styling, legend, zoom control, attribution) at 1200x630 with the site's
+     header branding, for the social share card. Regenerate with:
        "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new \
-         --window-size=1200,630 --hide-scrollbars --virtual-time-budget=12000 \
-         --screenshot=emderlt-og.png http://localhost:8742/og-capture.html -->
+         --window-size=1200,630 --hide-scrollbars --force-device-scale-factor=2 \
+         --virtual-time-budget=15000 --screenshot=emderlt-og.png \
+         http://localhost:8742/og-capture.html -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
  body{margin:0}
  #map{position:fixed;inset:0;width:1200px;height:630px}
- .leaflet-control-container{display:none}
- #panel{position:fixed;left:26px;top:26px;z-index:1000;width:430px;background:rgba(255,255,255,.92);
-  border:1px solid #d7dbe0;border-radius:14px;box-shadow:0 3px 18px rgba(0,0,0,.14);padding:20px 24px 16px;
-  font-family:"Helvetica Neue",Helvetica,Arial,sans-serif}
- #panel h1{margin:0;font-size:46px;font-weight:300;letter-spacing:-0.015em;color:#1d1d1d;
+ /* legend styled exactly like the live page */
+ .legend{background:#fff;padding:9px 11px;border-radius:8px;box-shadow:0 1px 6px rgba(0,0,0,.18);
+  font:12.5px/1.7 "Lato","Helvetica Neue",Helvetica,Arial,sans-serif;color:#1d1d1d}
+ .legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:7px;vertical-align:middle}
+ /* header branding panel, matching the site header */
+ #panel{position:fixed;left:74px;top:16px;z-index:1000;background:rgba(255,255,255,.93);
+  border:1px solid #e3e7ec;border-radius:14px;box-shadow:0 3px 16px rgba(0,0,0,.13);padding:14px 22px 13px}
+ #panel .row{display:flex;align-items:center;gap:14px}
+ #panel img{width:58px;height:58px}
+ #panel h1{margin:0;font-size:54px;font-weight:300;letter-spacing:-0.015em;color:#1d1d1d;line-height:1;
   font-family:"Source Sans Pro","Helvetica Neue",Helvetica,Arial,sans-serif}
- #panel .sub{font-family:Georgia,serif;font-size:18.5px;color:#3a4048;margin:4px 0 8px;line-height:1.3}
- #panel .st{font-size:13.5px;color:#69707d;margin:0 0 10px;line-height:1.45}
- #panel .lg{font-size:11.5px;color:#48505e;margin-top:2px}
- #panel .lg b{display:block;margin-bottom:4px;font-size:11px;color:#48505e}
- #panel .lg i{display:inline-block;width:11px;height:11px;border-radius:50%;margin:0 6px 0 0;vertical-align:middle;border:1px solid #33373f}
- #panel .lg span{margin-right:12px;white-space:nowrap}
- #url{position:fixed;right:16px;bottom:12px;z-index:1000;font:600 12px "Helvetica Neue",Helvetica,Arial,sans-serif;color:#5a6068;
-  background:rgba(255,255,255,.85);padding:4px 9px;border-radius:7px}
+ #panel .sub{font-family:Georgia,"Iowan Old Style",serif;font-size:16.5px;color:#555;margin:7px 0 0}
+ #panel .st{font:12.5px "Lato","Helvetica Neue",Helvetica,Arial,sans-serif;color:#79808d;margin-top:4px}
 </style></head><body>
 <div id="map"></div>
 <div id="panel">
- <h1>EMDERLT</h1>
- <div class="sub">The Emerging &amp; Developing Economies Research&nbsp;Lab&nbsp;Tracker</div>
- <div class="st">1,700+ verified R&amp;D labs in 45 countries<br>coloured by patent quality &middot; live daily updates</div>
- <div class="lg"><b>AVG PATENT RANK OF HOST-COUNTRY PATENTS</b>
-  <span><i style="background:#99000d"></i>&gt; 4&times; world avg</span>
-  <span><i style="background:#fb6a4a"></i>above avg</span><br>
-  <span style="margin-top:3px;display:inline-block"><i style="background:#9ecae1"></i>below avg</span>
-  <span><i style="background:#08306b"></i>far below</span>
- </div>
+ <div class="row"><img src="emderlt-logo3.svg" alt=""><h1>EMDERLT</h1></div>
+ <div class="sub">The Emerging and Developing Economies Research Lab Tracker</div>
+ <div class="st">1,700+ verified R&amp;D labs in 45 countries &middot; live daily updates &middot; mondpanther.github.io/kevceinsights</div>
 </div>
-<div id="url">mondpanther.github.io/kevceinsights</div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 fetch('mnc-rd-labs-map.html').then(r=>r.text()).then(function(T){
  const RECS=JSON.parse(T.match(/const RECS=(\[.*?\]);\nconst WORLDQ/s)[1]);
  const WORLDQ=JSON.parse(T.match(/const WORLDQ=(\{.*?\});/s)[1]);
- const map=L.map('map',{zoomControl:false,attributionControl:false,zoomSnap:0.1}).setView([16,55],2.4);
- L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:11}).addTo(map);
+ const map=L.map('map',{zoomSnap:0.05,zoomControl:true}).setView([21,40],2.05);
+ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+   {attribution:'&copy; OpenStreetMap &copy; CARTO',subdomains:'abcd',maxZoom:11}).addTo(map);
  const QC=['#08306b','#2171b5','#9ecae1','#fcae91','#fb6a4a','#99000d'],TH=[.25,.5,1,2,4],W=WORLDQ.ev;
  RECS.forEach(function(d){
   const hold=d.source==='holder';
   if(d.pat_ev==null){
-   L.circleMarker([d.lat,d.lon],{radius:4.5,color:'#333',weight:1.1,fillOpacity:0}).addTo(map);
+   L.circleMarker([d.lat,d.lon],{radius:5.5,color:'#333333',weight:1.3,fillColor:'#ffffff',fillOpacity:0,opacity:1}).addTo(map);
   }else{
    let r=d.pat_ev/W,i=0; while(i<5&&r>TH[i])i++;
-   L.circleMarker([d.lat,d.lon],{radius:6,color:hold?'#b8860b':'#33373f',weight:hold?1.8:0.8,
-    fillColor:QC[i],fillOpacity:0.92,dashArray:hold?'2,1.6':null}).addTo(map);
+   L.circleMarker([d.lat,d.lon],{radius:7,color:hold?'#b8860b':'#33373f',weight:hold?2.2:1,
+    fillColor:QC[i],fillOpacity:0.9,opacity:1,dashArray:hold?'2,1.6':null}).addTo(map);
   }});
+ // the live page's quality legend, verbatim
+ const legend=L.control({position:'bottomright'});
+ legend.onAdd=function(){const div=L.DomUtil.create('div','legend');
+  let h='<div style="font-weight:600;margin-bottom:3px">avg Patent Rank ($M)<br><span style="font-weight:400;color:#69707d">relative to the world average over all innovations ($4.57m)</span></div>';
+  const LBL=['&lt; &frac14;&times; world avg','&frac14;&ndash;&frac12;&times;','&frac12;&ndash;1&times;','1&ndash;2&times;','2&ndash;4&times;','&gt; 4&times; world avg'];
+  for(let i=0;i<6;i++) h+='<div><i style="background:'+QC[i]+'"></i>'+LBL[i]+'</div>';
+  h+='<div><i style="background:#fff;border:1.5px solid #333"></i>No innovations mapped to host country</div>';
+  h+='<div style="font-weight:600;margin:6px 0 3px;border-top:1px solid #eee;padding-top:5px">Marker</div><div><i style="background:#777"></i>Scoreboard-firm lab</div><div><i style="background:#777;box-shadow:0 0 0 2px #b8860b inset;border:1px solid #b8860b"></i>Assignee-pipeline lab</div>';
+  div.innerHTML=h;return div;};
+ legend.addTo(map);
 });
 </script></body></html>
