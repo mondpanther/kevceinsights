@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls /Users/rmartin/GitHub/agriconnect /Users/rmartin/GitHub/greenconnect /Users/rmartin/GitHub/kevceinsights 2>&1)"
+    ]
+  }
+}
