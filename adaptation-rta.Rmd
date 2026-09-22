@@ -23,14 +23,15 @@ knitr::opts_chunk$set(
 library(DBI)
 library(duckdb)
 library(dplyr)
-library(ggplot2)
-library(ggiraph)
+library(jsonlite)
 library(countrycode)
 ```
 
 ```{r params}
 # ── Inputs ────────────────────────────────────────────────────────────────────
-# top_n         : how many countries each panel shows
+# top_n         : how many countries each panel starts out showing. In the
+#                 rendered page this is a slider, so `top_n` only sets where
+#                 the slider sits when the page loads.
 # min_allinnos  : drop countries with fewer than this many innovations in total
 top_n        <- params$top_n
 min_allinnos <- 100
@@ -171,148 +172,267 @@ Each bar is one country. **Height is RTA**; **width is the country's share of wo
 adaptation innovation**, so the bars are laid out along an axis measured in percent
 of world adaptation innovation — a bar you can barely see is a country that barely
 registers in the global total. Colour is the Explorer's income classification. Hover
-any bar for the underlying counts.
+any bar for the underlying counts, and **move the slider** to change how many
+countries each panel shows.
 
 ```{r disconnect}
 dbDisconnect(con, shutdown = TRUE)
 ```
 
-```{r plotfun}
-pal <- c("High income countries"         = "#3d5bd9",
-         "Low & middle income countries" = "#c8bb8b")
+```{r widget_assets, include = FALSE}
+# Markup, styling and the drawing code for the interactive figure. Kept out of
+# the output chunk so the piece that actually emits anything stays short.
+# NOTE: no blank lines in the emitted HTML — pandoc would otherwise break out
+# of the raw-HTML block and start interpreting the contents as markdown.
+adapt_widget_html_head <- paste0(
+'<style>',
+'.adapt{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;margin:16px 0 4px;position:relative;}',
+'.adapt-bar{display:flex;flex-wrap:wrap;align-items:center;gap:18px;padding:10px 14px;border:1px solid #e3e3df;border-radius:5px;background:#faf9f6;font-size:13px;color:#333;}',
+'.adapt-bar label{font-weight:600;}',
+'.adapt-bar input[type=range]{vertical-align:middle;width:190px;}',
+'.adapt-n{font-variant-numeric:tabular-nums;font-weight:600;min-width:1.4em;display:inline-block;}',
+'.adapt-key{display:inline-flex;align-items:center;gap:6px;}',
+'.adapt-sw{width:13px;height:13px;border-radius:2px;display:inline-block;}',
+'.adapt-panel{margin-top:10px;}',
+'.adapt-tip{position:absolute;pointer-events:none;opacity:0;transition:opacity .08s;background:#fff;border:1px solid #ccc;border-radius:3px;padding:6px 8px;font-size:11px;line-height:1.45;white-space:pre;box-shadow:0 1px 4px rgba(0,0,0,.14);z-index:20;}',
+'.adapt-btn{font:inherit;font-size:12px;padding:5px 11px;border:1px solid #c9c9c4;border-radius:4px;background:#fff;color:#2b5a8c;cursor:pointer;}',
+'.adapt-btn:hover{background:#f0f4f9;border-color:#2b5a8c;}',
+'.adapt-cap{font-size:13px;color:#555;margin:14px 0 6px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;}',
+'.adapt-table{width:100%;border-collapse:collapse;font-size:12.5px;}',
+'.adapt-table th{text-align:right;border-bottom:2px solid #d8d8d3;padding:5px 7px;font-weight:600;}',
+'.adapt-table td{text-align:right;border-bottom:1px solid #eeeee9;padding:4px 7px;font-variant-numeric:tabular-nums;}',
+'.adapt-table th:first-child,.adapt-table td:first-child,',
+'.adapt-table th:nth-child(2),.adapt-table td:nth-child(2){text-align:left;}',
+'</style>',
+'<div class="adapt" id="adapt-app">',
+'<div class="adapt-bar">',
+'<span><label for="adapt-slider">Countries shown per panel:</label> ',
+'<span class="adapt-n" id="adapt-n-out"></span></span>',
+'<input type="range" id="adapt-slider" min="3" max="40" step="1">',
+'<span class="adapt-key"><span class="adapt-sw" style="background:#3d5bd9"></span>High income countries</span>',
+'<span class="adapt-key"><span class="adapt-sw" style="background:#c8bb8b"></span>Low &amp; middle income countries</span>',
+'<button class="adapt-btn" id="adapt-dl-all" type="button">Download all countries (CSV)</button>',
+'</div>',
+'<div class="adapt-panel" id="adapt-chart-rta"></div>',
+'<div class="adapt-panel" id="adapt-chart-share"></div>',
+'<div class="adapt-tip" id="adapt-tip"></div>',
+'</div>')
 
-lab_col <- c("High income countries"         = "#2b3fa8",
-             "Low & middle income countries" = "#8a7c46")
-
-# Spread label positions so narrow neighbouring bars stay readable: labels are
-# nudged apart left-to-right until they no longer overlap, then pulled back
-# inside the panel, and leader lines run from each bar to its label.
-spread_labels <- function(x, halfw, lo, hi, pad) {
-  o <- order(x); x <- x[o]; halfw <- halfw[o]
-  for (i in seq_along(x)[-1]) {
-    need <- x[i - 1] + halfw[i - 1] + halfw[i] + pad
-    if (x[i] < need) x[i] <- need
+adapt_widget_js <- r"(<script>
+(function(){
+var NS="http://www.w3.org/2000/svg";
+var PAL={"High income countries":"#3d5bd9","Low & middle income countries":"#c8bb8b"};
+var LABCOL={"High income countries":"#2b3fa8","Low & middle income countries":"#8a7c46"};
+var COLS=[["country","Country",null],["income","Income",null],["rta","RTA",2],
+          ["innos","Adaptation innovations",0],["allinnos","All innovations",0],
+          ["share_own","Adaptation share of own innovation (%)",2],
+          ["share_world","Share of world adaptation (%)",3]];
+var ROWS=ADAPT_CFG.rows, cur={};
+function mk(t,a){var e=document.createElementNS(NS,t);for(var k in a){e.setAttribute(k,a[k]);}return e;}
+function num(x,d){return d===0?Math.round(x).toLocaleString("en-US"):x.toFixed(d);}
+// top n on the chosen criterion, then laid out left-to-right by descending RTA
+function pick(mode,n){
+  var s=ROWS.slice();
+  s.sort(function(a,b){return mode==="rta"?b.rta-a.rta:b.share_world-a.share_world;});
+  s=s.slice(0,n).map(function(r){var o={};for(var k in r){o[k]=r[k];}return o;});
+  s.sort(function(a,b){return b.rta-a.rta;});
+  var x=0;
+  s.forEach(function(r){r.x0=x;x+=r.share_world;r.x1=x;r.xm=(r.x0+r.x1)/2;});
+  return s;
+}
+function ticks(span){
+  var raw=span/5,mag=Math.pow(10,Math.floor(Math.log(raw)/Math.LN10)),nm=raw/mag,st;
+  if(nm<1.5){st=mag;}else if(nm<3){st=2*mag;}else if(nm<7){st=5*mag;}else{st=10*mag;}
+  var out=[],v=0,guard=0;
+  while(v<=span*1.0000001&&guard++<60){out.push(v);v+=st;}
+  return out;
+}
+// nudge labels apart in pixel space, then keep them inside the drawing area
+function spread(items,lo,hi,pad){
+  items.sort(function(a,b){return a.x-b.x;});
+  for(var i=1;i<items.length;i++){
+    var need=items[i-1].x+items[i-1].w/2+items[i].w/2+pad;
+    if(items[i].x<need){items[i].x=need;}
   }
-  if (x[length(x)] + halfw[length(x)] > hi) {
-    x[length(x)] <- hi - halfw[length(x)]
-    for (i in rev(seq_along(x))[-1]) {
-      room <- x[i + 1] - halfw[i + 1] - halfw[i] - pad
-      if (x[i] > room) x[i] <- room
+  var last=items[items.length-1];
+  if(last&&last.x+last.w/2>hi){
+    last.x=hi-last.w/2;
+    for(var j=items.length-2;j>=0;j--){
+      var room=items[j+1].x-items[j+1].w/2-items[j].w/2-pad;
+      if(items[j].x>room){items[j].x=room;}
     }
   }
-  x <- pmax(x, lo + halfw)
-  out <- numeric(length(x)); out[o] <- x; out
+  items.forEach(function(it){if(it.x-it.w/2<lo){it.x=lo+it.w/2;}});
 }
-
-# Variable-width bar panel: width proportional to `share_global`, laid out
-# cumulatively along x, height = RTA, labels on leader lines above the bars.
-make_panel <- function(df, title) {
-  df <- df |>
-    arrange(desc(RTA)) |>
-    mutate(
-      xmax = cumsum(share_global),
-      xmin = xmax - share_global,
-      xmid = (xmin + xmax) / 2
-    )
-
-  span <- max(df$xmax)
-
-  # Three staggered rows above the bars, so a label never sits on a bar.
-  rows  <- c(2.12, 2.30, 2.48)
-  df$lab_y <- rows[(rank(df$xmid, ties.method = "first") - 1) %% 3 + 1]
-
-  # Rough character width in data units: the drawing area holds roughly 60
-  # characters of label text across at this font size once the legend is
-  # accounted for.
-  char_w   <- span / 60
-  df$halfw <- nchar(df$country_name) * char_w / 2
-  df$lab_x <- df$xmid
-
-  for (r in rows) {
-    k <- df$lab_y == r
-    if (sum(k) > 1) {
-      df$lab_x[k] <- spread_labels(df$xmid[k], df$halfw[k], 0, span, char_w * 0.4)
-    } else if (sum(k) == 1) {
-      df$lab_x[k] <- pmin(pmax(df$xmid[k], df$halfw[k]), span - df$halfw[k])
-    }
+function tipText(r){
+  return r.country+"\nRTA: "+num(r.rta,2)
+    +"\nAdaptation innovations: "+num(r.innos,0)
+    +"\nAll innovations: "+num(r.allinnos,0)
+    +"\nShare of world adaptation: "+num(r.share_world,2)+"%"
+    +"\nAdaptation share of own innovation: "+num(r.share_own,2)+"%";
+}
+function drawPanel(host,rows,title){
+  host.innerHTML="";
+  var app=document.getElementById("adapt-app"),tip=document.getElementById("adapt-tip");
+  var W=Math.max(host.clientWidth||680,300),H=330,m={l:46,r:16,t:88,b:48};
+  var svg=mk("svg",{width:"100%",height:H,viewBox:"0 0 "+W+" "+H});
+  host.appendChild(svg);
+  var span=rows.length?rows[rows.length-1].x1:1;
+  var px=function(v){return m.l+(v/span)*(W-m.l-m.r);};
+  var py=function(v){return (H-m.b)-(v/2.05)*(H-m.b-m.t);};
+  function txt(x,y,s,o){
+    var t=mk("text",{x:x,y:y,"font-size":(o&&o.size)||11,fill:(o&&o.fill)||"#555",
+      "text-anchor":(o&&o.anchor)||"middle"});
+    if(o&&o.weight){t.setAttribute("font-weight",o.weight);}
+    t.textContent=s;svg.appendChild(t);return t;
   }
-
-  ggplot(df) +
-    geom_rect_interactive(
-      aes(xmin = xmin, xmax = xmax, ymin = 0, ymax = RTA, fill = income,
-          data_id = ctry_code,
-          tooltip = paste0(
-            country_name,
-            "\nRTA: ", sprintf("%.2f", RTA),
-            "\nAdaptation innovations: ", format(innos, big.mark = ","),
-            "\nAll innovations: ", format(allinnos, big.mark = ","),
-            "\nShare of world adaptation: ", sprintf("%.2f%%", share_global),
-            "\nAdaptation share of own innovation: ", sprintf("%.2f%%", 100 * share_c))),
-      colour = "white", linewidth = 0.15) +
-    # leader line: up from the bar, then across to the label
-    geom_segment(aes(x = xmid, xend = xmid, y = RTA, yend = 2.04),
-                 colour = "#9a9ab0", linewidth = 0.3) +
-    geom_segment(aes(x = xmid, xend = lab_x, y = 2.04, yend = lab_y - 0.04),
-                 colour = "#9a9ab0", linewidth = 0.3) +
-    geom_text(aes(x = lab_x, y = lab_y, label = country_name, colour = income),
-              size = 3.1, vjust = 0, show.legend = FALSE) +
-    geom_hline(yintercept = 1, linetype = "dashed",
-               colour = "#8a8a8a", linewidth = 0.35) +
-    scale_fill_manual(values = pal, name = NULL, drop = FALSE) +
-    scale_colour_manual(values = lab_col, drop = FALSE) +
-    scale_y_continuous(breaks = c(0, 1, 2)) +
-    coord_cartesian(xlim = c(0, span), ylim = c(0, 2.62),
-                    expand = FALSE, clip = "off") +
-    labs(title = title,
-         x = "Cumulative share of world adaptation innovation (%)",
-         y = "RTA") +
-    theme_minimal(base_size = 12) +
-    theme(
-      plot.title         = element_text(hjust = 0.5, face = "bold", size = 13),
-      plot.margin        = margin(6, 10, 6, 6),
-      panel.grid.minor   = element_blank(),
-      panel.grid.major.x = element_blank(),
-      axis.title.x       = element_text(size = 10, colour = "#555"),
-      axis.title.y       = element_text(size = 10, colour = "#555", angle = 0,
-                                        vjust = 0.53, hjust = 1,
-                                        margin = margin(r = 4)),
-      legend.position    = "right",
-      legend.text        = element_text(size = 9)
-    )
+  txt(W/2,20,title,{size:13,fill:"#1d1d1d",weight:"600"});
+  [0,1,2].forEach(function(v){
+    svg.appendChild(mk("line",{x1:m.l,x2:W-m.r,y1:py(v),y2:py(v),
+      stroke:v===1?"#8a8a8a":"#e6e6e2","stroke-width":v===1?1:1,
+      "stroke-dasharray":v===1?"4 3":"none"}));
+    txt(m.l-7,py(v)+4,String(v),{anchor:"end"});
+  });
+  txt(m.l-7,py(2)-12,"RTA",{anchor:"end",size:10});
+  svg.appendChild(mk("line",{x1:m.l,x2:W-m.r,y1:py(0),y2:py(0),stroke:"#bdbdb8"}));
+  ticks(span).forEach(function(v){
+    txt(px(v),py(0)+16,span<3?v.toFixed(2):(span<30?v.toFixed(1):String(Math.round(v))));
+  });
+  txt((m.l+W-m.r)/2,H-10,"Cumulative share of world adaptation innovation (%)",{size:10});
+  rows.forEach(function(r){
+    var x=px(r.x0),w=Math.max(px(r.x1)-px(r.x0),0.8);
+    var rect=mk("rect",{x:x,y:py(r.rta),width:w,height:py(0)-py(r.rta),
+      fill:PAL[r.income]||"#999",stroke:"#fff","stroke-width":0.6});
+    rect.style.cursor="crosshair";
+    rect.addEventListener("mouseenter",function(){rect.setAttribute("fill-opacity",0.72);});
+    rect.addEventListener("mousemove",function(ev){
+      var b=app.getBoundingClientRect();
+      tip.textContent=tipText(r);tip.style.opacity=1;
+      var tx=ev.clientX-b.left+14,ty=ev.clientY-b.top+12;
+      tip.style.left=Math.min(tx,b.width-tip.offsetWidth-6)+"px";tip.style.top=ty+"px";
+    });
+    rect.addEventListener("mouseleave",function(){
+      rect.setAttribute("fill-opacity",1);tip.style.opacity=0;});
+    svg.appendChild(rect);
+  });
+  // labels: three staggered rows above the bars, joined by leader lines
+  var bands=[m.t-14,m.t-32,m.t-50],slots=[[],[],[]];
+  rows.forEach(function(r,i){
+    var b=i%3,t=txt(0,bands[b],r.country,{fill:LABCOL[r.income]||"#555",size:10.5});
+    var w=0;try{w=t.getComputedTextLength();}catch(e){w=r.country.length*5.6;}
+    if(!w){w=r.country.length*5.6;}
+    slots[b].push({x:px(r.xm),w:w,node:t,bar:px(r.xm),y:bands[b],rta:r.rta});
+  });
+  slots.forEach(function(items){spread(items,m.l,W-m.r,7);});
+  slots.forEach(function(items){items.forEach(function(it){
+    it.node.setAttribute("x",it.x);
+    svg.insertBefore(mk("line",{x1:it.bar,x2:it.bar,y1:py(it.rta),y2:m.t-8,
+      stroke:"#9a9ab0","stroke-width":0.7}),svg.firstChild);
+    svg.insertBefore(mk("line",{x1:it.bar,x2:it.x,y1:m.t-8,y2:it.y+3,
+      stroke:"#9a9ab0","stroke-width":0.7}),svg.firstChild);
+  });});
 }
-
-top_rta   <- dat |> arrange(desc(RTA))          |> head(top_n)
-top_share <- dat |> arrange(desc(share_global)) |> head(top_n)
+function tableHTML(rows){
+  var h="<table class='adapt-table'><thead><tr>";
+  COLS.forEach(function(c){h+="<th>"+c[1]+"</th>";});
+  h+="</tr></thead><tbody>";
+  rows.forEach(function(r){
+    h+="<tr>";
+    COLS.forEach(function(c){
+      h+="<td>"+(c[2]===null?r[c[0]]:num(r[c[0]],c[2]))+"</td>";
+    });
+    h+="</tr>";
+  });
+  return h+"</tbody></table>";
+}
+function csv(rows){
+  var q=function(v){v=String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};
+  var out=[COLS.map(function(c){return q(c[1]);}).join(",")];
+  rows.forEach(function(r){
+    out.push(COLS.map(function(c){
+      return q(c[2]===null?r[c[0]]:(c[2]===0?r[c[0]]:r[c[0]].toFixed(c[2])));
+    }).join(","));
+  });
+  return out.join("\n");
+}
+function download(name,text){
+  var b=new Blob(["﻿"+text],{type:"text/csv;charset=utf-8;"});
+  var u=URL.createObjectURL(b),a=document.createElement("a");
+  a.href=u;a.download=name;document.body.appendChild(a);a.click();
+  document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(u);},800);
+}
+function sumShare(rows){
+  return rows.reduce(function(s,r){return s+r.share_world;},0);
+}
+function render(){
+  var n=+document.getElementById("adapt-slider").value;
+  document.getElementById("adapt-n-out").textContent=n;
+  cur.rta=pick("rta",n);cur.share=pick("share",n);
+  drawPanel(document.getElementById("adapt-chart-rta"),cur.rta,
+            "Top "+n+" countries by RTA in adaptation");
+  drawPanel(document.getElementById("adapt-chart-share"),cur.share,
+            "Top "+n+" countries by share of world adaptation innovation");
+  var t1=document.getElementById("adapt-tbl-rta"),t2=document.getElementById("adapt-tbl-share");
+  if(t1){t1.innerHTML=tableHTML(cur.rta);}
+  if(t2){t2.innerHTML=tableHTML(cur.share);}
+  Array.prototype.forEach.call(document.querySelectorAll(".adapt-nref"),function(e){
+    e.textContent=n;});
+  var s1=document.getElementById("adapt-sum-rta"),s2=document.getElementById("adapt-sum-share");
+  if(s1){s1.textContent=sumShare(cur.rta).toFixed(2)+"%";}
+  if(s2){s2.textContent=sumShare(cur.share).toFixed(1)+"%";}
+}
+function wire(id,fn){var e=document.getElementById(id);if(e){e.addEventListener("click",fn);}}
+function init(){
+  var sl=document.getElementById("adapt-slider");
+  sl.max=ADAPT_CFG.nmax;sl.value=Math.min(ADAPT_CFG.n0,ADAPT_CFG.nmax);
+  sl.addEventListener("input",render);
+  wire("adapt-dl-all",function(){download("adaptation_rta_all_countries.csv",csv(ROWS));});
+  wire("adapt-dl-rta",function(){
+    download("adaptation_top"+cur.rta.length+"_by_rta.csv",csv(cur.rta));});
+  wire("adapt-dl-share",function(){
+    download("adaptation_top"+cur.share.length+"_by_share.csv",csv(cur.share));});
+  render();
+  var t;window.addEventListener("resize",function(){
+    clearTimeout(t);t=setTimeout(render,150);});
+}
+if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",init);}
+else{init();}
+})();
+</script>)"
 ```
 
-```{r fig_rta, fig.width = 9, fig.height = 4.6}
-girafe(ggobj = make_panel(top_rta,
-         sprintf("Top %d countries by RTA in adaptation", top_n)),
-       width_svg = 9, height_svg = 4.6,
-       options = list(
-         opts_sizing(rescale = TRUE, width = 1),
-         opts_hover(css = "fill-opacity:0.75;"),
-         opts_tooltip(css = paste0("background-color:white;padding:6px;",
-                                   "border-radius:3px;border:1px solid #ccc;",
-                                   "font-family:sans-serif;font-size:11px;"))))
+```{r widget, results = "asis"}
+# ── Interactive figure ───────────────────────────────────────────────────────
+# The rendered page is a static, self-contained HTML file — there is no Shiny
+# server behind it — so the full country table is embedded as JSON and the two
+# panels, the tables and the CSV exports are all drawn client-side from it.
+# That is what lets `n` be a live slider rather than a render-time constant.
+payload <- dat |>
+  arrange(desc(RTA)) |>
+  transmute(code        = ctry_code,
+            country     = country_name,
+            income      = income,
+            rta         = round(RTA, 6),
+            innos       = as.integer(innos),
+            allinnos    = as.integer(allinnos),
+            share_own   = round(100 * share_c, 6),
+            share_world = round(share_global, 8))
+
+cfg <- list(rows = payload, n0 = top_n, nmax = min(40L, nrow(payload)),
+            minAllinnos = min_allinnos)
+
+cat(paste0(
+  adapt_widget_html_head,
+  "<script>var ADAPT_CFG = ",
+  toJSON(cfg, dataframe = "rows", auto_unbox = TRUE, digits = NA),
+  ";</script>",
+  adapt_widget_js))
 ```
 
-```{r fig_share, fig.width = 9, fig.height = 4.6}
-girafe(ggobj = make_panel(top_share,
-         sprintf("Top %d countries by share of world adaptation innovation", top_n)),
-       width_svg = 9, height_svg = 4.6,
-       options = list(
-         opts_sizing(rescale = TRUE, width = 1),
-         opts_hover(css = "fill-opacity:0.75;"),
-         opts_tooltip(css = paste0("background-color:white;padding:6px;",
-                                   "border-radius:3px;border:1px solid #ccc;",
-                                   "font-family:sans-serif;font-size:11px;"))))
-```
-
-Note the two x-axes. The top panel's `r top_n` countries together account for
-**`r sprintf("%.2f%%", sum(top_rta$share_global))`** of world adaptation innovation;
-the bottom panel's `r top_n` account for
-**`r sprintf("%.1f%%", sum(top_share$share_global))`**.
+Note the two x-axes. The top panel's <span class="adapt-nref"></span> countries together
+account for <b><span id="adapt-sum-rta"></span></b> of world adaptation innovation; the
+bottom panel's <span class="adapt-nref"></span> account for
+<b><span id="adapt-sum-share"></span></b>.
 
 ## What it says
 
@@ -335,31 +455,29 @@ pointed anywhere in particular.
 
 ## The numbers
 
-### Top `r top_n` by RTA
+### By RTA
 
-```{r tbl_rta}
-top_rta |>
-  transmute(Country = country_name,
-            Income  = income,
-            RTA     = round(RTA, 2),
-            `Adaptation innovations` = innos,
-            `All innovations`        = allinnos,
-            `Adaptation share of own innovation (%)` = round(100 * share_c, 2),
-            `Share of world adaptation (%)`          = round(share_global, 3))
+```{r tbl_rta, results = "asis"}
+cat(paste0(
+  '<div class="adapt-cap"><span>Top <span class="adapt-nref"></span> countries by RTA',
+  ' in adaptation</span>',
+  '<button class="adapt-btn" id="adapt-dl-rta" type="button">Download this table (CSV)',
+  '</button></div><div id="adapt-tbl-rta"></div>'))
 ```
 
-### Top `r top_n` by share of world adaptation innovation
+### By share of world adaptation innovation
 
-```{r tbl_share}
-top_share |>
-  transmute(Country = country_name,
-            Income  = income,
-            RTA     = round(RTA, 2),
-            `Adaptation innovations` = innos,
-            `All innovations`        = allinnos,
-            `Adaptation share of own innovation (%)` = round(100 * share_c, 2),
-            `Share of world adaptation (%)`          = round(share_global, 3))
+```{r tbl_share, results = "asis"}
+cat(paste0(
+  '<div class="adapt-cap"><span>Top <span class="adapt-nref"></span> countries by share',
+  ' of world adaptation innovation</span>',
+  '<button class="adapt-btn" id="adapt-dl-share" type="button">Download this table (CSV)',
+  '</button></div><div id="adapt-tbl-share"></div>'))
 ```
+
+Both tables follow the slider, and the CSV they export is exactly what is on screen.
+The button in the control bar above the figure exports all `r nrow(dat)` countries that
+clear the `r min_allinnos`-innovation floor, ranked by RTA.
 
 ## Caveats
 
@@ -387,7 +505,8 @@ The same cut is reachable interactively:
 [Country Explorer → Revealed Technological Advantage, Adaptation, multi-application
 families only, utility models excluded, all-innovation threshold 100](https://mondpanther-iseapp2.share.connect.posit.cloud/?_inputs_&country-sidebar=true&navbar_page=%22Country%20Explorer%22&country-inner_tabs=%22Revealed%20Technological%20Advantage%22&country-country=%22All%20countries%22&country-techs=%22Adaptation%22&country-toflow=%22is_global%22&country-multifam_only=true&country-exclude_um=true&country-granted_only=false&country-topn_rta=10&country-minallinnos_rta=100).
 
-This note renders from `adaptation-rta.Rmd` with `top_n` as a parameter:
+This note renders from `adaptation-rta.Rmd`. The slider does the work in the rendered
+page, so `top_n` only sets its starting position:
 
 ```r
 rmarkdown::render("adaptation-rta.Rmd", params = list(top_n = 15))
