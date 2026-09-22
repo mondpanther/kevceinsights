@@ -1,0 +1,394 @@
+---
+title: "Who specialises in climate adaptation technology?"
+subtitle: "Revealed technological advantage vs. sheer size, for adaptation innovation"
+author: "Ralf"
+date: "`r format(Sys.Date(), '%B %Y')`"
+params:
+  top_n: 10
+  iseapp_data: "../iseapp/inst/extdata"
+output:
+  html_document:
+    self_contained: true
+    theme: default
+    toc: true
+    toc_float: true
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE, message = FALSE, warning = FALSE,
+  fig.align = "center"
+)
+library(DBI)
+library(duckdb)
+library(dplyr)
+library(ggplot2)
+library(ggiraph)
+library(countrycode)
+```
+
+```{r params}
+# ── Inputs ────────────────────────────────────────────────────────────────────
+# top_n         : how many countries each panel shows
+# min_allinnos  : drop countries with fewer than this many innovations in total
+top_n        <- params$top_n
+min_allinnos <- 100
+
+# Filters, matching the Innovation Strategy Explorer settings this note is
+# built from: multi-application families only, utility models excluded,
+# no granted-only restriction, no firm or city filter.
+multifam_only <- TRUE
+exclude_um    <- TRUE
+granted_only  <- FALSE
+toflow        <- "is_global"
+tech_sel      <- "Adaptation"
+```
+
+## The question
+
+Adaptation technology — irrigation and water management, flood and coastal defence,
+drought- and heat-resistant agriculture, early-warning systems, cooling, resilient
+construction — is the part of climate innovation that matters most to the countries
+already living with the damage. So: **which countries are specialised in it?**
+
+There are two very different answers, and the figure below puts them side by side.
+
+- **Revealed technological advantage (RTA)** asks whether adaptation takes up a
+  *larger share of a country's own innovation* than it does of world innovation.
+  It is a measure of orientation, and it is scale-free — a small country can score high.
+- **Share** asks how much of *the world's* adaptation innovation a country accounts for.
+  That is a measure of weight, and it is dominated by the big patenting economies.
+
+The countries that top the first list barely register on the second. That gap is
+the story.
+
+## How the numbers are built
+
+Everything comes from the [Innovation Strategy Explorer](https://mondpanther-iseapp2.share.connect.posit.cloud/)
+patent database (DOCDB families, inventor country). An "innovation" is a patent family
+counted against each country whose inventors contributed to it.
+
+RTA is the normalised (Balassa) form the Explorer uses,
+
+$$\text{RTA}_c \;=\; \frac{2\,s_c}{s_c + s}, \qquad
+s_c = \frac{\text{adaptation innovations in } c}{\text{all innovations in } c}, \qquad
+s = \frac{\text{adaptation innovations, all countries}}{\text{all innovations, all countries}}$$
+
+which sits on $[0, 2]$ with **1 = exactly the world average orientation**.
+
+Three restrictions, all of which matter:
+
+- **Multi-application families only** — the family must have been filed in more than one
+  jurisdiction, a standard quality screen that removes purely domestic one-off filings.
+- **Utility models excluded** — families where *every* application is a utility model are
+  dropped. About 30% of PATSTAT families are flagged this way, heavily concentrated in
+  China, and they are much weaker rights than patents.
+- **Countries with fewer than `r min_allinnos` innovations in total are excluded**, so the
+  RTA ranking is not won by a country with four patents, two of which happen to be about
+  irrigation.
+
+```{r data}
+d <- normalizePath(params$iseapp_data, mustWork = TRUE)
+
+con <- dbConnect(duckdb())
+
+# `is_global` is derived on the fly exactly as the Explorer's
+# full_patent_database view derives it; only its NOT NULL-ness is used here,
+# as the row-selection restriction the app applies to every query.
+dbExecute(con, sprintf("
+  CREATE OR REPLACE VIEW p_raw AS
+  SELECT *,
+    CASE WHEN cost IS NULL OR cost = 0 THEN 0
+         ELSE ((alpha + 1) / cost) * ev_global * CAST(pv <= 2 * cost AS DOUBLE)
+    END AS is_global
+  FROM read_parquet('%s')", file.path(d, "patent_database.parquet")))
+
+for (t in c("patents_x_tech", "tech_lookup", "country_lookup")) {
+  dbExecute(con, sprintf(
+    "CREATE OR REPLACE TABLE %s AS SELECT * FROM read_parquet('%s')",
+    t, file.path(d, paste0(t, ".parquet"))))
+}
+
+flt <- paste(
+  if (multifam_only) "AND p.fam_size_min2 = TRUE" else "",
+  if (exclude_um)    "AND p.is_um = FALSE"        else "",
+  if (granted_only)  "AND p.granted = TRUE"       else "")
+
+# Numerator: distinct families per country matching the technology filter.
+tech_counts <- dbGetQuery(con, sprintf("
+  WITH ft AS (
+    SELECT DISTINCT t.docdb_family_id
+    FROM patents_x_tech t
+    JOIN tech_lookup tl ON t.technology = tl.technology
+    WHERE tl.tech_group IN ('%s') OR t.technology IN ('%s')
+  )
+  SELECT p.ctry_code, COUNT(DISTINCT p.docdb_family_id) AS innos
+  FROM p_raw p
+  INNER JOIN ft ON p.docdb_family_id = ft.docdb_family_id
+  JOIN country_lookup cl ON p.ctry_code = cl.ctry_code
+  WHERE p.%s IS NOT NULL %s
+  GROUP BY p.ctry_code", tech_sel, tech_sel, toflow, flt))
+
+# Denominator: the same row base, without the technology filter.
+all_counts <- dbGetQuery(con, sprintf("
+  SELECT p.ctry_code, COUNT(DISTINCT p.docdb_family_id) AS allinnos
+  FROM p_raw p
+  JOIN country_lookup cl ON p.ctry_code = cl.ctry_code
+  WHERE p.%s IS NOT NULL %s
+  GROUP BY p.ctry_code", toflow, flt))
+
+lookup <- dbGetQuery(con, "SELECT ctry_code, is_hic FROM country_lookup")
+
+world_share <- sum(tech_counts$innos) / sum(all_counts$allinnos)
+
+dat <- tech_counts |>
+  left_join(all_counts, by = "ctry_code") |>
+  left_join(lookup,     by = "ctry_code") |>
+  filter(allinnos >= min_allinnos) |>
+  mutate(
+    share_c      = innos / allinnos,
+    RTA          = 2 * share_c / (share_c + world_share),
+    share_global = 100 * innos / sum(tech_counts$innos),
+    income       = if_else(is_hic, "High income countries",
+                                   "Low & middle income countries"),
+    country_name = coalesce(
+      countrycode(ctry_code, "iso2c", "country.name.en", warn = FALSE),
+      ctry_code)
+  )
+```
+
+The current build gives `r format(sum(tech_counts$innos), big.mark = ",")` country-level
+adaptation innovations against
+`r format(sum(all_counts$allinnos), big.mark = ",")` innovations in total — so adaptation
+is **`r sprintf("%.2f%%", 100 * world_share)`** of world innovation, and that figure is the
+yardstick RTA = 1 refers to. After the `r min_allinnos`-innovation floor,
+`r nrow(dat)` countries remain.
+
+## The figure
+
+Each bar is one country. **Height is RTA**; **width is the country's share of world
+adaptation innovation**, so the bars are laid out along an axis measured in percent
+of world adaptation innovation — a bar you can barely see is a country that barely
+registers in the global total. Colour is the Explorer's income classification. Hover
+any bar for the underlying counts.
+
+```{r disconnect}
+dbDisconnect(con, shutdown = TRUE)
+```
+
+```{r plotfun}
+pal <- c("High income countries"         = "#3d5bd9",
+         "Low & middle income countries" = "#c8bb8b")
+
+lab_col <- c("High income countries"         = "#2b3fa8",
+             "Low & middle income countries" = "#8a7c46")
+
+# Spread label positions so narrow neighbouring bars stay readable: labels are
+# nudged apart left-to-right until they no longer overlap, then pulled back
+# inside the panel, and leader lines run from each bar to its label.
+spread_labels <- function(x, halfw, lo, hi, pad) {
+  o <- order(x); x <- x[o]; halfw <- halfw[o]
+  for (i in seq_along(x)[-1]) {
+    need <- x[i - 1] + halfw[i - 1] + halfw[i] + pad
+    if (x[i] < need) x[i] <- need
+  }
+  if (x[length(x)] + halfw[length(x)] > hi) {
+    x[length(x)] <- hi - halfw[length(x)]
+    for (i in rev(seq_along(x))[-1]) {
+      room <- x[i + 1] - halfw[i + 1] - halfw[i] - pad
+      if (x[i] > room) x[i] <- room
+    }
+  }
+  x <- pmax(x, lo + halfw)
+  out <- numeric(length(x)); out[o] <- x; out
+}
+
+# Variable-width bar panel: width proportional to `share_global`, laid out
+# cumulatively along x, height = RTA, labels on leader lines above the bars.
+make_panel <- function(df, title) {
+  df <- df |>
+    arrange(desc(RTA)) |>
+    mutate(
+      xmax = cumsum(share_global),
+      xmin = xmax - share_global,
+      xmid = (xmin + xmax) / 2
+    )
+
+  span <- max(df$xmax)
+
+  # Three staggered rows above the bars, so a label never sits on a bar.
+  rows  <- c(2.12, 2.30, 2.48)
+  df$lab_y <- rows[(rank(df$xmid, ties.method = "first") - 1) %% 3 + 1]
+
+  # Rough character width in data units: the drawing area holds roughly 60
+  # characters of label text across at this font size once the legend is
+  # accounted for.
+  char_w   <- span / 60
+  df$halfw <- nchar(df$country_name) * char_w / 2
+  df$lab_x <- df$xmid
+
+  for (r in rows) {
+    k <- df$lab_y == r
+    if (sum(k) > 1) {
+      df$lab_x[k] <- spread_labels(df$xmid[k], df$halfw[k], 0, span, char_w * 0.4)
+    } else if (sum(k) == 1) {
+      df$lab_x[k] <- pmin(pmax(df$xmid[k], df$halfw[k]), span - df$halfw[k])
+    }
+  }
+
+  ggplot(df) +
+    geom_rect_interactive(
+      aes(xmin = xmin, xmax = xmax, ymin = 0, ymax = RTA, fill = income,
+          data_id = ctry_code,
+          tooltip = paste0(
+            country_name,
+            "\nRTA: ", sprintf("%.2f", RTA),
+            "\nAdaptation innovations: ", format(innos, big.mark = ","),
+            "\nAll innovations: ", format(allinnos, big.mark = ","),
+            "\nShare of world adaptation: ", sprintf("%.2f%%", share_global),
+            "\nAdaptation share of own innovation: ", sprintf("%.2f%%", 100 * share_c))),
+      colour = "white", linewidth = 0.15) +
+    # leader line: up from the bar, then across to the label
+    geom_segment(aes(x = xmid, xend = xmid, y = RTA, yend = 2.04),
+                 colour = "#9a9ab0", linewidth = 0.3) +
+    geom_segment(aes(x = xmid, xend = lab_x, y = 2.04, yend = lab_y - 0.04),
+                 colour = "#9a9ab0", linewidth = 0.3) +
+    geom_text(aes(x = lab_x, y = lab_y, label = country_name, colour = income),
+              size = 3.1, vjust = 0, show.legend = FALSE) +
+    geom_hline(yintercept = 1, linetype = "dashed",
+               colour = "#8a8a8a", linewidth = 0.35) +
+    scale_fill_manual(values = pal, name = NULL, drop = FALSE) +
+    scale_colour_manual(values = lab_col, drop = FALSE) +
+    scale_y_continuous(breaks = c(0, 1, 2)) +
+    coord_cartesian(xlim = c(0, span), ylim = c(0, 2.62),
+                    expand = FALSE, clip = "off") +
+    labs(title = title,
+         x = "Cumulative share of world adaptation innovation (%)",
+         y = "RTA") +
+    theme_minimal(base_size = 12) +
+    theme(
+      plot.title         = element_text(hjust = 0.5, face = "bold", size = 13),
+      plot.margin        = margin(6, 10, 6, 6),
+      panel.grid.minor   = element_blank(),
+      panel.grid.major.x = element_blank(),
+      axis.title.x       = element_text(size = 10, colour = "#555"),
+      axis.title.y       = element_text(size = 10, colour = "#555", angle = 0,
+                                        vjust = 0.53, hjust = 1,
+                                        margin = margin(r = 4)),
+      legend.position    = "right",
+      legend.text        = element_text(size = 9)
+    )
+}
+
+top_rta   <- dat |> arrange(desc(RTA))          |> head(top_n)
+top_share <- dat |> arrange(desc(share_global)) |> head(top_n)
+```
+
+```{r fig_rta, fig.width = 9, fig.height = 4.6}
+girafe(ggobj = make_panel(top_rta,
+         sprintf("Top %d countries by RTA in adaptation", top_n)),
+       width_svg = 9, height_svg = 4.6,
+       options = list(
+         opts_sizing(rescale = TRUE, width = 1),
+         opts_hover(css = "fill-opacity:0.75;"),
+         opts_tooltip(css = paste0("background-color:white;padding:6px;",
+                                   "border-radius:3px;border:1px solid #ccc;",
+                                   "font-family:sans-serif;font-size:11px;"))))
+```
+
+```{r fig_share, fig.width = 9, fig.height = 4.6}
+girafe(ggobj = make_panel(top_share,
+         sprintf("Top %d countries by share of world adaptation innovation", top_n)),
+       width_svg = 9, height_svg = 4.6,
+       options = list(
+         opts_sizing(rescale = TRUE, width = 1),
+         opts_hover(css = "fill-opacity:0.75;"),
+         opts_tooltip(css = paste0("background-color:white;padding:6px;",
+                                   "border-radius:3px;border:1px solid #ccc;",
+                                   "font-family:sans-serif;font-size:11px;"))))
+```
+
+Note the two x-axes. The top panel's `r top_n` countries together account for
+**`r sprintf("%.2f%%", sum(top_rta$share_global))`** of world adaptation innovation;
+the bottom panel's `r top_n` account for
+**`r sprintf("%.1f%%", sum(top_share$share_global))`**.
+
+## What it says
+
+**Specialisation and scale are almost disjoint.** The countries most *oriented* towards
+adaptation are small and mostly outside the high-income group; between them they hold a
+rounding error's worth of the world's adaptation innovation. The countries that *hold*
+the adaptation portfolio are the usual patent powers, and their RTAs cluster around 1 —
+adaptation is neither a priority nor a blind spot for them, it is simply proportional
+to everything else they do.
+
+**Around 1 is the norm, and that is itself informative.** Nobody in the bottom panel is
+strongly specialised. There is no large economy that has turned itself into an adaptation
+innovator the way some have in, say, green energy.
+
+**The demand-supply mismatch is visible in one picture.** Adaptation need is concentrated
+where climate exposure and low incomes coincide. Adaptation *innovation capacity* is
+concentrated where the patent system is. The countries in the top panel are pointed in
+the right direction but are tiny; the countries in the bottom panel are large but not
+pointed anywhere in particular.
+
+## The numbers
+
+### Top `r top_n` by RTA
+
+```{r tbl_rta}
+top_rta |>
+  transmute(Country = country_name,
+            Income  = income,
+            RTA     = round(RTA, 2),
+            `Adaptation innovations` = innos,
+            `All innovations`        = allinnos,
+            `Adaptation share of own innovation (%)` = round(100 * share_c, 2),
+            `Share of world adaptation (%)`          = round(share_global, 3))
+```
+
+### Top `r top_n` by share of world adaptation innovation
+
+```{r tbl_share}
+top_share |>
+  transmute(Country = country_name,
+            Income  = income,
+            RTA     = round(RTA, 2),
+            `Adaptation innovations` = innos,
+            `All innovations`        = allinnos,
+            `Adaptation share of own innovation (%)` = round(100 * share_c, 2),
+            `Share of world adaptation (%)`          = round(share_global, 3))
+```
+
+## Caveats
+
+**Income classification is binary here.** The Explorer's database carries one income
+flag per country (`is_hic` in `country_lookup`), so the legend splits high income from
+low-and-middle income rather than the three World Bank classes. It also follows the
+project's own fixed country list, which is not re-based on the World Bank's annual
+reclassifications — a handful of countries (Chile among them) sit in the low-and-middle
+group here although the World Bank now calls them high income.
+
+**Innovations are counted per country, not split between them.** A family with inventors
+in two countries counts once for each, so country counts sum to more than the world
+total and the share axis is a share of that summed total.
+
+**"Adaptation" is a CPC-based technology class**, and the boundary between adaptation and
+mitigation is genuinely fuzzy — efficient cooling, water treatment and resilient
+agriculture can sit on either side.
+
+**The multi-application and utility-model screens are doing real work.** Dropping them
+raises China's counts sharply. They are defensible quality screens, not neutral ones.
+
+## Reproducing this in the Explorer
+
+The same cut is reachable interactively:
+[Country Explorer → Revealed Technological Advantage, Adaptation, multi-application
+families only, utility models excluded, all-innovation threshold 100](https://mondpanther-iseapp2.share.connect.posit.cloud/?_inputs_&country-sidebar=true&navbar_page=%22Country%20Explorer%22&country-inner_tabs=%22Revealed%20Technological%20Advantage%22&country-country=%22All%20countries%22&country-techs=%22Adaptation%22&country-toflow=%22is_global%22&country-multifam_only=true&country-exclude_um=true&country-granted_only=false&country-topn_rta=10&country-minallinnos_rta=100).
+
+This note renders from `adaptation-rta.Rmd` with `top_n` as a parameter:
+
+```r
+rmarkdown::render("adaptation-rta.Rmd", params = list(top_n = 15))
+```
