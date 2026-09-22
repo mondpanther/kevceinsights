@@ -218,7 +218,7 @@ adapt_widget_html_head <- paste0(
 '<div class="adapt-tip" id="adapt-tip"></div>',
 '</div>')
 
-adapt_widget_js <- r"(<script>
+adapt_widget_js <- r"----(<script>
 (function(){
 var NS="http://www.w3.org/2000/svg";
 var PAL={"High income countries":"#3d5bd9","Low & middle income countries":"#c8bb8b"};
@@ -286,7 +286,9 @@ function drawPanel(host,rows,title){
     if(o&&o.weight){t.setAttribute("font-weight",o.weight);}
     t.textContent=s;svg.appendChild(t);return t;
   }
-  txt(W/2,20,title,{size:13,fill:"#1d1d1d",weight:"600"});
+  var ttl=txt(W/2,20,title,{size:13,fill:"#1d1d1d",weight:"600"});
+  try{var tl=ttl.getComputedTextLength();
+    if(tl>W-20){ttl.setAttribute("font-size",Math.max(8.5,13*(W-20)/tl*0.95));}}catch(e){}
   [0,1,2].forEach(function(v){
     svg.appendChild(mk("line",{x1:m.l,x2:W-m.r,y1:py(v),y2:py(v),
       stroke:v===1?"#8a8a8a":"#e6e6e2","stroke-width":v===1?1:1,
@@ -398,7 +400,7 @@ function init(){
 if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",init);}
 else{init();}
 })();
-</script>)"
+</script>)----"
 ```
 
 ```{r widget, results = "asis"}
