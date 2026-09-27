@@ -1,0 +1,143 @@
+---
+title: "To degrow or to regrow?"
+subtitle: "Why stopping growth won't stop emissions — and why rebuilding the capital stock will"
+author: "Ralf Martin"
+date: 2026-08-06
+format:
+  html:
+    toc: true
+    embed-resources: true
+---
+
+<!-- Source reconstructed 2026-09-27 from the rendered degrowth-or-regrowth.html
+     (the original .qmd was never committed); model extended with sector-specific
+     technology growth rates g_D and g_C (equal by default, reproducing the
+     original single-g model exactly). -->
+
+## The argument in one paragraph
+
+Economic growth over the last two centuries created unprecedented wealth — and, along the way, climate change. The degrowth movement concludes that the way to fix the environment is to stop, or reverse, growth. This rests on a misunderstanding of what economists mean by growth and what actually drives emissions. The real problem is not the *flow* of output but the *stock of dirty capital* we have built up. Stopping growth does almost nothing about that stock — we would keep emitting far too much every year even in a perfectly stagnant economy. The only way out is to *rebuild* the capital stock as clean capital, and that is an investment problem that shrinking the economy makes harder, not easier. So the honest slogan is not degrowth but **regrowth** — and you can test the logic yourself with the interactive model below.
+
+## Why do economies grow?
+
+The workhorse model of growth is the Solow model. Output is produced from capital $K$, labour $L$ and a technology level $A$ via a Cobb–Douglas production function, $Y = A\,K^{\alpha}L^{1-\alpha}$, with **decreasing returns to each individual factor**. Capital has to be produced: it rises with the saved-and-invested share $s$ of output and falls as a fraction $\delta$ depreciates each year. Because investment runs into decreasing returns while depreciation is proportional to the stock, the economy converges to a **steady state** and then stops growing. Capital accumulation alone cannot sustain growth, and population growth cannot raise output *per head*. The only thing that does is **technological progress** [Solow 1956].
+
+The implication for the degrowth debate is immediate: in the long run, "growth" and "innovation" are the same thing. To *permanently* stop growth you would have to stop innovation — which is neither desirable (innovation is our main tool against climate change) nor feasible. This is essentially the case Aghion and co-authors make in *The Power of Creative Destruction* [Aghion, Antonin & Bunel 2021]; van den Bergh [2011] makes the more careful version — that a deliberate GDP contraction would starve the clean investment we need — and pleads for "a-growth".
+
+## But growth is not the problem — the capital stock is
+
+The usual green-growth reply is that richer economies are less carbon-intensive, because people buy more low-carbon services. True, but it misses the binding constraint. Even if every extra unit of output were a zero-carbon service, the **dirty capital we already own keeps emitting** — coal plants, blast furnaces, gas boilers, petrol cars. Put it at its sharpest: *even a perfectly stagnant, zero-growth economy would still emit far too much every year.* A smaller economy full of dirty capital is still a dirty economy. The only way to cut emissions is to *replace* the dirty capital stock with clean capital — an investment problem.
+
+## Try it yourself
+
+Split the capital stock into **dirty** capital $K_D$ and **clean** capital $K_C$ (clean is initially less productive, weighted by $\phi<1$). Pollution is a property of the dirty part, $P = \omega\,Y\,\tfrac{K_D}{K_D+K_C}$, where $\omega$ is emissions per unit of dirty output. Technology need not be neutral either: dirty and clean technology can improve at their own rates $g_D$ and $g_C$, and $\phi$ — the clean-to-dirty productivity ratio — drifts with the gap between them ($\phi$ rises when $g_C>g_D$, falls when clean innovation lags). Move the sliders below to set your own policy — how much to invest in dirty vs. clean capital, how hard to work, how fast each technology improves, and how dirty output is — and compare **your economy** (red) against **business as usual** (grey: keep investing in dirty capital at 5%).
+
+```{ojs}
+viewof sd = Inputs.range([0, 0.15], {value: 0.05, step: 0.005, label: "Savings → dirty capital (sᴰ)"})
+viewof sc = Inputs.range([0, 0.15], {value: 0.00, step: 0.005, label: "Savings → clean capital (sᶜ)"})
+viewof omega = Inputs.range([0, 1.5], {value: 1.0, step: 0.05, label: "Emissions per unit of dirty output (ω)"})
+viewof Lval = Inputs.range([0.6, 1.0], {value: 1.0, step: 0.05, label: "Work / labour (L)"})
+viewof gd = Inputs.range([0, 0.04], {value: 0.02, step: 0.005, label: "Tech growth, dirty (g_D)"})
+viewof gc = Inputs.range([0, 0.04], {value: 0.02, step: 0.005, label: "Tech growth, clean (g_C)"})
+viewof phi = Inputs.range([0.5, 1.0], {value: 0.8, step: 0.05, label: "Initial clean-capital productivity (ϕ = A_C/A_D)"})
+viewof tau = Inputs.range([0, 1.0], {value: 0.3, step: 0.05, label: "Emissions price for net GDP (τ)"})
+```
+
+```{ojs}
+function runModel(sd, sc, L, gd, gc, omega, phi0) {
+  const alpha = 0.3, dd = 0.2, dc = 0.2, N = 25;
+  let Kd = 0.1, Kc = 0.0, A = 0.75, phi = phi0;  // A = A_D; phi = A_C/A_D
+  let K = Kd + phi*Kc;
+  let Y = Math.pow(K, alpha) * A;   // L=1 at the common start
+  let Id = 0.05*Y, Ic = 0.0;
+  const out = [{t: 1, Y, poll: omega*Y*Kd/(Kd+Kc), cons: Y*(1-0.05)}];
+  for (let t = 2; t <= N; t++) {
+    const nKd = Kd*(1-dd) + Id, nKc = Kc*(1-dc) + Ic;
+    Kd = nKd; Kc = nKc;
+    A = A*(1+gd);                   // dirty technology
+    phi = phi*(1+gc)/(1+gd);        // clean/dirty gap moves with g_C - g_D
+    K = Kd + phi*Kc;
+    Y = Math.pow(K, alpha) * Math.pow(L, 1-alpha) * A;
+    Id = sd*Y; Ic = sc*Y;
+    out.push({t, Y, poll: omega*Y*Kd/(Kd+Kc), cons: Y*(1-sd-sc)});
+  }
+  return out;
+}
+
+series = {
+  const addNet = d => ({...d, netY: d.Y - tau*d.poll});
+  const you = runModel(sd, sc, Lval, gd, gc, omega, phi).map(d => ({...addNet(d), who: "Your economy"}));
+  const bau = runModel(0.05, 0.0, 1.0, gd, gc, omega, phi).map(d => ({...addNet(d), who: "Business as usual"}));
+  return bau.concat(you);
+}
+
+col = ({legend: true, domain: ["Business as usual", "Your economy"], range: ["#5b6773", "#A5332B"]})
+
+function chart(y, label) {
+  return Plot.plot({
+    height: 240, marginLeft: 55, marginBottom: 35,
+    x: {label: "Period →"},
+    y: {label: label, grid: true, zero: true},
+    color: col,
+    marks: [ Plot.line(series, {x: "t", y: y, stroke: "who", strokeWidth: 2.6}) ]
+  });
+}
+```
+
+::: {.panel-tabset}
+
+## Pollution
+
+```{ojs}
+chart("poll", "Annual pollution")
+```
+
+## Output (GDP)
+
+```{ojs}
+chart("Y", "Output")
+```
+
+## Consumption
+
+```{ojs}
+chart("cons", "Consumption")
+```
+
+## Net GDP
+
+```{ojs}
+chart("netY", "Net GDP  (Y − τ·pollution)")
+```
+
+:::
+
+A few experiments to try. **Degrowth alone:** leave clean savings at zero and pull *Work / labour* down — pollution barely moves, because the dirty capital is still running. **The transition:** set dirty savings to zero and clean savings to 5% — emissions fall as the dirty stock depreciates away. **Invest more:** push clean savings to 10% — emissions fall faster *and* output ends up higher. **Degrowth + transition:** now also cut *Work / labour* — you get the emissions cut, but it's the most painful path for consumption, because you're rebuilding the capital stock with a smaller surplus. **Directed innovation:** push clean tech growth $g_C$ above dirty $g_D$ — $\phi$ climbs as clean knowledge catches up and the transition gets ever cheaper; flip the two rates to watch technological lock-in deepen instead.
+
+## Does the GDP critique rescue degrowth?
+
+A standard objection at this point: *"GDP is a poor measure of wellbeing, so maximising it is the wrong objective in the first place."* We agree with the premise — and the model already contains the fix. Assign a monetary value $\tau$ to each unit of emissions and compute **net GDP**,
+
+$$Y^{net} = Y - \tau \cdot P,$$
+
+which is precisely what the *Net GDP* tab above shows (move the $\tau$ slider to make the environmental damage weigh as heavily as you like). Two things follow.
+
+First, **re-valuing output does not change the dynamics**. Net GDP is a different way of *scoring* the paths, but the paths themselves — how capital accumulates, what pollutes — are untouched. The degrowth path (work less, keep the dirty investment pattern) is a one-off cut to the *level* of output; the growth *rate* is still set by technical progress $g$. Push $\tau$ as high as you like: working less still barely dents pollution, because the dirty capital stock is still there and still running. Indeed, as long as $g>0$ — even if fewer hours also slowed innovation somewhat — output, and with it emissions, keeps growing without bound on the degrowth path. A level shift is asymptotically irrelevant against exponential growth.
+
+Second, and more interestingly: **taking net GDP seriously leads to green growth, not degrowth**. With a high $\tau$, the path that maximises net GDP is not the one that works less — it is the one that redirects investment from dirty to clean capital, because that is what removes the $\tau\cdot P$ penalty while keeping output. If society actually *priced* emissions at $\tau$, firms would make exactly that reallocation on their own — the emissions price is the transition policy. The GDP critique, followed to its logical end, is an argument for pricing carbon and rebuilding the capital stock — not for shrinking the economy.
+
+One honest concession: during a *slow* transition, a temporary reduction in output does shave some cumulative emissions while the clean stock builds up — that is why the "degrowth + transition" path sits slightly below "transition alone" on pollution, at a real consumption cost. So the precise statement is: the transition is *necessary*; degrowth is *neither necessary nor sufficient* — at best a costly way to buy a little carbon-budget headroom.
+
+## Degrowth or regrowth?
+
+The binding constraint on emissions is the **stock of dirty capital**, not the **flow of GDP**. Stopping growth leaves that stock in place and keeps the emissions coming. The only exit is to invest in clean capital and let the dirty capital retire — a process that is easier the more output you have to invest, and hardest if you are deliberately shrinking. This is the directed-technical-change logic of Acemoglu, Aghion, Bursztyn & Hémous [2012] in capital-accumulation form, and a two-capital cousin of the Green Solow model [Brock & Taylor 2010]. So the choice is badly framed: we do not face *degrowth vs. catastrophe* but **rebuild vs. catastrophe** — and rebuilding is an investment programme that growth pays for.
+
+## References
+
+- Acemoglu, D., Aghion, P., Bursztyn, L. & Hémous, D. (2012). "The Environment and Directed Technical Change." *American Economic Review* 102(1): 131–166.
+- Aghion, P., Antonin, C. & Bunel, S. (2021). *The Power of Creative Destruction.* Harvard University Press.
+- Brock, W. A. & Taylor, M. S. (2010). "The Green Solow Model." *Journal of Economic Growth* 15(2): 127–153.
+- Solow, R. M. (1956). "A Contribution to the Theory of Economic Growth." *Quarterly Journal of Economics* 70(1): 65–94.
+- van den Bergh, J. C. J. M. (2011). "Environment versus growth — A criticism of 'degrowth' and a plea for 'a-growth'." *Ecological Economics* 70(5): 881–890.
+
+*A stylised two-capital Solow simulation; parameters are illustrative.*
