@@ -1,0 +1,73 @@
+// ---- ojs-cell-1 ----
+viewof sd = Inputs.range([0, 0.15], {value: 0.05, step: 0.005, label: "Savings → dirty capital (sᴰ)"})
+viewof sc = Inputs.range([0, 0.15], {value: 0.00, step: 0.005, label: "Savings → clean capital (sᶜ)"})
+viewof omega = Inputs.range([0, 1.5], {value: 1.0, step: 0.05, label: "Emissions per unit of dirty output (ω)"})
+viewof Lval = Inputs.range([0.6, 1.0], {value: 1.0, step: 0.05, label: "Work / labour (L)"})
+viewof g = Inputs.range([0, 0.04], {value: 0.02, step: 0.005, label: "Tech growth (g)"})
+viewof phi = Inputs.range([0.5, 1.0], {value: 0.8, step: 0.05, label: "Clean-capital productivity (ϕ)"})
+viewof tau = Inputs.range([0, 1.0], {value: 0.3, step: 0.05, label: "Emissions price for net GDP (τ)"})
+
+// ---- ojs-cell-2 ----
+function runModel(sd, sc, L, g, omega, phi) {
+  const alpha = 0.3, dd = 0.2, dc = 0.2, N = 25;
+  let Kd = 0.1, Kc = 0.0, A = 0.75;
+  let K = Kd + phi*Kc;
+  let Y = Math.pow(K, alpha) * A;   // L=1 at the common start
+  let Id = 0.05*Y, Ic = 0.0;
+  const out = [{t: 1, Y, poll: omega*Y*Kd/(Kd+Kc), cons: Y*(1-0.05)}];
+  for (let t = 2; t <= N; t++) {
+    const nKd = Kd*(1-dd) + Id, nKc = Kc*(1-dc) + Ic;
+    Kd = nKd; Kc = nKc; A = A*(1+g);
+    K = Kd + phi*Kc;
+    Y = Math.pow(K, alpha) * Math.pow(L, 1-alpha) * A;
+    Id = sd*Y; Ic = sc*Y;
+    out.push({t, Y, poll: omega*Y*Kd/(Kd+Kc), cons: Y*(1-sd-sc)});
+  }
+  return out;
+}
+
+series = {
+  const addNet = d => ({...d, netY: d.Y - tau*d.poll});
+  const you = runModel(sd, sc, Lval, g, omega, phi).map(d => ({...addNet(d), who: "Your economy"}));
+  const bau = runModel(0.05, 0.0, 1.0, g, omega, phi).map(d => ({...addNet(d), who: "Business as usual"}));
+  return bau.concat(you);
+}
+
+col = ({legend: true, domain: ["Business as usual", "Your economy"], range: ["#5b6773", "#A5332B"]})
+
+function chart(y, label) {
+  return Plot.plot({
+    height: 240, marginLeft: 55, marginBottom: 35,
+    x: {label: "Period →"},
+    y: {label: label, grid: true, zero: true},
+    color: col,
+    marks: [ Plot.line(series, {x: "t", y: y, stroke: "who", strokeWidth: 2.6}) ]
+  });
+}
+
+// ---- ojs-cell-3 ----
+chart("poll", "Annual pollution")
+
+// ---- ojs-cell-4 ----
+chart("Y", "Output")
+
+// ---- ojs-cell-5 ----
+chart("cons", "Consumption")
+
+// ---- ojs-cell-6 ----
+chart("netY", "Net GDP  (Y − τ·pollution)")
+
+// ---- ? ----
+shinyInput('sd')
+// ---- ? ----
+shinyInput('sc')
+// ---- ? ----
+shinyInput('omega')
+// ---- ? ----
+shinyInput('Lval')
+// ---- ? ----
+shinyInput('g')
+// ---- ? ----
+shinyInput('phi')
+// ---- ? ----
+shinyInput('tau')
