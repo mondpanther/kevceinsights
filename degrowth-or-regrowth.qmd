@@ -9,10 +9,12 @@ format:
     embed-resources: true
 ---
 
+```{=html}
 <!-- Source reconstructed 2026-09-27 from the rendered degrowth-or-regrowth.html
      (the original .qmd was never committed); model extended with sector-specific
      technology growth rates g_D and g_C (equal by default, reproducing the
      original single-g model exactly). -->
+```
 
 ## The argument in one paragraph
 
@@ -20,9 +22,9 @@ Economic growth over the last two centuries created unprecedented wealth — and
 
 ## Why do economies grow?
 
-The workhorse model of growth is the Solow model. Output is produced from capital $K$, labour $L$ and a technology level $A$ via a Cobb–Douglas production function, $Y = A\,K^{\alpha}L^{1-\alpha}$, with **decreasing returns to each individual factor**. Capital has to be produced: it rises with the saved-and-invested share $s$ of output and falls as a fraction $\delta$ depreciates each year. Because investment runs into decreasing returns while depreciation is proportional to the stock, the economy converges to a **steady state** and then stops growing. Capital accumulation alone cannot sustain growth, and population growth cannot raise output *per head*. The only thing that does is **technological progress** [Solow 1956].
+The workhorse model of growth is the Solow model. Output is produced from capital $K$, labour $L$ and a technology level $A$ via a Cobb–Douglas production function, $Y = A\,K^{\alpha}L^{1-\alpha}$, with **decreasing returns to each individual factor**. Capital has to be produced: it rises with the saved-and-invested share $s$ of output and falls as a fraction $\delta$ depreciates each year. Because investment runs into decreasing returns while depreciation is proportional to the stock, the economy converges to a **steady state** and then stops growing. Capital accumulation alone cannot sustain growth, and population growth cannot raise output *per head*. The only thing that does is **technological progress** \[Solow 1956\].
 
-The implication for the degrowth debate is immediate: in the long run, "growth" and "innovation" are the same thing. To *permanently* stop growth you would have to stop innovation — which is neither desirable (innovation is our main tool against climate change) nor feasible. This is essentially the case Aghion and co-authors make in *The Power of Creative Destruction* [Aghion, Antonin & Bunel 2021]; van den Bergh [2011] makes the more careful version — that a deliberate GDP contraction would starve the clean investment we need — and pleads for "a-growth".
+The implication for the degrowth debate is immediate: in the long run, "growth" and "innovation" are the same thing. To *permanently* stop growth you would have to stop innovation — which is neither desirable (innovation is our main tool against climate change) nor feasible. This is essentially the case Aghion and co-authors make in *The Power of Creative Destruction* \[Aghion, Antonin & Bunel 2021\]; van den Bergh \[2011\] makes the more careful version — that a deliberate GDP contraction would starve the clean investment we need — and pleads for "a-growth".
 
 ## But growth is not the problem — the capital stock is
 
@@ -84,8 +86,7 @@ function chart(y, label) {
 }
 ```
 
-::: {.panel-tabset}
-
+::: panel-tabset
 ## Pollution
 
 ```{ojs}
@@ -109,7 +110,6 @@ chart("cons", "Consumption")
 ```{ojs}
 chart("netY", "Net GDP  (Y − τ·pollution)")
 ```
-
 :::
 
 A few experiments to try. **Degrowth alone:** leave clean savings at zero and pull *Work / labour* down — pollution barely moves, because the dirty capital is still running. **The transition:** set dirty savings to zero and clean savings to 5% — emissions fall as the dirty stock depreciates away. **Invest more:** push clean savings to 10% — emissions fall faster *and* output ends up higher. **Degrowth + transition:** now also cut *Work / labour* — you get the emissions cut, but it's the most painful path for consumption, because you're rebuilding the capital stock with a smaller surplus. **Directed innovation:** push clean tech growth $g_C$ above dirty $g_D$ — $\phi$ climbs as clean knowledge catches up and the transition gets ever cheaper; flip the two rates to watch technological lock-in deepen instead.
@@ -130,7 +130,7 @@ One honest concession: during a *slow* transition, a temporary reduction in outp
 
 ## Degrowth or regrowth?
 
-The binding constraint on emissions is the **stock of dirty capital**, not the **flow of GDP**. Stopping growth leaves that stock in place and keeps the emissions coming. The only exit is to invest in clean capital and let the dirty capital retire — a process that is easier the more output you have to invest, and hardest if you are deliberately shrinking. This is the directed-technical-change logic of Acemoglu, Aghion, Bursztyn & Hémous [2012] in capital-accumulation form, and a two-capital cousin of the Green Solow model [Brock & Taylor 2010]. So the choice is badly framed: we do not face *degrowth vs. catastrophe* but **rebuild vs. catastrophe** — and rebuilding is an investment programme that growth pays for.
+The binding constraint on emissions is the **stock of dirty capital**, not the **flow of GDP**. Stopping growth leaves that stock in place and keeps the emissions coming. The only exit is to invest in clean capital and let the dirty capital retire — a process that is easier the more output you have to invest, and hardest if you are deliberately shrinking. This is the directed-technical-change logic of Acemoglu, Aghion, Bursztyn & Hémous \[2012\] in capital-accumulation form, and a two-capital cousin of the Green Solow model \[Brock & Taylor 2010\]. So the choice is badly framed: we do not face *degrowth vs. catastrophe* but **rebuild vs. catastrophe** — and rebuilding is an investment programme that growth pays for.
 
 ## References
 
