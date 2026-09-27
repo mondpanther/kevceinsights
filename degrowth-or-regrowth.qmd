@@ -70,7 +70,7 @@ viewof Lval = Inputs.range([0.6, 1.0], {value: 1.0, step: 0.05, label: htl.html`
 ```{ojs}
 viewof omega = Inputs.range([0, 1.5], {value: 1.0, step: 0.05, label: htl.html`Emissions per unit of dirty output (<i>ω</i>)`})
 viewof g = Inputs.range([0, 0.04], {value: 0.02, step: 0.005, label: htl.html`Tech growth (<i>g</i>)`})
-viewof xeta = Inputs.range([0, 1.0], {value: 0, step: 0.01, label: htl.html`Clean catch-up strength (<i>ξ</i>)`})
+viewof xeta = Inputs.range([0, 2.0], {value: 0, step: 0.01, label: htl.html`Clean catch-up strength (<i>ξ</i>)`})
 ```
 :::
 
