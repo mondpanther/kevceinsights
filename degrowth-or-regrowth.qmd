@@ -34,7 +34,7 @@ The usual green-growth reply is that richer economies are less carbon-intensive,
 
 ## Try it yourself
 
-Split the capital stock into **dirty** capital $K_D$ and **clean** capital $K_C$ (clean is initially less productive, weighted by $\phi<1$). Pollution is a property of the dirty part, $P = \omega\,Y\,\tfrac{K_D}{K_D+K_C}$, where $\omega$ is emissions per unit of dirty output. Technology need not be neutral either: dirty technology improves at rate $g$, while clean technology improves at $g_C = g\,(A_D/A_C)^{\xi}$ — with $\xi>0$, the further clean lags behind the frontier, the faster it learns from it, so $\phi = A_C/A_D$ converges towards 1; with $\xi=0$ (the default) both improve at $g$ and the gap is frozen. Move the sliders below to set your own policy — how much to invest in dirty vs. clean capital, how hard to work, how fast each technology improves, and how dirty output is — and compare **your economy** (red) against **business as usual** (grey: keep investing in dirty capital at 5%).
+Split the capital stock into **dirty** capital $K_D$ and **clean** capital $K_C$ (clean is initially less productive, weighted by $\phi<1$). Pollution is a property of the dirty part, $P = \omega\,Y\,\tfrac{K_D}{K_D+K_C}$, where $\omega$ is emissions per unit of dirty output. Technology need not be neutral either: dirty technology improves at rate $g$, while clean technology improves at $g_C = g - 1 + (A_D/A_C)^{\xi}$ — with $\xi>0$, clean enjoys a temporary growth **bonus** proportional to how far it lags the frontier, so $\phi = A_C/A_D$ converges towards 1 and the bonus melts away; with $\xi=0$ (the default) both improve at $g$ and the gap is frozen. Move the sliders below to set your own policy — how much to invest in dirty vs. clean capital, how hard to work, how fast each technology improves, and how dirty output is — and compare **your economy** (red) against **business as usual** (grey: keep investing in dirty capital at 5%).
 
 ```{ojs}
 viewof sd = Inputs.range([0, 0.15], {value: 0.05, step: 0.005, label: htl.html`Savings → dirty capital (<i>s<sub>D</sub></i>)`})
@@ -42,7 +42,7 @@ viewof sc = Inputs.range([0, 0.15], {value: 0.00, step: 0.005, label: htl.html`S
 viewof omega = Inputs.range([0, 1.5], {value: 1.0, step: 0.05, label: htl.html`Emissions per unit of dirty output (<i>ω</i>)`})
 viewof Lval = Inputs.range([0.6, 1.0], {value: 1.0, step: 0.05, label: htl.html`Work / labour (<i>L</i>)`})
 viewof g = Inputs.range([0, 0.04], {value: 0.02, step: 0.005, label: htl.html`Tech growth (<i>g</i>)`})
-viewof xeta = Inputs.range([0, 2], {value: 0, step: 0.1, label: htl.html`Clean catch-up strength (<i>ξ</i>)`})
+viewof xeta = Inputs.range([0, 0.3], {value: 0, step: 0.01, label: htl.html`Clean catch-up strength (<i>ξ</i>)`})
 viewof phi = Inputs.range([0.5, 1.0], {value: 0.8, step: 0.05, label: htl.html`Initial clean-capital productivity (<i>φ</i> = <i>A<sub>C</sub></i>/<i>A<sub>D</sub></i>)`})
 viewof tau = Inputs.range([0, 1.0], {value: 0.3, step: 0.05, label: htl.html`Emissions price for net GDP (<i>τ</i>)`})
 ```
@@ -58,7 +58,7 @@ function runModel(sd, sc, L, g, xeta, omega, phi0) {
   for (let t = 2; t <= N; t++) {
     const nKd = Kd*(1-dd) + Id, nKc = Kc*(1-dc) + Ic;
     Kd = nKd; Kc = nKc;
-    const gc = g * Math.pow(1/phi, xeta);  // clean tech: g_C = g (A_D/A_C)^xi
+    const gc = g - 1 + Math.pow(1/phi, xeta);  // clean tech: g_C = g - 1 + (A_D/A_C)^xi
     A = A*(1+g);                           // dirty technology grows at g
     phi = phi*(1+gc)/(1+g);                // xi > 0: the gap closes over time
     K = Kd + phi*Kc;
@@ -115,7 +115,7 @@ chart("netY", "Net GDP  (Y − τ·pollution)")
 ```
 :::
 
-A few experiments to try. **Degrowth alone:** leave clean savings at zero and pull *Work / labour* down — pollution barely moves, because the dirty capital is still running. **The transition:** set dirty savings to zero and clean savings to 5% — emissions fall as the dirty stock depreciates away. **Invest more:** push clean savings to 10% — emissions fall faster *and* output ends up higher. **Degrowth + transition:** now also cut *Work / labour* — you get the emissions cut, but it's the most painful path for consumption, because you're rebuilding the capital stock with a smaller surplus. **Catch-up:** push $\xi$ above zero — the further clean technology lags, the faster it learns from the frontier, so $\phi$ climbs towards 1 and the transition gets ever cheaper; at $\xi=0$ the productivity gap is frozen and lock-in persists.
+A few experiments to try. **Degrowth alone:** leave clean savings at zero and pull *Work / labour* down — pollution barely moves, because the dirty capital is still running. **The transition:** set dirty savings to zero and clean savings to 5% — emissions fall as the dirty stock depreciates away. **Invest more:** push clean savings to 10% — emissions fall faster *and* output ends up higher. **Degrowth + transition:** now also cut *Work / labour* — you get the emissions cut, but it's the most painful path for consumption, because you're rebuilding the capital stock with a smaller surplus. **Catch-up:** push $\xi$ above zero — clean technology grows faster than dirty *for a while*, with a bonus that shrinks as it closes the gap, so $\phi$ climbs towards 1 and the transition gets ever cheaper; at $\xi=0$ the productivity gap is frozen and lock-in persists.
 
 ## Does the GDP critique rescue degrowth?
 
