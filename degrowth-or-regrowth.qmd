@@ -37,14 +37,14 @@ The usual green-growth reply is that richer economies are less carbon-intensive,
 Split the capital stock into **dirty** capital $K_D$ and **clean** capital $K_C$ (clean is initially less productive, weighted by $\phi<1$). Pollution is a property of the dirty part, $P = \omega\,Y\,\tfrac{K_D}{K_D+K_C}$, where $\omega$ is emissions per unit of dirty output. Technology need not be neutral either: dirty technology improves at rate $g$, while clean technology improves at $g_C = g\,(A_D/A_C)^{\xi}$ — with $\xi>0$, the further clean lags behind the frontier, the faster it learns from it, so $\phi = A_C/A_D$ converges towards 1; with $\xi=0$ (the default) both improve at $g$ and the gap is frozen. Move the sliders below to set your own policy — how much to invest in dirty vs. clean capital, how hard to work, how fast each technology improves, and how dirty output is — and compare **your economy** (red) against **business as usual** (grey: keep investing in dirty capital at 5%).
 
 ```{ojs}
-viewof sd = Inputs.range([0, 0.15], {value: 0.05, step: 0.005, label: "Savings → dirty capital (sᴰ)"})
-viewof sc = Inputs.range([0, 0.15], {value: 0.00, step: 0.005, label: "Savings → clean capital (sᶜ)"})
-viewof omega = Inputs.range([0, 1.5], {value: 1.0, step: 0.05, label: "Emissions per unit of dirty output (ω)"})
-viewof Lval = Inputs.range([0.6, 1.0], {value: 1.0, step: 0.05, label: "Work / labour (L)"})
-viewof g = Inputs.range([0, 0.04], {value: 0.02, step: 0.005, label: "Tech growth (g)"})
-viewof xeta = Inputs.range([0, 2], {value: 0, step: 0.1, label: "Clean catch-up strength (ξ)"})
-viewof phi = Inputs.range([0.5, 1.0], {value: 0.8, step: 0.05, label: "Initial clean-capital productivity (ϕ = A_C/A_D)"})
-viewof tau = Inputs.range([0, 1.0], {value: 0.3, step: 0.05, label: "Emissions price for net GDP (τ)"})
+viewof sd = Inputs.range([0, 0.15], {value: 0.05, step: 0.005, label: htl.html`Savings → dirty capital (<i>s<sub>D</sub></i>)`})
+viewof sc = Inputs.range([0, 0.15], {value: 0.00, step: 0.005, label: htl.html`Savings → clean capital (<i>s<sub>C</sub></i>)`})
+viewof omega = Inputs.range([0, 1.5], {value: 1.0, step: 0.05, label: htl.html`Emissions per unit of dirty output (<i>ω</i>)`})
+viewof Lval = Inputs.range([0.6, 1.0], {value: 1.0, step: 0.05, label: htl.html`Work / labour (<i>L</i>)`})
+viewof g = Inputs.range([0, 0.04], {value: 0.02, step: 0.005, label: htl.html`Tech growth (<i>g</i>)`})
+viewof xeta = Inputs.range([0, 2], {value: 0, step: 0.1, label: htl.html`Clean catch-up strength (<i>ξ</i>)`})
+viewof phi = Inputs.range([0.5, 1.0], {value: 0.8, step: 0.05, label: htl.html`Initial clean-capital productivity (<i>φ</i> = <i>A<sub>C</sub></i>/<i>A<sub>D</sub></i>)`})
+viewof tau = Inputs.range([0, 1.0], {value: 0.3, step: 0.05, label: htl.html`Emissions price for net GDP (<i>τ</i>)`})
 ```
 
 ```{ojs}
