@@ -3,6 +3,7 @@ title: "To degrow or to regrow?"
 subtitle: "Why stopping growth won't stop emissions — and why rebuilding the capital stock will"
 author: "Ralf Martin"
 date: 2026-08-06
+date-modified: 2026-09-27
 format:
   html:
     toc: true
@@ -34,17 +35,39 @@ The usual green-growth reply is that richer economies are less carbon-intensive,
 
 ## Try it yourself
 
-Split the capital stock into **dirty** capital $K_D$ and **clean** capital $K_C$ (clean is initially less productive, weighted by $\phi<1$). Pollution is a property of the dirty part, $P = \omega\,Y\,\tfrac{K_D}{K_D+K_C}$, where $\omega$ is emissions per unit of dirty output. Technology need not be neutral either: dirty technology improves at rate $g$, while clean technology improves at $g_C = g - 1 + (A_D/A_C)^{\xi}$ — with $\xi>0$, clean enjoys a temporary growth **bonus** proportional to how far it lags the frontier, so $\phi = A_C/A_D$ converges towards 1 and the bonus melts away; with $\xi=0$ (the default) both improve at $g$ and the gap is frozen. Move the sliders below to set your own policy — how much to invest in dirty vs. clean capital, how hard to work, how fast each technology improves, and how dirty output is — and compare **your economy** (red) against **business as usual** (grey: keep investing in dirty capital at 5%).
+Split the capital stock into **dirty** capital $K_D$ and **clean** capital $K_C$ (clean is initially less productive, weighted by $\phi<1$). Pollution is a property of the dirty part, $P = \omega\,Y\,\tfrac{K_D}{K_D+K_C}$, where $\omega$ is emissions per unit of dirty output. Technology need not be neutral either: dirty technology improves at rate $g$, while clean technology improves at $g_C = g - 1 + (A_D/A_C)^{\xi}$ — with $\xi>0$, clean enjoys a temporary growth **bonus** proportional to how far it lags the frontier, so $\phi = A_C/A_D$ converges towards 1 and the bonus melts away; with $\xi=0$ (the default) both improve at $g$ and the gap is frozen. Each economy has its own policy sliders — how much to invest in dirty vs. clean capital, and how hard to work — so you can compare **your economy** (red) against **business as usual** (grey, which by default keeps investing in dirty capital at 5%). The technology and valuation parameters below the two columns apply to both, and a toggle switches every chart between levels and period growth rates.
+
+:::: columns
+::: column
+**Business as usual** <span style="color:#5b6773">(grey)</span>
+
+```{ojs}
+viewof sdb = Inputs.range([0, 0.15], {value: 0.05, step: 0.005, label: htl.html`Savings → dirty capital (<i>s<sub>D</sub></i>)`})
+viewof scb = Inputs.range([0, 0.15], {value: 0.00, step: 0.005, label: htl.html`Savings → clean capital (<i>s<sub>C</sub></i>)`})
+viewof Lb = Inputs.range([0.6, 1.0], {value: 1.0, step: 0.05, label: htl.html`Work / labour (<i>L</i>)`})
+```
+:::
+
+::: column
+**Your economy** <span style="color:#A5332B">(red)</span>
 
 ```{ojs}
 viewof sd = Inputs.range([0, 0.15], {value: 0.05, step: 0.005, label: htl.html`Savings → dirty capital (<i>s<sub>D</sub></i>)`})
 viewof sc = Inputs.range([0, 0.15], {value: 0.00, step: 0.005, label: htl.html`Savings → clean capital (<i>s<sub>C</sub></i>)`})
-viewof omega = Inputs.range([0, 1.5], {value: 1.0, step: 0.05, label: htl.html`Emissions per unit of dirty output (<i>ω</i>)`})
 viewof Lval = Inputs.range([0.6, 1.0], {value: 1.0, step: 0.05, label: htl.html`Work / labour (<i>L</i>)`})
+```
+:::
+::::
+
+**The world both economies face**
+
+```{ojs}
+viewof omega = Inputs.range([0, 1.5], {value: 1.0, step: 0.05, label: htl.html`Emissions per unit of dirty output (<i>ω</i>)`})
 viewof g = Inputs.range([0, 0.04], {value: 0.02, step: 0.005, label: htl.html`Tech growth (<i>g</i>)`})
 viewof xeta = Inputs.range([0, 0.3], {value: 0, step: 0.01, label: htl.html`Clean catch-up strength (<i>ξ</i>)`})
 viewof phi = Inputs.range([0.5, 1.0], {value: 0.8, step: 0.05, label: htl.html`Initial clean-capital productivity (<i>φ</i> = <i>A<sub>C</sub></i>/<i>A<sub>D</sub></i>)`})
 viewof tau = Inputs.range([0, 1.0], {value: 0.3, step: 0.05, label: htl.html`Emissions price for net GDP (<i>τ</i>)`})
+viewof rates = Inputs.toggle({label: "Show growth rates", value: false})
 ```
 
 ```{ojs}
@@ -54,7 +77,7 @@ function runModel(sd, sc, L, g, xeta, omega, phi0) {
   let K = Kd + phi*Kc;
   let Y = Math.pow(K, alpha) * A;   // L=1 at the common start
   let Id = 0.05*Y, Ic = 0.0;
-  const out = [{t: 1, Y, poll: omega*Y*Kd/(Kd+Kc), cons: Y*(1-0.05)}];
+  const out = [{t: 1, Y, poll: omega*Y*Kd/(Kd+Kc), cons: Y*(1-0.05), ratio: phi}];
   for (let t = 2; t <= N; t++) {
     const nKd = Kd*(1-dd) + Id, nKc = Kc*(1-dc) + Ic;
     Kd = nKd; Kc = nKc;
@@ -64,7 +87,7 @@ function runModel(sd, sc, L, g, xeta, omega, phi0) {
     K = Kd + phi*Kc;
     Y = Math.pow(K, alpha) * Math.pow(L, 1-alpha) * A;
     Id = sd*Y; Ic = sc*Y;
-    out.push({t, Y, poll: omega*Y*Kd/(Kd+Kc), cons: Y*(1-sd-sc)});
+    out.push({t, Y, poll: omega*Y*Kd/(Kd+Kc), cons: Y*(1-sd-sc), ratio: phi});
   }
   return out;
 }
@@ -72,19 +95,26 @@ function runModel(sd, sc, L, g, xeta, omega, phi0) {
 series = {
   const addNet = d => ({...d, netY: d.Y - tau*d.poll});
   const you = runModel(sd, sc, Lval, g, xeta, omega, phi).map(d => ({...addNet(d), who: "Your economy"}));
-  const bau = runModel(0.05, 0.0, 1.0, g, xeta, omega, phi).map(d => ({...addNet(d), who: "Business as usual"}));
+  const bau = runModel(sdb, scb, Lb, g, xeta, omega, phi).map(d => ({...addNet(d), who: "Business as usual"}));
   return bau.concat(you);
 }
 
 col = ({legend: true, domain: ["Business as usual", "Your economy"], range: ["#5b6773", "#A5332B"]})
 
 function chart(y, label) {
+  const data = rates
+    ? series.map(d => {
+        const prev = series.find(p => p.who === d.who && p.t === d.t - 1);
+        const ok = prev && prev[y] > 0 && Number.isFinite(d[y]);
+        return {...d, val: ok ? (d[y]/prev[y] - 1)*100 : NaN};
+      }).filter(d => Number.isFinite(d.val))
+    : series.map(d => ({...d, val: d[y]}));
   return Plot.plot({
     height: 240, marginLeft: 55, marginBottom: 35,
     x: {label: "Period →"},
-    y: {label: label, grid: true, zero: true},
+    y: {label: rates ? label + " — growth, %/period" : label, grid: true, zero: true},
     color: col,
-    marks: [ Plot.line(series, {x: "t", y: y, stroke: "who", strokeWidth: 2.6}) ]
+    marks: [ Plot.line(data, {x: "t", y: "val", stroke: "who", strokeWidth: 2.6}) ]
   });
 }
 ```
@@ -112,6 +142,12 @@ chart("cons", "Consumption")
 
 ```{ojs}
 chart("netY", "Net GDP  (Y − τ·pollution)")
+```
+
+## Tech gap (φ)
+
+```{ojs}
+chart("ratio", "φ = A_C / A_D")
 ```
 :::
 
