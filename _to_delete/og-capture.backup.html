@@ -39,8 +39,8 @@ fetch('mnc-rd-labs-map.html').then(r=>r.text()).then(function(T){
  const RECS=JSON.parse(T.match(/const RECS=(\[.*?\]);\nconst WORLDQ/s)[1]);
  const WORLDQ=JSON.parse(T.match(/const WORLDQ=(\{.*?\});/s)[1]);
  const map=L.map('map',{zoomSnap:0.05,zoomControl:true}).setView([21,40],2.05);
- L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
-   {attribution:'Tiles &copy; Esri',subdomains:'abcd',maxZoom:11}).addTo(map);
+ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+   {attribution:'&copy; OpenStreetMap &copy; CARTO',subdomains:'abcd',maxZoom:11}).addTo(map);
  const QC=['#08306b','#2171b5','#9ecae1','#fcae91','#fb6a4a','#99000d'],TH=[.25,.5,1,2,4],W=WORLDQ.ev;
  RECS.forEach(function(d){
   const hold=d.source==='holder';
