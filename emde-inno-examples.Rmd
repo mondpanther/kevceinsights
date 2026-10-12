@@ -122,6 +122,7 @@ bigdata <- params$bigdata
 stopifnot(dir.exists(bigdata), dir.exists(params$iseapp_data))
 source(file.path(params$lmic_code, "country_definitions.R"))   # lmics, lmics_excl_china, hic
 ctry_group <- function(iso) fifelse(iso == "CN", "China", fifelse(iso %in% lmics_excl_china, "EMDE", fifelse(iso %in% hic, "HIC", "other")))
+cname <- function(iso) { x <- countrycode(iso, "iso2c", "country.name", warn = FALSE); fifelse(is.na(x), iso, x) }
 
 MEASURES <- list(
   ev_global       = list(label = "Global knowledge spillover",      unit = "USD M per innovation", fmt = 1),
@@ -527,7 +528,7 @@ fwrite(top_firm[order(sample, measure, min_n, rank)], file.path(cache_dir, "top_
 paper_dir <- params$paper_dir
 if (dir.exists(paper_dir) && nrow(HIGHLIGHTS)) {
   fig_dir <- file.path(paper_dir, "figures2025", "examples"); dir.create(fig_dir, showWarnings = FALSE, recursive = TRUE)
-  tex_esc <- function(x) { x <- gsub("\\\\", "\\\\textbackslash{}", x); x <- gsub("([&%$#_{}])", "\\\\\\1", x); x <- gsub("~", "\\\\textasciitilde{}", x); gsub("\u2014", "---", x) }
+  tex_esc <- function(x) { x <- gsub("\\\\", "\\\\textbackslash{}", x); x <- gsub("([&%$#_{}])", "\\\\\\1", x); x <- gsub("~", "\\\\textasciitilde{}", x); gsub("\u2014", "---", enc2utf8(x), fixed = TRUE) }
   fmt <- function(v, m) { if (is.na(v)) return("n/a"); x <- v * (if (is.null(m$scale)) 1 else m$scale); formatC(x, format = "f", digits = m$fmt, big.mark = ",") }
   hx <- merge(HIGHLIGHTS, fam[, c("docdb_family_id", "companies", "fam_year", "is_green", "labs", "ctry_line", names(MEASURES)), with = FALSE], by = "docdb_family_id")
   hx <- merge(hx, enr[, .(docdb_family_id, title, headline, summary, image, image_from, rotate, n_inventors, team, green_tags, green_codes)], by = "docdb_family_id")
@@ -548,15 +549,17 @@ if (dir.exists(paper_dir) && nrow(HIGHLIGHTS)) {
     figfile <- NA_character_
     if (!is.na(r$image)) {
       figfile <- file.path(fig_dir, paste0(gsub("[^A-Za-z0-9]", "", r$pubno), ".png"))
-      if (!file.exists(figfile)) try(download.file(r$image, figfile, mode = "wb", quiet = TRUE), silent = TRUE)
+      if (!file.exists(figfile)) { op <- options(timeout = 30); on.exit(options(op), add = TRUE)
+        ok <- try(download.file(r$image, figfile, mode = "wb", quiet = TRUE, method = "libcurl"), silent = TRUE)
+        if (inherits(ok, "try-error") || !isTRUE(ok == 0)) { if (file.exists(figfile)) unlink(figfile); message("drawing not downloaded for ", r$pubno, ": ", r$image) } }
       if (!file.exists(figfile)) figfile <- NA_character_
     }
     firm_name <- tools::toTitleCase(tolower(r$company_raw)); firm_name <- gsub("\\bAbb\\b", "ABB", firm_name)
-    mix <- fci[company_raw == r$company_raw & !is.na(ctry_code)][order(-n_families)][1:min(4, .N)]
+    mix <- head(fci[company_raw == r$company_raw & !is.na(ctry_code)][order(-n_families)], 4)
     mix_txt <- if (nrow(mix)) paste(sprintf("%s %.0f\\%%", cname(toupper(mix$ctry_code)), 100 * mix$n_families / sum(fci[company_raw == r$company_raw, n_families])), collapse = ", ") else ""
     paste0(
-      "\\subsection*{", tex_esc(firm_name), " (", tex_esc(cname(r$hq_iso)), if (!is.na(r$sector)) paste0("; ", tex_esc(r$sector)) else "", ")",
-      "\\hfill{\\normalfont\\small\\href{", firm_link(r$firm_pos), "}{firm card}", if (!is.na(r$inno_pos)) paste0(" $\\cdot$ \\href{", inno_link(r$inno_pos), "}{innovation card}") else "", "}}\n",
+      "\\subsection*{", tex_esc(firm_name), " (", tex_esc(cname(r$hq_iso)), if (!is.na(r$sector)) paste0("; ", tex_esc(r$sector)) else "", ")}\n",
+      "\\noindent{\\small Online: \\href{", firm_link(r$firm_pos), "}{firm card}", if (!is.na(r$inno_pos)) paste0(" $\\cdot$ \\href{", inno_link(r$inno_pos), "}{innovation card}") else "", "}\\par\\smallskip\n",
       if (!is.na(figfile)) paste0("\\begin{wrapfigure}{r}{0.34\\textwidth}\\vspace{-10pt}\\centering\\includegraphics[width=0.32\\textwidth", if (r$rotate %in% c(90, 270)) sprintf(",angle=%d", -r$rotate) else "", "]{figures2025/examples/", basename(figfile), "}\\vspace{-16pt}\\end{wrapfigure}\n") else "",
       "\\textbf{", tex_esc(r$headline), ".} ", tex_esc(r$summary), " ",
       "(\\emph{", tex_esc(r$title), "}, ", tex_esc(r$pubno), ", filed ", r$fam_year, if (!is.na(r$labs)) paste0("; verified lab: ", tex_esc(r$labs)) else "", ".) ",
@@ -585,7 +588,6 @@ if (dir.exists(paper_dir) && nrow(HIGHLIGHTS)) {
 ```
 
 ```{r payload}
-cname <- function(iso) { x <- countrycode(iso, "iso2c", "country.name", warn = FALSE); fifelse(is.na(x), iso, x) }
 fam_json <- merge(fam[docdb_family_id %in% fam_sel, c("docdb_family_id", "companies", "fam_year", "is_green", "HICinno", "EMDENOCNinno", "CNinno",
                                                        "n_ctry_map", "countries", "ctry_line", "n_hic_c", "n_emde_c", "n_cn_c", "labs", names(MEASURES)), with = FALSE],
                   enr, by = "docdb_family_id", all.x = TRUE)
