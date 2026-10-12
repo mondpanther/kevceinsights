@@ -1,0 +1,1002 @@
+{
+ "US2014211529": {
+  "headline": "Solar inverter that also helps at night",
+  "summary": "Small inverters attached to individual solar panels normally sit idle once the sun goes down. This design lets the unit run in reverse when no solar power is available, so it can draw power from the grid or help stabilise voltage on the network, making the hardware useful around the clock.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2014218070": {
+  "headline": "Faster signal bridge between chip voltage levels",
+  "summary": "Different parts of a chip often run at different voltages, and signals must be converted when crossing between them. This circuit speeds up that conversion by dynamically adjusting the voltage references inside a small memory element, so data moves between low- and high-voltage sections with less delay.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2014222878": {
+  "headline": "Keeping track of failed file sync attempts",
+  "summary": "When files are copied between a local computer and remote servers, some updates fail without anyone noticing. This system detects when a change to a file or folder did not go through and records which item was affected, so the problem can be fixed or retried later rather than silently lost.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2014226967": {
+  "headline": "Smarter backup routes for communication networks",
+  "summary": "In large telecoms networks, data needs a standby route ready in case a link fails. This method has each network node announce how much bandwidth it needs, which links share a common risk of failing together, and which backup path it would switch to, so the network can plan shared spare capacity more efficiently.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2014253195": {
+  "headline": "Correcting timing errors in high-speed data links",
+  "summary": "Fast serial connections between chips rely on a clock signal that can arrive slightly distorted. This approach measures the distortion at the receiving end, works out the correction needed and sends it back to the transmitter in a form it can apply directly, keeping the link accurate without complex feedback loops.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2014269090": {
+  "headline": "Gentler erasing to prolong flash memory life",
+  "summary": "Flash memory cells wear out with repeated erasing. This method tracks how heavily each group of cells has been used and, once a threshold is passed, switches to a longer, multi-step erase that is kinder to worn cells, helping storage devices such as SSDs last longer and stay reliable.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2014280595": {
+  "headline": "Videoconferencing that scales up in the cloud",
+  "summary": "Video meetings traditionally depend on dedicated hardware that is costly and inflexible. This system mixes physical conferencing equipment with software that imitates it, and uses load-balancing to add or remove capacity as demand changes, so a videoconferencing service can grow or shrink on whatever cloud infrastructure is available.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2014281875": {
+  "headline": "Shared mark-ups on the same document",
+  "summary": "Several people often need to comment on one file without altering the original. Here each person's notes are saved as a separate layer, uploaded to cloud storage and then overlaid together on the original document, so everyone sees all annotations at once while the source file stays untouched.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2014287730": {
+  "headline": "Telling mobile users when streaming will work better",
+  "summary": "Mobile video can stutter when the network is congested. This system predicts the quality a user is likely to experience before content is delivered and, if it falls short, tells them a time or place where the connection should be good enough, rather than simply serving a poor stream.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2014295237": {
+  "headline": "Sturdier seal for high-temperature sodium batteries",
+  "summary": "Sodium metal halide batteries used for grid-scale energy storage run hot and must be sealed tightly. This cell design uses a ceramic collar brazed to a porous metal mesh current collector and sealed to the casing, improving durability and electrical connection inside each cell.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2014322694": {
+  "headline": "Learning materials that improve from student behaviour",
+  "summary": "Online courses need to know which lessons actually work. This system watches how many learners interact with a piece of learning content, derives attributes such as difficulty or usefulness from their actions, and keeps those attributes updated so the platform can decide whether and when to offer that lesson to other students.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2014331001": {
+  "headline": "Orderly handling of admin commands in SSDs",
+  "summary": "Solid-state drives process a queue of read and write requests while also receiving management instructions that can affect those queues. This method pauses new requests, inserts a marker, finishes the existing work up to the marker and only then applies the management command, avoiding conflicts and data errors.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2014335498": {
+  "headline": "Automatically creating different versions of an exam",
+  "summary": "Giving every student an identical test invites copying. This system automatically builds several versions of a test from a question bank, each differing by at least one question, and assigns them to participants according to set rules, then administers the tests, reducing cheating with little extra effort for teachers.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2014337650": {
+  "headline": "Powering down idle drives in shared storage",
+  "summary": "Large storage enclosures shared by many servers waste electricity keeping rarely used drives spinning. A power controller monitors how many requests each drive receives over a period and moves quiet drives into a lower-power state, cutting energy use in data centres without affecting busy drives.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2014350839": {
+  "headline": "Helping a robot know where it is",
+  "summary": "A mobile robot, such as a vacuum cleaner, must build a map of a room while working out its own position in it. This method keeps many competing guesses about location, each with its own map, updates them with sensor readings, weights them by how well they fit, and picks the best to fix the robot's position.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2014351589": {
+  "headline": "Logging in by scanning a QR code",
+  "summary": "Passwords alone are weak protection for online services. Here the server hides a one-off random code inside a QR code shown on screen; the user's phone scans it, unlocks it with a private key stored on the phone and displays a one-time password to type in, giving two-factor security without special hardware.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2014363870": {
+  "headline": "Yeast that makes copper nanoparticles and cleans wastewater",
+  "summary": "Producing copper nanoparticles usually needs harsh chemicals, and copper-laden wastewater is a pollution problem. This process uses dead biomass of a common yeast to pull copper out of wastewater and convert it into nanoparticles, offering a cheap, environmentally friendly route that can be scaled up industrially.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015005946": {
+  "headline": "Switching fan control to the best sensors",
+  "summary": "Computers use temperature sensors to decide how hard to run their cooling fans. This method starts with one set of sensors and, depending on the readings, hands fan control over to a different process using another set of sensors, so cooling responds to whichever part of the machine is actually heating up.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015012144": {
+  "headline": "Real-time optimisation for mixed power systems",
+  "summary": "Systems combining several power sources, such as renewables, batteries and generators, are hard to run efficiently over the long term. This controller feeds live measurements and forecasts into a continuously updated optimisation that tells the system how much power to route where and which switches to operate.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015056491": {
+  "headline": "Better battery separator that resists clogging",
+  "summary": "The porous film between a battery's electrodes must let ions through while blocking short circuits. This coating mixes inorganic particles, adhesive and polymer particles that swell by different amounts, forming a smoother layer that is less likely to block the pores, improving ion flow and battery conductivity.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015062847": {
+  "headline": "Flexible connector linking parts inside phones",
+  "summary": "Mobile devices pack components on several faces of a circuit board, which must be electrically joined. This bent metal connector mounts on the board and reaches around to contact parts on adjacent or opposite sides, simplifying assembly in cramped handsets.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015067648": {
+  "headline": "Trimming software tests to the ones that matter",
+  "summary": "Testing software thoroughly is slow and costly. This system gathers details about an application and its test cases, removes redundant or obsolete tests, estimates each remaining test's chance of failure and risk, and uses statistical selection and run-time estimates to produce a smaller, sharper set of tests to run.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015067832": {
+  "headline": "Stopping users typing passwords into fake sites",
+  "summary": "Phishing tricks people into entering sensitive details on impostor websites. Rather than trying to spot the fraudulent message, this approach watches what the user types; if a registered security word such as a password appears, it checks whether the destination is on an approved list and warns if it is not.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015100810": {
+  "headline": "Predicting idle time to switch off disk drives",
+  "summary": "Spinning down an idle hard drive saves power, but doing so just before it is needed costs time. This controller records how long past idle periods lasted, groups them into time windows and, when a drive goes quiet, uses the most common pattern to predict whether the pause will be long enough to justify powering down.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015103593": {
+  "headline": "Safeguarding data while moving it in flash memory",
+  "summary": "Flash storage often shifts data from one memory block to another. This method checks the health of the destination block after writing and, if it looks faulty, keeps the original copy and its address mapping in place, so data is not lost to a failing block.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015112690": {
+  "headline": "Low-power wake word for sleeping devices",
+  "summary": "Listening for a spoken wake-up phrase around the clock can drain a device's battery. Here a tiny always-on circuit screens microphone input for a likely match, then wakes a dedicated audio processor to confirm it before the main processor is roused, keeping standby power very low.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015117495": {
+  "headline": "Cheaper, more accurate on-chip thermometers",
+  "summary": "Temperature sensors built into chips are affected by manufacturing variations between transistors. This method uses the transistors' own characteristics to calculate and cancel out those imperfections, calibrating each part individually and avoiding the need for an expensive external reference thermometer.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015130915": {
+  "headline": "3D glasses with built-in depth control",
+  "summary": "Stereoscopic video can feel too deep or too flat for individual viewers. These glasses include a control on the frame that adjusts a parameter of the 3D image pair, letting the wearer tune the depth effect directly rather than through the television or player.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015134954": {
+  "headline": "Birth certificates for connected devices",
+  "summary": "Networks of smart sensors need to know each device is genuine before trusting it. This method registers a digital birth certificate tied to a private key for each device, uses it to authenticate the device and then allows the device to be reconfigured physically, logically or in its mode of operation.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015138876": {
+  "headline": "Faster, more reliable writes to memory chips",
+  "summary": "Writing data into on-chip memory becomes harder as transistors shrink. This design uses a shared global wire that is toggled just before and after a write to give the local wire a brief negative voltage boost, helping the memory cell flip state reliably at low power.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015142545": {
+  "headline": "Automatic early-payment discounts on invoices",
+  "summary": "Suppliers often want to be paid sooner and customers want a discount for paying early. This system uses a rules engine to automatically make or accept discount offers on invoices, adjusting the terms based on factors such as the offeror's account balance, encouraging faster payment.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015156143": {
+  "headline": "Using phone edge screens to save power",
+  "summary": "Phones with displays along their edges can show notifications without lighting up the main screen. By giving side screens their own display buffers, this approach lets them show content while the main display and other components stay asleep, saving battery and processing power.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015168465": {
+  "headline": "Estimating conditions across an electricity distribution grid",
+  "summary": "Distribution networks have few sensors, so operators cannot see conditions at every point. This method uses measured current and power flows to estimate loads at each node, compares the resulting voltage estimates with actual readings and adjusts the load estimates until they agree, giving a more accurate picture of the grid.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015179918": {
+  "headline": "Cleaner surfaces for quantum computing circuits",
+  "summary": "Josephson junctions, the building blocks of superconducting quantum chips, are sensitive to contamination. This process etches away oxides and residues from the exposed superconducting electrode using a plasma, then immediately deposits the junction's thin barrier layer in the same sealed chamber, avoiding recontamination.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015188900": {
+  "headline": "Keeping users logged in across data centres",
+  "summary": "Online services spread over several data centres must recognise a user's session wherever it lands. A gateway checks each request with a key, routes it to the nearest data centre, which creates an encrypted token recording where the session lives; that token then travels with later requests so they reach the right place.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015205269": {
+  "headline": "Clearer dashboard for advanced plant controllers",
+  "summary": "Industrial plants rely on controllers that juggle many variables at once, which can be opaque to operators. This system computes indicators showing how each controlled variable relates to the process variables affecting it and displays them together on screen, helping operators monitor and understand the controller's behaviour.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015205636": {
+  "headline": "Jumping the queue to speed up a processor",
+  "summary": "When a computer running slowly to save power needs to speed up, the instruction that raises the clock rate may be stuck behind other tasks. This method finds that task in the pending list and runs it first, so the processor accelerates sooner.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015206883": {
+  "headline": "Sturdier capacitors in memory chips",
+  "summary": "Tall, thin capacitor electrodes in memory chips can lean or collapse during manufacture. This design adds a patterned reinforcing layer with alignment holes through which the electrodes pass, plus a supporting layer above it, keeping the structures upright and properly positioned.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015220128": {
+  "headline": "Matching power supply to what circuits need",
+  "summary": "Digital circuits draw power in bursts timed to a clock signal. This method predicts, for each clock pulse, which elements will actually consume power and adjusts the power supply accordingly, reducing waste and voltage fluctuations in chips and electronic systems.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015227452": {
+  "headline": "Generating software tests from business process maps",
+  "summary": "Writing test cases for business software by hand is slow. This system reads a model of the business process the software supports, identifies test scenarios from it, generates test cases and data for each, and produces automated test scripts from associated keywords.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015228045": {
+  "headline": "Hidden watermarks in text documents",
+  "summary": "Proving the origin of a leaked or copied document is difficult. This method converts each page to an image, crops the margins, divides the page into blocks and embeds an invisible watermark in selected blocks; the same block selection is later used to recover the watermark and trace the document.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015231081": {
+  "headline": "Delayed-release tablet for an antifungal drug",
+  "summary": "Posaconazole, an antifungal medicine, is poorly absorbed in conventional forms. This tablet dissolves the drug in a polymer by hot-melt extrusion so that it is released later in the digestive tract, with the aim of improving how the drug is taken up by the body.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015234745": {
+  "headline": "Smarter guessing of data a processor needs next",
+  "summary": "Processors fetch data in advance to avoid waiting, but wrong guesses waste bandwidth. This controller combines two prefetching strategies with a back-off mechanism that counts whether fetched data is actually used and switches prefetching off when too much goes unused, improving efficiency.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015242263": {
+  "headline": "Smoother running of data backup operations",
+  "summary": "Enterprise backup systems can clog networks and overload servers. This system queues jobs to spread the load, forecasts how long operations will take based on expected throughput between machines, and automatically escalates alerts to someone else if the usual recipient is unavailable.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015243563": {
+  "headline": "Transistors with different switching thresholds on one chip",
+  "summary": "Chips need some transistors that switch easily and others that resist leakage. Here two groups of transistors share the same metal gate material, but the layer is made thicker in one group than the other, producing different switching voltages without additional materials.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015274066": {
+  "headline": "Glowing trim panels for car interiors",
+  "summary": "Car makers want ambient lighting inside vehicles without bulky fittings. This system places a light pipe behind a translucent trim panel so that light passes through the panel into the cabin, creating soft illumination integrated into the interior surfaces.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015286629": {
+  "headline": "Spotting names of organisations in any language",
+  "summary": "Search engines and text tools need to recognise names of companies, places and people in web pages. This system trains machine-learning models on labelled sentences drawn from inter-linked multilingual documents and machine translation data, so it can identify and classify such names across many languages and enrich the text with related information.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015292894": {
+  "headline": "Driving directions with confidence in arrival time",
+  "summary": "Journey time estimates are often wrong because conditions change. This routing engine works out several routes to a destination, predicts the travel time for each using data on weather and other environmental factors affecting traffic, and also estimates how likely each prediction is to be accurate.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015309828": {
+  "headline": "Managing many types of virtual servers at once",
+  "summary": "Data centres often run virtual machines on hypervisors from different vendors, each managed separately. An adaptive virtual server monitors how much each virtual machine uses and reallocates resources dynamically, even drawing on several hypervisors of different types, to improve utilisation and performance.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015333775": {
+  "headline": "Efficient decoding for a new error-correcting code",
+  "summary": "Polar codes are a modern way of protecting transmitted data from errors, but efficient decoders are hard to build. This method derives the pattern of fixed bits from a decoder with a different internal wiring so that a simpler, time-shared decoder with fixed connections can still achieve strong performance.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015371135": {
+  "headline": "Planning delivery routes that adapt to road changes",
+  "summary": "Working out the best routes for a fleet of vehicles is a notoriously hard problem, especially when roads close or conditions change. This method inserts placeholder nodes into the route map when changes occur and solves the problem with a hybrid of ant-colony and genetic algorithms.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015379429": {
+  "headline": "Interactive tool for judging prediction models",
+  "summary": "Users of machine-learning services need to understand how good a model's predictions are. This interface displays quality metrics from an evaluation run and lets the user slide a threshold that decides how predictions are interpreted, showing immediately how the quality measures change.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2015379848": {
+  "headline": "Turning sensor alerts into useful notifications",
+  "summary": "Buildings and sites may have many sensors producing alerts of different kinds. This system gathers alerts from multiple sensor types, works out which events they indicate, decides whether a notification is warranted and sends it to the relevant parties, cutting down on noise.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016004628": {
+  "headline": "Testing websites on many browsers at once",
+  "summary": "Websites must work across many browsers, and testing each in turn is slow. A server takes a selection of test scripts and target browsers, instructs client machines to launch the browsers, distributes the scripts to run in parallel and collects the results.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016011845": {
+  "headline": "One-click screen sharing from a chat",
+  "summary": "Switching from a text chat to showing your screen usually means opening another application. Here a button in the chat window starts a screen-sharing session; the other participants receive an invitation message in their chat and, on accepting, see the shared screen without leaving the conversation.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016026579": {
+  "headline": "Faster bookkeeping for storage caches",
+  "summary": "A cache that holds frequently used data in fast memory must track what is stored where and what has changed. This controller uses a mathematical mapping between data locations and the cache, plus compact bitmaps of recent use and modifications, to manage this metadata efficiently.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016028551": {
+  "headline": "Secure hardware that vouches for connected devices",
+  "summary": "Internet-connected devices need trusted credentials but often lack the power for heavy cryptography. A certificate authority running inside a tamper-resistant hardware security module issues each device a certificate, then takes over its key management and encryption tasks once it has authenticated.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016036441": {
+  "headline": "Protecting delicate transistors when shifting voltages",
+  "summary": "Signals that move into a higher-voltage part of a chip can stress components beyond their safe limits. This circuit adds tracking elements that cap the voltage across sensitive parts, and compensates for the delay they introduce so the output still switches on time.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016049658": {
+  "headline": "Cooler-running sodium-sulphur battery",
+  "summary": "Conventional sodium-sulphur batteries operate at very high temperatures, creating heat management and sealing problems. This design pairs a sodium anode and a sulphur cathode with a liquid electrolyte and a solid sodium-conducting membrane, aiming to deliver good charge and discharge performance at lower temperatures.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016057596": {
+  "headline": "Phone distress signal on multiple radio bands",
+  "summary": "A person in trouble may be out of range of one network but not another. This app turns a mobile phone into a distress beacon that broadcasts simultaneously over several radio protocols and frequency bands, increasing the chance the signal is picked up.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016058872": {
+  "headline": "Drugs that make cells destroy target proteins",
+  "summary": "Many disease-causing proteins cannot be blocked by conventional drugs. These two-ended molecules attach one end to the cell's own protein-disposal machinery and the other to a chosen target protein, bringing them together so the cell breaks the target down, potentially offering a route to treat a wide range of conditions.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016062947": {
+  "headline": "Faster image processing for neural networks",
+  "summary": "Convolution, the core calculation in image-recognition neural networks, is computationally heavy. This engine splits the work into image tiles processed independently on a parallel chip, assembling each tile in on-chip memory only as needed and multiplying it with filter data, saving both memory and time.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016079613": {
+  "headline": "Air-cooled housing for fuel cell electronics",
+  "summary": "Electronics in fuel cell systems need cooling but some parts should be kept away from moving air. This housing is split by a heat exchanger into two compartments: a fan blows air through one, while the other remains still, so all components are cooled without exposing sensitive parts to airflow.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016085290": {
+  "headline": "Preventing power overload in fast storage drives",
+  "summary": "High-speed memory drives connected directly to a computer can draw more power than their slot allows. This method monitors the drive's state, checks whether a new operation would push power over a preset limit and, if so, delays it while existing operations continue.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016085575": {
+  "headline": "Restarting a backed-up virtual machine in minutes",
+  "summary": "Restoring a virtual machine from backup normally means waiting for all its data to be copied back. This system starts the machine almost immediately from pre-staged blocks in the backup store, predicting which data it will need first, while the rest is moved to primary storage in the background.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016095110": {
+  "headline": "Wi-Fi and mobile networks sharing airwaves politely",
+  "summary": "Mobile operators increasingly use unlicensed radio bands that Wi-Fi also relies on, risking interference. Here a Wi-Fi access point reports which channels are busy, the mobile base station picks a free one and announces its transmission, and the Wi-Fi point tells its devices to stay off that channel meanwhile.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016099010": {
+  "headline": "Combined neural network for speech recognition",
+  "summary": "Transcribing speech accurately is difficult. This approach feeds audio features through a model that stacks three kinds of neural network layers, convolutional, long short-term memory and fully connected, to produce a transcription, and can also identify the language being spoken.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016105321": {
+  "headline": "Moving virtual machines to the cloud intact",
+  "summary": "Shifting a virtual machine from a company's own data centre to a public cloud risks losing the infrastructure settings it depends on. This method records those configurations and how critical each is, bundles them into a migration package, and the cloud recreates the machine to match.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016148079": {
+  "headline": "Faster face detection in photos",
+  "summary": "Finding faces or other objects in an image means checking many candidate regions. This method passes those regions through a chain of neural networks, each quickly discarding regions that clearly contain no object, so only promising candidates reach the slower, more accurate later stages.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016169142": {
+  "headline": "Fine-tuning fuel mix in dual-fuel engines",
+  "summary": "Engines that burn two fuels, such as diesel and natural gas, need the right blend in each cylinder. This method estimates the temperature inside each cylinder from exhaust residuals, manifold conditions and fuel quantity, then sets how much of the first fuel to replace with the second, cylinder by cylinder.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016182565": {
+  "headline": "Network access rules based on where you are",
+  "summary": "Companies may want certain data available only from particular places. This security device works out the geographical location of a device requesting access and checks it against location-specific rules for the resource before deciding whether to allow the request.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016188245": {
+  "headline": "Memory cards that start up at low voltage",
+  "summary": "Some host devices send their first commands to a memory card at a lower voltage than the card's circuitry expects. This system detects that situation and switches the card's voltage regulator into a low-voltage mode so it can receive the start-up commands correctly.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016191568": {
+  "headline": "Seeing which apps are using the network",
+  "summary": "Network administrators often cannot tell which applications are generating traffic, by whom and from where. This architecture copies selected traffic flows to an application-identification tool, starting small and growing to cover the whole network, and uses the results to set and enforce usage policies.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016213673": {
+  "headline": "Supplement to boost physical endurance",
+  "summary": "Athletes and active people seek safe ways to sustain effort. This formulation combines dihydrocapsiate, a compound derived from chilli peppers, with caffeine and the amino acid arginine, and is claimed to increase human endurance during physical activity.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016231716": {
+  "headline": "Simulating industrial systems for better business decisions",
+  "summary": "Running connected industrial assets involves trade-offs between physical performance and commercial results. This system generates scenarios from chosen criteria, simulates both the physical and business outcomes of each over time, and picks the scenario that best balances performance and risk.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016261727": {
+  "headline": "Switching live data streams between data centres",
+  "summary": "Streams of database updates must keep flowing even when one data centre has to hand over to another. This method performs such a switchover while notifying each component in the chain, so processing continues without losing or duplicating data.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016266894": {
+  "headline": "Updating network device software without downtime",
+  "summary": "Updating the firmware on a router or switch usually means restarting it and interrupting traffic. This method replaces the firmware on one group of processor cores at a time while the others keep handling packets, until every core is running the new version with no reset.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016281607": {
+  "headline": "Smarter start-up for combined-cycle power plants",
+  "summary": "Starting a combined-cycle power plant is a delicate, costly process. This method collects start-up measurements from many similar plants, derives reference relationships between operating parameters, and uses them to benchmark and adjust the start-up of a target plant.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016299767": {
+  "headline": "Network card that can boot the server itself",
+  "summary": "Servers in storage networks normally boot their operating system from remote storage. This adapter includes its own non-volatile memory holding a boot image; data addressed to that memory is kept locally while other data goes to the network, and at power-up the server can boot directly from the card.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016328674": {
+  "headline": "Filling orders from the nearest warehouse with stock",
+  "summary": "Retailers selling through many channels struggle to fulfil orders when the main warehouse is out of stock. This system checks the primary hub first, then consults a cache of stock at secondary hubs, chooses one by proximity to the delivery address and priority, and places a backorder if none can supply.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016342491": {
+  "headline": "Spreading backup copies across many servers",
+  "summary": "Storage systems built from many nodes must decide where to keep data and its redundant copies. Here every node holds configuration information on data placement, and any node can take the lead in recalculating that layout when the redundancy policy changes.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016342501": {
+  "headline": "Speeding up automated software testing",
+  "summary": "Writing automated tests for software screens is laborious. This system records a script of a screen to identify its input fields, chooses test-case templates based on sample input, gathers the needed data sets and checks, and assembles them into an executable test that produces a report.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016350653": {
+  "headline": "One neural network for many language tasks",
+  "summary": "Different language-processing tasks usually require separate systems. This framework recasts every task, from translation to sentiment, as answering a question about an input text, building memories from the input and question and generating answers from those memories.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016364608": {
+  "headline": "Automatically pulling key information from long documents",
+  "summary": "Extracting specific details from lengthy documents such as contracts is slow manual work. This pipeline recognises a document's structure, splits it into sections, classifies and maps them to key elements, drills into sub-sections with machine learning, and presents the extracted information in a navigable interface.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016364857": {
+  "headline": "Learning which medical images lead to a diagnosis",
+  "summary": "Radiologists view many images in a study but base their diagnosis on only some. This system records characteristics of each image and whether it was used to reach the diagnosis, building a dataset that can reveal which image features matter for a given type of study.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2016378168": {
+  "headline": "Smarter power saving for processor cores",
+  "summary": "Mobile processors waste power keeping cores active when little is happening. This power manager tracks how many cores are busy and how hard they work, takes cores offline when averages fall below thresholds, wakes them only periodically for background updates, and shuts cores down if the device gets too hot.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2017004513": {
+  "headline": "Predicting which subscribers will cancel",
+  "summary": "Subscription businesses want to know who is about to leave. This system selects the most informative customer attributes from historical data, builds a decision tree from them and applies it to current subscribers to flag those likely to churn.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2017024645": {
+  "headline": "One neural network for many language tasks",
+  "summary": "Different language-processing tasks usually require separate systems. This framework recasts every task as answering a question about an input text, building memories from the input and question and generating answers from those dynamically retrieved memories.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2017024864": {
+  "headline": "Removing unwanted objects from photos convincingly",
+  "summary": "Erasing an object from a picture leaves a gap that must be filled plausibly. This method aligns several photos of the same scene from different viewpoints, builds a library of image patches from them, and reconstructs the gap by combining the best-matching patches.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2017060653": {
+  "headline": "Apps that report when they misbehave",
+  "summary": "Companies struggle to know how their apps actually perform on users' devices. This method wraps the app so that it reports performance metrics for each operating state to a central computer, which checks them against rules and sends a response back when something is out of line.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2017061250": {
+  "headline": "Matching pictures to words automatically",
+  "summary": "Searching images by text, or captioning them, requires understanding how pictures and sentences relate. This framework maps both into a shared semantic space using a deep learning model, judges their relevance by closeness, and can output the best-matching sentence as a caption.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2017062851": {
+  "headline": "Fuel cell stacks that warn of trouble early",
+  "summary": "Problems in a fuel cell stack can spread before they are detected. This design gives the cells at the ends of the stack a lower fuel flow and higher air flow than the rest, making them more sensitive so adverse conditions show up there first and can be acted on.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2017072876": {
+  "headline": "Faster translation between car networks",
+  "summary": "Modern cars contain several incompatible internal networks that must exchange messages. This gateway uses dedicated hardware to filter packets, look up headers and bundle messages, translating between the different bus standards far faster than software alone.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2017116693": {
+  "headline": "Blockchain record of who may play digital media",
+  "summary": "Managing rights to films, music and other digital content usually depends on a central authority. This system records licences on a shared blockchain ledger; a playback device finds the licence matching its own identity, decrypts the content key with its private key and plays the content.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2017123935": {
+  "headline": "Organising files for efficient cloud backup",
+  "summary": "Businesses use fast file storage for daily work but cheaper object storage for backups. This layout represents folders and files as metadata objects in object storage, with file data stored as elements of data objects, making snapshots and de-duplication of backups more efficient.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2017126314": {
+  "headline": "Squeezing more traffic through optical networks",
+  "summary": "Optical fibre networks often reserve more capacity than traffic actually uses. This method samples bandwidth use over time on ports and links, monitors statistical measures of it, and triggers adjustments to traffic or routing when patterns allow, so capacity is shared more efficiently.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2017173879": {
+  "headline": "3D printer nozzle with adjustable openings",
+  "summary": "Standard 3D printer nozzles extrude a fixed stream of material. This nozzle has several concentric rings at its tip that can be opened or closed during printing to vary how much material comes out or to mix materials, giving finer control over the printed object.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2017176985": {
+  "headline": "Predicting product quality before final inspection",
+  "summary": "Manufacturers usually find defects only at final inspection. This method tests sub-components earlier, investigates which of their attributes drive lower final quality, builds and validates prediction models from those attributes and forecasts the end-of-line quality of each assembled product.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2017206431": {
+  "headline": "Quickly finding and naming objects in images",
+  "summary": "Identifying what objects are in a picture and where is central to computer vision. This method generates a feature map from the image, proposes candidate regions likely to hold objects, then classifies each region and reports the object type with a confidence score.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2017235662": {
+  "headline": "A single quality score for software applications",
+  "summary": "Judging the overall quality of an application means weighing many factors. This method collects data on functional aspects, what the software does, and non-functional aspects such as performance and security, from several sources, scores each and combines them into one quality score.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2017236060": {
+  "headline": "Spotting mistakes in data as it is typed",
+  "summary": "Typing errors and wrong entries creep into databases and are costly to find later. This system uses statistics and machine learning to flag entries that look suspicious, either as they are being typed in or in records that were stored earlier, so they can be checked and corrected.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2017236081": {
+  "headline": "Mapping who really talks to whom at work",
+  "summary": "Official organisation charts rarely show how information actually flows in a company. This tool builds a picture of the organisation from real communication patterns, drawing staff as connected nodes where the links reflect how often and about what people interact, helping managers see influence, bottlenecks and involvement in decisions.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2017269980": {
+  "headline": "Predicting when storage drives will fail",
+  "summary": "Solid-state drives in large storage systems fail without much warning, which can disrupt services. This method keeps watch on health reports, workloads and response times, combines them to estimate how close each drive is to failure, and recommends replacing drives in a cost-effective order before a serious breakdown occurs.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2017270765": {
+  "headline": "Fitness tracker shows messages when you move",
+  "summary": "Fitness bands have small screens and limited battery, so showing messages constantly is wasteful. This approach downloads messages to the device and displays one only when the wearer moves after being still, such as lifting the wrist, so messages appear when the person is likely to look.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2017272458": {
+  "headline": "Machine learning to catch network intruders",
+  "summary": "Cyber attacks increasingly evade traditional defences that only look for known threats. This security platform analyses large volumes of network data and learns the normal behaviour of users and devices, flagging unusual activity both instantly and in periodic deeper reviews, and presents risk scores with evidence so administrators can act quickly.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2017286572": {
+  "headline": "A virtual copy that monitors real equipment",
+  "summary": "Industrial equipment is costly to inspect and failures are disruptive. This system keeps a digital twin, a computer model of a physical machine fed by its sensors, that tracks the condition of chosen parts and estimates their remaining useful life, even while the machine is switched off, then reports the findings.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2017286979": {
+  "headline": "Predicting which media files people will download",
+  "summary": "Online libraries hold far more files than anyone can browse. This method summarises each media file as a data profile, compares it with similar files whose download history is known, and produces a score estimating how likely users are to download it, helping decide what to promote or store.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2017291301": {
+  "headline": "Teaching robots to navigate by example",
+  "summary": "Programming robots to find their way around is laborious. This approach lets a robot learn on the job: as a trainer guides it, the robot links what its sensors see to the control actions taken, and gradually predicts the right moves itself. The learning runs on board in real time, enabling autonomous navigation.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2017302431": {
+  "headline": "Keeping fast data links in step",
+  "summary": "When data travels at very high speed over several parallel lines, signals can arrive slightly out of step and corrupt the message. This transceiver design re-times, combines and separates data streams to keep them aligned, allowing reliable high-speed connections between computers, storage and peripheral devices.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2017315838": {
+  "headline": "Choosing the best server for a moving workload",
+  "summary": "Data centres often shift virtual machines between servers for maintenance or balancing. This method scores each candidate server on how well it meets the workload's operating requirements and uses the scores to pick the most suitable destination, making migrations smoother.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2017329332": {
+  "headline": "Self-driving car judges if objects will interfere",
+  "summary": "Self-driving cars must decide how to react to pedestrians, cyclists and other vehicles nearby. This control system uses sensor data about the road ahead to estimate the probability that a detected object will cross the car's planned path, then adjusts speed or route according to that likelihood.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2018067565": {
+  "headline": "Recognising who is wearing a fitness tracker",
+  "summary": "Fitness trackers cannot easily tell whether the right person is wearing them. This method identifies the wearer from the device's own data, combining the pattern of their movements with the shape of their heartbeat signal, which could help secure personal data or detect when the tracker is shared.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2018071918": {
+  "headline": "Home robot that works around household activity",
+  "summary": "Household robots can be disruptive if they run while people are busy. This robot maps the home, connects to the home network, notices which connected devices are present and whether they are active or idle, and starts or pauses its chores, such as cleaning, accordingly.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2018089042": {
+  "headline": "Cutting data centre costs by predicting failures",
+  "summary": "Servers and hard drives in data centres wear out faster in hot, humid or corrosive conditions. This system monitors the environment, estimates when each piece of equipment is likely to fail, and weighs replacement, running and downtime costs to minimise total cost of ownership and energy use.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2018121766": {
+  "headline": "Smarter task allocation in call centres",
+  "summary": "Call centres must constantly decide which agent or automated system should handle each enquiry. This system uses reinforcement learning to build a model of how the centre behaves under uncertainty and then uses that model to choose and assign work items to staff and machines more effectively.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2018146015": {
+  "headline": "Merging multiple internet connections into one",
+  "summary": "Modern devices can send data over several connections at once, such as Wi-Fi and mobile, but many servers cannot handle this. This method lets an intermediary device track the separate streams, renumber their packets consistently, and pass everything to the server as a single ordinary connection.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2018149333": {
+  "headline": "Slimmer, brighter car lights",
+  "summary": "Car lights must be compact yet put most of their light where it is needed. This lighting module uses a thin silicone lens whose entry surface gathers at least 69 per cent of the light into a parallel beam, while a patterned exit surface shapes it into the required pattern.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2018152425": {
+  "headline": "Keeping Wi-Fi broadcast traffic within groups",
+  "summary": "On a shared Wi-Fi network, broadcast messages intended for one group of users can be seen by everyone. This method gives each group its own encryption key, so broadcast messages are scrambled and can only be read by devices belonging to that group, improving privacy and security.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2018190265": {
+  "headline": "Removing bad samples to improve synthetic speech",
+  "summary": "Text-to-speech systems sound unnatural when the recordings used to train them are badly matched to their transcripts. This method automatically detects misaligned or mispronounced segments using features of pitch and timing, and removes them, so the resulting synthetic voice is clearer.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2018229856": {
+  "headline": "Monitoring aircraft between landing and take-off",
+  "summary": "Aircraft turnaround at the gate is a tight, costly window where problems are easy to miss. This system pulls operational readings from the aircraft's on-board systems during turnaround, checks them against expected ranges and raises alerts when something is out of line.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2018246173": {
+  "headline": "Estimating lead-acid battery charge and health live",
+  "summary": "Knowing how much charge remains in a lead-acid battery, and how worn it is, is hard to measure directly. This method uses regular voltage, current and temperature readings with a lightweight mathematical model and filtering to estimate charge in real time and update the battery's health after each charge or discharge.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2018251037": {
+  "headline": "Built-in jumper cable for flat batteries",
+  "summary": "Drivers with a flat battery often lack jumper cables. This vehicle has a retractable cable with a plug stored in a compartment on the bodywork; when pulled out it connects directly to another vehicle's socket to give or receive a jump start.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2018253256": {
+  "headline": "Measuring how applications use shared storage",
+  "summary": "In large data centres it is hard to see how individual applications are performing on shared storage networks. This method monitors read and write commands passing through the network hardware, calculates detailed performance measures for each application, and uses them to choose the most suitable storage device.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2018285798": {
+  "headline": "Learning from past IT incidents to fix outages",
+  "summary": "IT operations teams face floods of alerts and repeat the same troubleshooting. This system groups past events into clusters, attaches how each was resolved, and trains models that predict the likely fix for new live events, retraining when accuracy slips.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2018330088": {
+  "headline": "Protecting backups from ransomware",
+  "summary": "Ransomware can encrypt files and then be copied into backups, destroying the clean versions. This backup system watches for unusual changes across many devices or on a single device compared with normal behaviour, and when it suspects an attack it locks or preserves earlier snapshots so clean copies survive.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2018332055": {
+  "headline": "Putting security rules in the best order",
+  "summary": "Network firewalls apply long lists of rules, and where a new rule sits in the list affects how well threats are caught. This system lets administrators create rules from a visual display and automatically works out the best position for each one based on detected anomalies and threat data.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2019004504": {
+  "headline": "Predicting chip defects with deep learning",
+  "summary": "Finding defects in semiconductor wafers by inspection alone is slow and expensive. This method uses initial inspection results, design details and manufacturing settings to train a deep learning model, refines it until predictions are accurate enough, and then uses it to predict where new defects are likely to appear.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2019028407": {
+  "headline": "Keeping priority workloads to their service levels",
+  "summary": "In shared data centres, important workloads must receive the network performance they were promised. This method collects performance data over time, tracks both short-term and long-term trends, and uses them to make sure high-priority workloads, and all workloads overall, stay within their quality-of-service targets.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2019042559": {
+  "headline": "Decoding ambiguous references in medical notes",
+  "summary": "Medical records are full of pronouns and references such as 'it' or 'this' whose meaning is ambiguous for computers. This program uses medical knowledge about related terms to work out which earlier entity each such reference points to, helping software read clinical text more accurately.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2019042923": {
+  "headline": "Faster hardware for neural network calculations",
+  "summary": "Neural networks rely heavily on a calculation called convolution, which is computationally demanding. This hardware accelerator uses a shortcut technique known as Winograd convolution and can reuse the same arrangement for different filter sizes, speeding up machine learning tasks.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2019049975": {
+  "headline": "Sharing warehouse jobs among robots efficiently",
+  "summary": "Warehouses with many robots must divide up collection tasks without a central bottleneck. This method breaks an overall job into sub-tasks, considers robot availability and cost constraints, and lets the robots negotiate the allocation among themselves with light coordination, so work is completed efficiently.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2019163254": {
+  "headline": "Quicker wake-up from processor sleep mode",
+  "summary": "Powering down a processor saves energy, but waking it fully takes time. This technique turns off the processing cores of a chip such as a graphics processor while keeping its data link interface powered, so the chip saves energy yet resumes work much faster than existing approaches.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2019168206": {
+  "headline": "Longer-lasting catalyst for making syngas",
+  "summary": "Converting carbon dioxide and methane into synthetic gas needs catalysts that usually degrade at high temperatures or require precious metals. This catalyst coats the active material on a metal oxide support and surrounds it with a surfactant, which stops it clumping or being coated in carbon, so it stays active for long periods.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2019188584": {
+  "headline": "Predicting equipment failures in industrial plants",
+  "summary": "Industrial plants record vast numbers of measurements, making it hard to build reliable failure predictors. This system cleans the data, removes uninformative variables, adds useful derived measures, selects the most relevant inputs and trains a model that then runs live to detect and predict equipment failures.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2019189356": {
+  "headline": "More reliable miniature capacitors",
+  "summary": "Multilayer ceramic capacitors are tiny components found in almost all electronics. This design adjusts the composition of the protective side margins, using less silicon in the layer nearest the internal electrodes, which is intended to improve the component's reliability.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2019190386": {
+  "headline": "Power supply that switches stages on demand",
+  "summary": "Power regulators that use several parallel stages waste energy when demand is low. This circuit compares the output against a threshold and automatically switches a second stage on or off as needed, improving efficiency across varying loads.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2019194092": {
+  "headline": "More propylene from oil refineries",
+  "summary": "Propylene, a key raw material for plastics, is in high demand. This process links a refinery's catalytic cracking unit with a step that converts leftover propane into propylene and other light olefins, using carbon dioxide from the cracker's own flue gas, boosting yields of valuable chemicals.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2019197420": {
+  "headline": "Compressing neural network data on the fly",
+  "summary": "Neural networks shuffle huge volumes of data between processors and memory, which slows them down. This design adds a hardware encoder and decoder to the memory transfer unit so the data is compressed as it is written and decompressed when read, saving bandwidth and energy.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2019207568": {
+  "headline": "Amplifier for ultra-fast fibre optic links",
+  "summary": "Fibre optic receivers must convert very faint light signals into clean electrical ones at speeds of 400 gigabits per second. This amplifier design, built with standard chip manufacturing, uses a dual-mode arrangement that works across a range of voltages, supporting faster and cheaper optical links.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2019217755": {
+  "headline": "Smarter-looking car seat back",
+  "summary": "The back of a car seat is often plain and hard to refurbish. This backrest fixes a hard panel to the seat frame and wraps it in a decorative cover whose edges are joined by a fastener, so the panel looks attractive and the cover can be opened or replaced.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2019220967": {
+  "headline": "Automatically spotting changes in images over time",
+  "summary": "Detecting change in images taken of the same place over time, such as farmland, normally needs laboriously labelled training data. This method uses a general-purpose image recognition network to extract features, groups images without labels, and combines this with classification for real-time analysis, even offline at the edge.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2019222560": {
+  "headline": "One search across many secure data stores",
+  "summary": "Organisations keep documents in many separate systems, forcing users to search each one. This method runs a single search across several stores that the user is authorised to access, gathers the results from each and merges them into one combined set of results.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2019278663": {
+  "headline": "Backups scheduled to meet recovery targets",
+  "summary": "Firms set targets for how much data they can afford to lose, but backup schedules are usually configured by hand. This system asks for fewer settings, schedules backups automatically to meet the target, raises the priority of failed items and retries only those, so the recovery goal is met.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2019278921": {
+  "headline": "Tamper-proof recordings of phone calls",
+  "summary": "Recorded conversations are only useful as evidence if they cannot be altered. This system records voice communications, uses an authentication server to verify their validity and timestamps them, storing the recordings in a database so their integrity can be trusted.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2019280514": {
+  "headline": "Car stops charging your phone when full",
+  "summary": "Leaving a phone plugged into a car charger keeps topping it up unnecessarily. This system detects when a phone is connected, charges it, then uses a Bluetooth link to read the battery level and switches charging off when it is high enough and back on when it drops below a lower level.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2019319868": {
+  "headline": "Forecasting mobile network quality ahead of time",
+  "summary": "Apps and networks perform better if they know in advance when a connection will slow down or drop. This system predicts future link performance, such as bandwidth, delay and coverage gaps, by combining results from several analysis layers and shares the forecasts with apps and network equipment.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2019340588": {
+  "headline": "Blockchain record of shared ownership of devices",
+  "summary": "Shared ownership of connected devices, such as a jointly owned car or appliance, is hard to track and enforce. This system records fractional ownership and usage rights on a secure blockchain ledger, applies encrypted rules when events occur, updates stakes accordingly and monitors whether owners respect usage limits.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2019340945": {
+  "headline": "Personalised learning paths towards a career goal",
+  "summary": "People seeking a new career rarely know which skills to learn in what order. This method builds a map of which skills depend on which, identifies the skills needed for a target job and their prerequisites, and generates a personalised sequence of courses and materials for the individual.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2019347668": {
+  "headline": "One customer record for sales, marketing and service",
+  "summary": "Businesses often hold scattered, inconsistent records of the same customer across departments. This platform keeps a single universal contact record for each person in one database, with attributes usable for sales, marketing, service and content activities, and offers improved tools for those functions built on it.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2019370123": {
+  "headline": "Copying live data to a backup computer",
+  "summary": "Businesses need a standby copy of their systems to recover quickly after a disaster. This method replicates data blocks from a running computer to a backup machine while the data is still changing, and can also replicate from a recovery machine that was itself built from a protected system.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2019385043": {
+  "headline": "Training AI on phones without sharing private data",
+  "summary": "Training machine learning models usually means collecting users' data centrally, raising privacy concerns. Here a server sends a shared model to devices, some of which improve it using their own data and send back only the suggested parameter changes, never the raw data, which the server combines to update the model.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2019386916": {
+  "headline": "Choosing network routes with timing in mind",
+  "summary": "Some network traffic needs routers whose clocks are precisely synchronised. This method lets the system that computes routes take into account the synchronisation status of each router when a path is requested, and returns a route that meets the requirement.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2020089650": {
+  "headline": "Automatically cleaning data for machine learning",
+  "summary": "Machine learning needs clean data, but tidying up missing or messy values is usually done by hand. This method describes each variable with summary features, feeds them to pre-trained models that recommend how to fill gaps and preprocess the data, applies those steps automatically and builds a better model.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2020097703": {
+  "headline": "Scoring how striking a photo is",
+  "summary": "Sorting large photo collections benefits from knowing which pictures have most impact. This method detects faces in an image, scores each one on features such as size or expression, weights and combines the scores, and stores an overall impact score for the picture.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2020112487": {
+  "headline": "Safely testing new software versions with live traffic",
+  "summary": "Rolling out a new version of a software service risks breaking things for users. This method copies real incoming traffic, analyses its patterns, and sends simulated traffic matching those patterns to the new version, then compares performance measurements of old and new versions before deciding to switch.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2020133658": {
+  "headline": "Blockchain for approving software code changes",
+  "summary": "Changes to a software project's source code need to be reviewed and traceable. This method treats each change as a transaction that must be validated by several contributors on a decentralised network and records it as a block in a blockchain, creating a tamper-resistant history.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2020160356": {
+  "headline": "Reading customer emotions to improve service",
+  "summary": "Companies struggle to make sense of what customers say about them across many channels. This system gathers direct and indirect customer communications, converts speech to text where needed, analyses sentiment and emotion, and displays the scores so managers can change products, fix service problems or target marketing.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2020164762": {
+  "headline": "Helping electric cars find battery swap stations",
+  "summary": "Electric vehicle drivers with low batteries need to find a place to swap them in time. This method reads the battery voltage, estimates remaining range, locates battery-swapping centres within reach when the level is low, and sends the centre information about the car's battery state.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2020208887": {
+  "headline": "Water-cooled air conditioning condenser",
+  "summary": "Air conditioning condensers work harder and use more energy when the air around them is hot. This design places a porous, water-soaked material in front of the condenser coil so incoming air is cooled by evaporation before reaching the coil, improving efficiency.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2020210223": {
+  "headline": "Running software tasks without waiting around",
+  "summary": "Complex software operations involve many steps, some of which call other services and would normally leave processors idle while waiting. This system arranges tasks as a graph, queues them to pools of workers in the right order, and makes calls to other services without blocking, so work keeps flowing.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2020402044": {
+  "headline": "Letting appliances pay for things securely",
+  "summary": "Connected appliances such as fridges could order supplies, but need a safe way to pay. This method registers an anonymous account to the appliance, gives it a payment token, links it later to the owner's account, and authorises transactions by checking the token against both accounts.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2021012298": {
+  "headline": "Self-certifying payment terminals for card networks",
+  "summary": "Before a payment terminal can process card transactions it must be certified, usually a slow manual process. This system lets the terminal send test transactions, compares the results with expected values automatically, and grants certification and authorisation to use the payment networks when they match.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2021026982": {
+  "headline": "Finding sensitive data by sampling files",
+  "summary": "Scanning every file in full to find personal or sensitive information is slow. This system analyses only part of each structured-data file, on the basis that if the sample contains no sensitive data the rest usually does not, and adjusts data management jobs to comply with privacy rules.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2021065391": {
+  "headline": "Building 3D maps from a single ordinary camera",
+  "summary": "Mapping surroundings in three dimensions usually requires special depth sensors. This method takes video from a single ordinary camera, uses a neural network to estimate depth for each frame, and combines the images and depth estimates to work out the camera's position and build a 3D map.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2021073026": {
+  "headline": "Checking and publishing automated workflows",
+  "summary": "Automated workflows written by one team can be useful to others but may be unreliable. This system receives a workflow over a network, tests it by running or analysing its steps, checks it meets publishing criteria, and if so stores it in a repository for other systems to use.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2021073377": {
+  "headline": "Reusing trained AI to detect new cyber threats",
+  "summary": "Training a threat detector from scratch for every file type needs lots of labelled examples. This method trains a model on one type of file, then transfers some of its learned layers to a second model trained on a different type, so the knowledge carries over and threats in the new domain are detected.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2021089822": {
+  "headline": "Teaching software which content types are similar",
+  "summary": "Content suggestion systems work better when they understand that some content types are more alike than others. This technique learns numerical representations of content types in which similar types sit close together, and uses them as features to improve suggestions to users.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2021107141": {
+  "headline": "Plugging AI models into office automation",
+  "summary": "Software robots that automate office tasks are hard to combine with machine learning models from different sources. This framework offers a drag-and-drop interface and a managed process for uploading, validating, publishing and deploying models, including versioning, so they slot into automated workflows.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2021108505": {
+  "headline": "Measuring the energy content of well fluids",
+  "summary": "Knowing the heat content of fluids flowing in a well, such as in geothermal or oil operations, is difficult. This downhole tool heats the fluid until it becomes a single phase, senses that transition, and uses the power consumed by the heater to calculate the fluid's enthalpy.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2021208615": {
+  "headline": "Steadier output voltage from chip connections",
+  "summary": "Chips must deliver reliable voltages at their output pins despite varying conditions. This circuit monitors the pin's voltage as feedback and combines it with two reference voltages to generate tracking signals that control the output, keeping the voltage stable.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2021266185": {
+  "headline": "Home router that filters encrypted web lookups",
+  "summary": "Encrypted domain name lookups protect privacy but stop home routers applying parental controls or blocking malicious sites. This router handles the encrypted lookups itself using its own certificate, decrypts the request, checks it against stored rules and acts accordingly.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2021398496": {
+  "headline": "Smoother screen brightness changes",
+  "summary": "Rapid changes in screen backlight, for example when brightness adjusts automatically, can be distracting to the eye. This technology generates a compensation signal from user and system inputs and passes it through a filter to smooth fast transitions, adjusting brightness in a way that suits human vision.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2022058090": {
+  "headline": "Backups that run when the moment is right",
+  "summary": "Backups run on fixed schedules even when the system is busy or data has barely changed. This approach calculates a readiness score from a number of operational factors, launches backups when conditions are favourable, and learns from recent jobs which factors matter most, adjusting their weights over time.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2022066839": {
+  "headline": "Controlling which chip cores access devices",
+  "summary": "In a chip with several processor cores, not every core should be able to control every attached device. This circuit keeps lock bits for each byte of a device's control registers and grants access at two levels, based on which core is asking and which bytes it wants, improving security.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2022078090": {
+  "headline": "Tracing a user's slow connection step by step",
+  "summary": "When a remote worker reports a slow connection, IT staff struggle to find the cause. This cloud-based technique lets an administrator start a detailed trace from the user's device to the destination, collects results and device metrics, and shows a map of the network path between them.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2022086234": {
+  "headline": "Resetting database sessions cheaply",
+  "summary": "Opening a fresh database connection for every request is clean but slow. This technique detects when an application has finished a unit of work, checks that the session is at a safe point, and resets it so it behaves like a new session without the cost of creating one, avoiding leaks of state between requests.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2022100813": {
+  "headline": "Reconfigurable chip for matrix maths",
+  "summary": "Matrix and vector calculations underpin AI and graphics, but fixed hardware layouts suit only some matrix shapes. This processor arranges computing elements in rows and columns and maps memory connections to them dynamically according to the dimensions of the matrices being processed, so it adapts to different jobs.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2022120367": {
+  "headline": "Rotating joint for hydraulic hoses",
+  "summary": "Hydraulic hoses on machinery can twist and wear where moving parts meet. This swivel joint receives fluid in one direction and can redirect it before it exits, using two repositionable connectors on a base so hoses can be routed flexibly.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2022121528": {
+  "headline": "Backing up large storage volumes in slices",
+  "summary": "Backing up very large block storage devices in one piece is slow and fragile. This system measures the device, splits it into slices, records where each slice is stored in a lookup table, and uses multiple backup agents to copy the slices in parallel to network storage as snapshots.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2022207988": {
+  "headline": "Automatic fixes for recurring plant alarms",
+  "summary": "Industrial control rooms are swamped with alarms, many of which recur in familiar sequences. This method identifies patterns in the alarm log, recognises when a new alarm fits a known pattern, works out the actions that resolved it before and carries them out.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2022250906": {
+  "headline": "Tougher catalyst for hydrogen production",
+  "summary": "Catalysts used in the first stage of making hydrogen from hydrocarbons can be damaged when exposed to steam alone. This nickel oxide catalyst with a small amount of platinum resists such deactivation, making the production of hydrogen or hydrogen-rich gas more robust.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2022414818": {
+  "headline": "Saving memory when drawing 3D graphics",
+  "summary": "Graphics processors store references to every corner of the shapes they draw, and full memory addresses take up space. This technique replaces them with much shorter index numbers within a window of recent vertices and indicates when a full address is needed, reducing memory use.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2023123775": {
+  "headline": "Cloud-style management for software-defined networks",
+  "summary": "Modern applications run in containers managed by orchestration tools, but network configuration often sits outside that world. This architecture lets the network controller handle both standard container resources and custom network settings through the same kind of interface, and automatically applies changes when settings are updated.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2023213997": {
+  "headline": "Slowing idle storage chip stages to save power",
+  "summary": "Storage controllers process data in a series of stages that all usually run at full speed. This design measures how busy each stage is and gives slower stages a lower clock speed than the system clock, cutting power use without slowing the work.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2023266899": {
+  "headline": "Switching memory boost features on by voltage",
+  "summary": "Memory chips have performance features that only help under certain operating conditions. This system watches the supply voltage and turns the feature on when voltage crosses a threshold one way and off when it crosses back, allowing the feature to be used safely even in very large, complex chips.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2023316629": {
+  "headline": "Faster realistic shadows in computer graphics",
+  "summary": "Realistic shading in games requires calculating how much light each point receives, which is expensive with full ray tracing. This method first checks whether cheaper screen-based or probe-based lighting data is available in a given direction and only falls back to ray tracing when it is not.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2023325173": {
+  "headline": "Personalised views of shared virtual storage",
+  "summary": "In shared virtual computing environments, users should only see storage information relevant to them. This virtualised file server answers requests for storage details, such as how much space is available, with responses tailored to each user's own configuration and quota.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2023326088": {
+  "headline": "Image compression keeping important parts sharp",
+  "summary": "Standard compression squeezes all parts of an image equally. This method lets a user indicate which areas matter most and a target file size; a neural network learns an importance map from that guidance and compresses the image so the important regions keep more detail.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2023327967": {
+  "headline": "Profiling normal network behaviour of each computer",
+  "summary": "Detecting unusual network activity requires knowing what normal looks like. This method sorts measurements of a computer's traffic with a service into ranges, refines those ranges over time by merging and splitting them, and aggregates the results into a profile of typical behaviour.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2023342552": {
+  "headline": "Better prompts for language models without retraining",
+  "summary": "Adapting large language models to new tasks is costly if the model itself must be retrained. This technique generates small learned prompts that adapt to each input text and refines them with a discrete codebook, then feeds them with the text into a frozen model, improving understanding at low cost.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2023362245": {
+  "headline": "Setting up private clusters in shared data centres",
+  "summary": "Cloud customers want dedicated computing clusters with pooled storage, but configuring them by hand is complex. This method takes a cluster request, builds a secure private network overlay for the tenant, uses it to provision further networking, links the servers' local disks into one shared pool and configures the switches automatically.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2023401088": {
+  "headline": "Automating deployment of interconnected microservices",
+  "summary": "Modern applications consist of many small services with dependencies on one another, making deployment fiddly. This technique fetches the right configuration package and container images for the required services, creates a cluster and deploys the services with their dependencies set up automatically.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2024048551": {
+  "headline": "Letting apps from new locations prove themselves",
+  "summary": "Access to restricted systems is often limited to known network addresses, which blocks legitimate users elsewhere. This method issues a one-off registration secret through a second channel, checks a token signed with it, and then gives the device a communication secret it can use to access the resource.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2024095993": {
+  "headline": "Fewer wasted calculations in ray tracing",
+  "summary": "Ray tracing hardware speeds up realistic rendering but often tests rays against bounding boxes they do not really hit. These techniques reduce such false positives by re-testing with higher precision where needed, discarding boxes that have shrunk to a point, and clipping rays beyond set distances.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2024163188": {
+  "headline": "Measuring network delay from packet numbers",
+  "summary": "Knowing how long a packet takes to travel to its destination and back helps diagnose network problems. This system records a packet's details, works out the acknowledgement number it should receive, and when a matching acknowledgement arrives, calculates the round-trip time from the two timestamps.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2024214383": {
+  "headline": "Spotting unusual user access rights",
+  "summary": "Organisations find it hard to notice when an employee's system access looks out of place. This AI system builds a graph of identities and their access rights, groups similar users into peer groups, and flags those whose patterns differ from their peers as potential risks.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2024288667": {
+  "headline": "Eight-element camera lens for phones",
+  "summary": "Compact cameras in phones and other devices need high image quality in little space. This lens assembly arranges eight lens elements in three groups with specific shapes and curvatures, including specially curved final elements, to achieve sharper images in a slim unit.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2024378117": {
+  "headline": "One backup snapshot covering several applications",
+  "summary": "Taking consistent backups when several applications share the same storage is tricky. This system checks with each application's agent that it is in a stable state, takes a single snapshot of the shared volume, and records which part of the snapshot belongs to which application for easy restoration.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2025250982": {
+  "headline": "Keeping pumps running at peak efficiency",
+  "summary": "Pumps and similar machines waste energy when run away from their most efficient speed. This controller estimates the motor's torque and speed, compares them with stored performance data to find the current operating point, checks how far it is from the best efficiency point, and decides whether to change speed.",
+  "source": "claude session 2026-10-12"
+ },
+ "US2025258680": {
+  "headline": "Central control panel for scattered business software",
+  "summary": "Large organisations run many different services spread across their systems, each configured separately. This system provides a single central place to configure a range of service types, including services run outside the cloud but linked to a cloud platform.",
+  "source": "claude session 2026-10-12"
+ }
+}

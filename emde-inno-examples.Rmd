@@ -1,0 +1,950 @@
+---
+title: "The highest-value innovations of the world's top R&D firms[*]{style='font-size:60%;vertical-align:super;'}"
+subtitle: "Which Scoreboard innovations and which Scoreboard firms score highest on knowledge spillovers, marginal returns and private value --- and what those innovations are"
+author: "Data tool for Samuel Edet, Ralf Martin, Golvine de Rochambeau, Trang Thu Tran and Dennis Verhoeven (2026), &ldquo;Innovation partnerships for development along green value chains&rdquo;"
+date: "`r format(Sys.Date(), '%d %B %Y')`"
+params:
+  bigdata: "../LMICinnovation/.bigdata"
+  iseapp_data: "../iseapp/inst/extdata"
+  lmic_code: "../LMICinnovation/code2025"
+  top_n: 20
+  fetch_abstracts: true
+  summary_model: "claude-sonnet-4-5"
+  min_n_choices: !r c(10, 30, 100)
+output:
+  html_document:
+    self_contained: true
+    theme: flatly
+    toc: true
+    toc_float: true
+    df_print: paged
+---
+
+<style>
+/* Typography matched to the other KEVCE Insights posts (greenconnect/green_report_focused.rmd):
+   a warm serif body and a large, light sans-serif title; table of contents on the right. */
+body.html_document, body {
+  font-family: Georgia, "Iowan Old Style", "Source Serif Pro", serif;
+  font-size: 16.5px;
+  line-height: 1.6;
+  color: #1d1d1d;
+}
+h1, h2, h3, h4, h5, h6, h1.title, .h1, .h2, .h3 {
+  font-family: Georgia, "Iowan Old Style", "Source Serif Pro", serif;
+}
+h1.title {
+  font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 5.85rem;
+  font-weight: 300;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+}
+h3.subtitle { font-size: 1.25rem; color: #555; font-weight: 400; line-height: 1.35; }
+h4.author  { font-size: 0.95rem; color: #555; font-weight: 400; line-height: 1.4; max-width: 70ch; }
+h4.date    { font-size: 0.9rem; color: #79808d; font-weight: 400; }
+.fignote {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #666;
+  margin: 10px 0 34px;
+}
+.fignote::before {
+  content: "\00A9 KEVCE";
+  display: block;
+  text-align: right;
+  font-size: 11px;
+  font-weight: 400;
+  font-style: normal;
+  color: #999;
+  margin-bottom: 8px;
+}
+.main-container img, .html-widget, .leaflet { margin-top: 14px; margin-bottom: 14px; }
+.tocify { left: auto; right: 0; margin-left: 0; margin-right: 2%; }
+.col-xs-12.col-sm-4.col-md-3 { float: right; }
+.toc-content { float: left; }
+</style>
+
+<div style="font-size:0.85em;color:#555;margin-top:-6px;margin-bottom:18px;">
+<sup>*</sup> This data tool accompanies the paper
+&ldquo;Innovation partnerships for development along green value chains&rdquo;
+by Samuel Edet, Ralf Martin, Golvine de Rochambeau, Trang Thu Tran and Dennis Verhoeven (2026), and is powered by the
+[Innovation Strategy Explorer](http://www.prinzproject.io/iseapp) database.
+</div>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, results = "hide")   # diagnostics go to the knit log only
+suppressPackageStartupMessages({
+  library(data.table)
+  library(arrow)
+  library(DBI)
+  library(duckdb)
+  library(jsonlite)
+  library(countrycode)
+})
+TOP_N <- params$top_n
+MIN_N <- sort(unique(as.integer(params$min_n_choices)))
+cache_dir <- "_cache_emde_inno_examples"   # per-family enrichment and patent texts, so re-knits are quick
+dir.create(cache_dir, showWarnings = FALSE)
+```
+
+```{r inputs}
+# ── Inputs ────────────────────────────────────────────────────────────────────
+# Everything comes from the LMICinnovation pipeline's shared datasets plus one
+# iseapp table that carries a publication number per family:
+#
+#   bigX_family_level.parquet  one row per patent family, 2013-2022: inventor-group
+#                              flags, spillover values (ev_*), marginal returns
+#                              (istrax_*), private value (pv), green flag
+#   firmmap_2025.parquet       Scoreboard company x family
+#   sb_firmlevel.parquet       firm-level facts (HQ country, sector, size)
+#   firm_country_indicators    firm x inventor country: distinct inventors and
+#                              families with an inventor there (rawpipeline section 7),
+#                              the firm-level country mix shown as a donut
+#   iseapp patents_x_tech      technology tags per family (the green flag of the paper
+#                              is "Any Green technology" in this table); the green
+#                              sub-tags explain WHY an innovation counts as green
+#   iseapp countrymap          family x country (inventors OR applicants, after name
+#                              harmonisation): THE table from which innopaper_results1
+#                              builds HICinno / CNinno / EMDENOCNinno. The team column
+#                              shows exactly this, so the EMDE tag is always explicable.
+#   data/inventors_2025 + persons_2025 (+ persons_addr_inferred)
+#                              raw inventor records of each family (headcount and the
+#                              country code given on the record), shown as a second line
+#   LMICinnovation/code2025/mnc_rd_labs_data/emde_rd_labs_map.json
+#                              EMDERLT, the verified EMDE R&D labs of Scoreboard firms,
+#                              used for the "linked to a verified lab" samples
+#   iseapp patent_database     publication number per family -> Espacenet link
+#
+# Titles and abstracts are fetched from Google Patents for the few hundred
+# families that make it into a top-20 list, and cached in _cache_emde_inno_examples/.
+bigdata <- params$bigdata
+stopifnot(dir.exists(bigdata), dir.exists(params$iseapp_data))
+source(file.path(params$lmic_code, "country_definitions.R"))   # lmics, lmics_excl_china, hic
+ctry_group <- function(iso) fifelse(iso == "CN", "China", fifelse(iso %in% lmics_excl_china, "EMDE", fifelse(iso %in% hic, "HIC", "other")))
+
+MEASURES <- list(
+  ev_global       = list(label = "Global knowledge spillover",      unit = "USD M per innovation", fmt = 1),
+  ev_HIC          = list(label = "Spillover to HIC inventors",      unit = "USD M per innovation", fmt = 1),
+  ev_EMDENOCN     = list(label = "Spillover to EMDE inventors",     unit = "USD M per innovation", fmt = 2),
+  istrax_global   = list(label = "Marginal return, global",         unit = "percent",              fmt = 0, scale = 100),
+  istrax_HIC      = list(label = "Marginal return, HIC",            unit = "percent",              fmt = 0, scale = 100),
+  istrax_EMDENOCN = list(label = "Marginal return, EMDE",           unit = "percent",              fmt = 1, scale = 100),
+  pv              = list(label = "Private value",                   unit = "USD M per innovation", fmt = 1))
+# Plain-English gloss of iseapp's green technology tags (built from the EPO's Y02/Y04S
+# climate-change-mitigation classes via classifications/ifcreport.xlsx). Shown on green
+# cards next to the specific Y02 codes of the patent.
+GREEN_GLOSS <- c(
+  "Green Energy"                      = "generating, storing or distributing energy with lower greenhouse-gas emissions: renewables, efficient power plants, grids and storage (EPO class Y02E)",
+  "Green Transport"                   = "cutting emissions from vehicles, ships, aircraft and traffic, for instance through electric or hybrid drives and more efficient vehicles (Y02T)",
+  "Electric Vehicles & Mobility"      = "electric and hybrid vehicles, their batteries, charging and drive systems",
+  "Green Housing"                     = "lower-carbon buildings: insulation, heating and cooling, lighting and building-energy management (Y02B)",
+  "Green Manufacturing"               = "cleaner or more energy-efficient industrial processes and materials, from chemicals and metals to food processing (Y02P)",
+  "Green ICT"                         = "energy-efficient computing and communication: processors, data centres and networks that use less power (Y02D)",
+  "Circular Economy"                  = "waste reduction, recycling and re-use of materials and wastewater treatment (Y02W)",
+  "Waste & Circular Economy"          = "waste reduction, recycling and re-use of materials and wastewater treatment (Y02W)",
+  "Adaptation"                        = "coping with the effects of climate change: water supply, flood and drought protection, resilient infrastructure and health (Y02A)",
+  "GHG Capture"                       = "capturing, storing or using greenhouse gases such as CO2 (Y02C)",
+  "Green Agriculture"                 = "climate-friendlier farming and food production",
+  "Water & Energy"                    = "saving water and energy in agriculture and water management",
+  "Any battery technology"            = "battery materials, cells and battery-management systems",
+  "Steel & Iron Decarbonisation"      = "lower-emission steel and iron making",
+  "Cement & Concrete Decarbonisation" = "lower-emission cement and concrete",
+  "Chemicals & Plastics Decarbonisation" = "lower-emission chemicals and plastics production",
+  "Aviation Decarbonisation"          = "lower-emission aviation",
+  "Shipping Decarbonisation"          = "lower-emission shipping",
+  "Any Hard to Abate technology"      = "decarbonising hard-to-abate industries such as steel, cement, chemicals, aviation and shipping")
+
+SAMPLES <- list(
+  all        = list(label = "All Scoreboard innovations"),
+  emde       = list(label = "Innovations with at least one EMDE inventor"),
+  emde_green = list(label = "Green innovations with at least one EMDE inventor"),
+  lab        = list(label = "Innovations linked to a verified EMDERLT lab"),
+  lab_green  = list(label = "Green innovations linked to a verified EMDERLT lab"))
+```
+
+## What this page shows
+
+The paper argues that the leading R&D investors of the EU JRC Scoreboard produce the
+most valuable innovations and account for half of all HIC--EMDE collaborative
+innovation. This page puts faces to those numbers. For every measure the paper uses
+--- knowledge spillovers accruing globally, to HIC inventors and to EMDE inventors;
+the marginal return index on each; and the private value of the innovation --- it
+lists the **`r TOP_N` highest-scoring innovations** linked to a Scoreboard firm and the
+**`r TOP_N` firms with the highest average** across their innovations. Each innovation
+comes with the firm, the inventor team's country composition, the patent title and
+abstract, and a link to the full text on Espacenet.
+
+Five samples can be chosen: all Scoreboard innovations; those with at least one
+inventor based in an EMDE (excluding China, as throughout the paper); those that can
+be linked to one of the verified EMDE research labs of the
+[EMDERLT tracker](https://mondpanther.github.io/kevceinsights/mnc-rd-labs-map.html)
+--- the firm has a verified lab in an EMDE country that appears on the patent, which
+rules out stray country attributions; and the green subsets of the last two. Spillover values and private values are in USD million per
+innovation; marginal returns are the ISTRAX index in percent. Definitions are those
+of the paper and of the [Innovation Strategy Explorer](https://mondpanther-iseapp2.share.connect.posit.cloud/).
+
+```{r data}
+# ── Family-level table of Scoreboard-linked innovations ──────────────────────
+bigX <- as.data.table(read_parquet(file.path(bigdata, "bigX_family_level.parquet"),
+  col_select = c("docdb_family_id", "HICinno", "CNinno", "EMDENOCNinno", "n_ctry", "multi_ctry",
+                 names(MEASURES), "is_green")))
+firmmap <- unique(as.data.table(read_parquet(file.path(bigdata, "firmmap_2025.parquet"))))
+sb <- as.data.table(read_parquet(file.path(bigdata, "sb_firmlevel.parquet"),
+  col_select = c("company_raw", "hq_iso", "hq_group", "sector", "n_families", "share_dev_nocn_innos")))
+fy <- as.data.table(read_parquet(file.path(bigdata, "fam_year.parquet")))
+fci <- as.data.table(read_parquet(file.path(bigdata, "firm_country_indicators.parquet"),
+  col_select = c("company_raw", "ctry_code", "n_inventors", "total_inventors", "n_families", "total_families")))
+
+cf <- merge(firmmap, bigX, by = "docdb_family_id")                 # (company, family) rows
+cf <- merge(cf, fy, by = "docdb_family_id", all.x = TRUE)
+cf <- cf[!is.na(ev_global)]
+in_sample <- list(all        = quote(TRUE),
+                  emde       = quote(EMDENOCNinno == TRUE),
+                  emde_green = quote(EMDENOCNinno == TRUE & is_green == TRUE),
+                  lab        = quote(lab_linked == TRUE),
+                  lab_green  = quote(lab_linked == TRUE & is_green == TRUE))
+
+# one row per family, with the list of Scoreboard firms it is linked to
+fam <- cf[, .(companies = paste(sort(unique(company_raw)), collapse = "; ")), by = docdb_family_id]
+fam <- merge(fam, unique(cf[, c("docdb_family_id", "HICinno", "CNinno", "EMDENOCNinno", "n_ctry", "multi_ctry", "is_green", "fam_year", names(MEASURES)), with = FALSE]), by = "docdb_family_id")
+cat(format(nrow(fam), big.mark = ","), "Scoreboard-linked innovations;",
+    format(fam[EMDENOCNinno == TRUE, .N], big.mark = ","), "with an EMDE inventor;",
+    format(fam[EMDENOCNinno == TRUE & is_green == TRUE, .N], big.mark = ","), "of those green\n")
+```
+
+```{r countrymap}
+# ── The countries behind the flags ───────────────────────────────────────────
+# innopaper_results1.rmd builds HICinno / CNinno / EMDENOCNinno from iseapp's unified
+# countrymap (COUNTRYMAP_SOURCE = "inst_extdata"): one row per family and country of
+# any inventor OR applicant, after the name-based country harmonisation of
+# build_countries_harm_duck.R. The team column shows this table, not the raw inventor
+# records, so that an "EMDE inventor" tag can always be traced to a listed country.
+read_countrymap <- function(ids) {
+  con <- dbConnect(duckdb::duckdb()); on.exit(dbDisconnect(con, shutdown = TRUE), add = TRUE)
+  dbExecute(con, "PRAGMA threads=4")
+  duckdb_register(con, "fams", data.frame(docdb_family_id = ids))
+  as.data.table(dbGetQuery(con, sprintf("
+    SELECT DISTINCT c.docdb_family_id, upper(trim(c.ctry_code)) AS iso
+    FROM read_parquet('%s') c JOIN fams USING (docdb_family_id)
+    WHERE c.ctry_code IS NOT NULL AND trim(c.ctry_code) <> ''",
+    normalizePath(file.path(params$iseapp_data, "countrymap.parquet")))))
+}
+cm <- read_countrymap(fam$docdb_family_id)
+cm[, grp := ctry_group(iso)]
+cm[, grp_ord := match(grp, c("EMDE", "China", "HIC", "other"))]
+setorder(cm, docdb_family_id, grp_ord, iso)     # EMDE countries first, so the tag's reason is visible at once
+cm_fam <- cm[, .(n_ctry_map = .N,
+                 countries  = paste(iso, collapse = ","),
+                 ctry_line  = paste(fifelse(grp == "EMDE", paste0(iso, "*"), iso), collapse = ", "),
+                 n_hic_c = sum(grp == "HIC"), n_emde_c = sum(grp == "EMDE"), n_cn_c = sum(grp == "China")),
+             by = docdb_family_id]
+fam <- merge(fam, cm_fam, by = "docdb_family_id", all.x = TRUE)
+# consistency check: flags recomputed from this table must agree with bigX
+mism <- fam[!is.na(n_ctry_map) & ((n_emde_c > 0) != EMDENOCNinno | (n_cn_c > 0) != CNinno | (n_hic_c > 0) != HICinno), .N]
+cat(format(sum(!is.na(fam$n_ctry_map)), big.mark = ","), "families found in countrymap;",
+    format(mism, big.mark = ","), "with a flag that disagrees with the recomputed one",
+    if (mism > 0) "(countrymap vintage differs from the one used to build bigX?)" else "", "\n")
+```
+
+```{r labs}
+# ── EMDERLT: innovations that can be tied to a verified EMDE lab ─────────────
+# A family is "lab-linked" for a Scoreboard firm when the firm has a verified lab
+# (either EMDERLT pipeline) in an EMDE-excl.-China country that is on the family's
+# countrymap record. This is the strict version of the EMDE sample: a stray country
+# attribution for a firm with no presence there does not qualify.
+labs_file <- file.path(params$lmic_code, "mnc_rd_labs_data", "emde_rd_labs_map.json")
+labs <- as.data.table(fromJSON(labs_file, simplifyVector = TRUE, flatten = TRUE))
+if (!"iso" %in% names(labs)) labs[, iso := NA_character_]
+labs[, iso := toupper(trimws(as.character(iso)))]
+labs[is.na(iso) | !nzchar(iso), iso := countrycode(country, "country.name", "iso2c", warn = FALSE)]
+labs <- unique(labs[iso %in% lmics_excl_china & !is.na(company_raw) & nzchar(company_raw), .(company_raw, iso, lab, city)])
+cat(nrow(labs), "verified EMDERLT labs (excl. China) of", uniqueN(labs$company_raw), "entities in", uniqueN(labs$iso), "countries\n")
+
+lab_links <- merge(cf[, .(company_raw, docdb_family_id)], labs, by = "company_raw", allow.cartesian = TRUE)
+lab_links <- lab_links[cm[, .(docdb_family_id, iso)], on = c("docdb_family_id", "iso"), nomatch = NULL]
+cf[, lab_linked := FALSE]
+cf[unique(lab_links[, .(company_raw, docdb_family_id)]), lab_linked := TRUE, on = c("company_raw", "docdb_family_id")]
+lab_text <- lab_links[, {
+  u <- unique(sprintf("%s (%s)", lab, city))
+  .(labs = if (length(u) > 3) paste0(paste(u[1:3], collapse = "; "), "; +", length(u) - 3, " more") else paste(u, collapse = "; "))
+}, by = docdb_family_id]
+fam <- merge(fam, lab_text, by = "docdb_family_id", all.x = TRUE)
+fam[, lab_linked := !is.na(labs)]
+cat(format(fam[lab_linked == TRUE, .N], big.mark = ","), "Scoreboard-linked innovations tie to a verified lab;",
+    format(fam[lab_linked == TRUE & is_green == TRUE, .N], big.mark = ","), "of those green;",
+    format(cf[lab_linked == TRUE, uniqueN(company_raw)], big.mark = ","), "firms\n")
+```
+
+```{r top-innovations}
+# ── Top-N innovations per (sample, measure) ───────────────────────────────────
+top_inno <- rbindlist(lapply(names(SAMPLES), function(s) rbindlist(lapply(names(MEASURES), function(m) {
+  d <- fam[eval(in_sample[[s]]) & !is.na(get(m))]
+  d <- d[order(-get(m), -pv)][seq_len(min(TOP_N, nrow(d)))]
+  data.table(sample = s, measure = m, rank = seq_len(nrow(d)), docdb_family_id = d$docdb_family_id, value = d[[m]])
+}))))
+fam_sel <- sort(unique(top_inno$docdb_family_id))
+cat(length(fam_sel), "distinct families across the top lists\n")
+```
+
+```{r top-companies}
+# ── Top-N firms by average measure per (sample, measure, min n) ──────────────
+top_firm <- rbindlist(lapply(names(SAMPLES), function(s) rbindlist(lapply(names(MEASURES), function(m) rbindlist(lapply(MIN_N, function(k) {
+  d <- cf[eval(in_sample[[s]]) & !is.na(get(m)), .(n = .N, avg = mean(get(m)), best_fam = docdb_family_id[which.max(get(m))], best = max(get(m))), by = company_raw][n >= k]
+  d <- d[order(-avg)][seq_len(min(TOP_N, nrow(d)))]
+  data.table(sample = s, measure = m, min_n = k, rank = seq_len(nrow(d)), company_raw = d$company_raw, n = d$n, avg = d$avg, best_fam = d$best_fam, best = d$best)
+}))))))
+top_firm <- merge(top_firm, sb, by = "company_raw", all.x = TRUE, sort = FALSE)
+# the firms' best innovations are enriched and fetched alongside the top innovations
+fam_sel <- sort(union(fam_sel, unique(top_firm$best_fam)))
+cat(length(fam_sel), "distinct families to enrich, including the firms' best innovations\n")
+```
+
+```{r enrich-families}
+# ── Per-family enrichment: inventor team, publication number ─────────────────
+# Cached: only families not yet in the cache are looked up.
+enrich_file <- file.path(cache_dir, "family_enrichment.parquet")
+have <- if (file.exists(enrich_file)) as.data.table(read_parquet(enrich_file)) else NULL
+need <- setdiff(fam_sel, if (is.null(have)) integer() else have$docdb_family_id)
+if (length(need)) {
+  con <- dbConnect(duckdb::duckdb()); on.exit(dbDisconnect(con, shutdown = TRUE), add = TRUE)
+  dbExecute(con, "PRAGMA threads=4")
+  ids <- paste(need, collapse = ",")
+  pq <- function(f) sprintf("read_parquet('%s')", normalizePath(f))
+  # inventor team: one row per (family, inventor), country from persons, falling back to the inferred address
+  team <- as.data.table(dbGetQuery(con, sprintf("
+    WITH inv AS (SELECT DISTINCT docdb_family_id, person_id FROM %s WHERE docdb_family_id IN (%s))
+    SELECT inv.docdb_family_id, inv.person_id,
+           COALESCE(NULLIF(TRIM(p.person_ctry_code), ''), NULLIF(TRIM(a.person_ctry_code), '')) AS iso
+    FROM inv
+    LEFT JOIN %s p ON p.person_id = inv.person_id
+    LEFT JOIN %s a ON a.person_id = inv.person_id",
+    pq(file.path(bigdata, "data", "inventors_2025.parquet")), ids,
+    pq(file.path(bigdata, "persons_2025.parquet")), pq(file.path(bigdata, "persons_addr_inferred.parquet")))))
+  team[, iso := toupper(iso)]
+  team_agg <- team[, {
+    tab <- sort(table(iso[!is.na(iso)]), decreasing = TRUE)
+    grp <- ctry_group(names(tab))
+    .(n_inventors = .N,
+      n_known = sum(!is.na(iso)),
+      team = paste(sprintf("%s %d", names(tab), as.integer(tab)), collapse = ", "),
+      n_hic = sum(as.integer(tab)[grp == "HIC"]), n_emde = sum(as.integer(tab)[grp == "EMDE"]), n_cn = sum(as.integer(tab)[grp == "China"]),
+      rec_countries = paste(names(tab), collapse = ","))
+  }, by = docdb_family_id]
+  # publication number (iseapp's patent_database carries one per family) -> Espacenet / Google Patents
+  pubs <- as.data.table(dbGetQuery(con, sprintf("
+    SELECT docdb_family_id, MIN(appln_id) AS pubno FROM %s WHERE docdb_family_id IN (%s) GROUP BY 1",
+    pq(file.path(params$iseapp_data, "patent_database.parquet")), ids)))
+  new <- merge(data.table(docdb_family_id = need), team_agg, by = "docdb_family_id", all.x = TRUE)
+  new <- merge(new, pubs, by = "docdb_family_id", all.x = TRUE)
+  have <- rbind(have, new, fill = TRUE)
+  write_parquet(have, enrich_file)
+}
+if ("countries" %in% names(have)) setnames(have, "countries", "rec_countries")   # older cache files
+enr <- have[docdb_family_id %in% fam_sel]
+
+# green technology tags of the listed families (iseapp patents_x_tech), one line per family
+green_tags <- local({
+  con <- dbConnect(duckdb::duckdb()); on.exit(dbDisconnect(con, shutdown = TRUE), add = TRUE)
+  duckdb_register(con, "sel", data.frame(docdb_family_id = fam_sel))
+  tg <- as.data.table(dbGetQuery(con, sprintf("SELECT DISTINCT t.docdb_family_id, t.technology FROM read_parquet('%s') t JOIN sel USING (docdb_family_id)",
+                                              normalizePath(file.path(params$iseapp_data, "patents_x_tech.parquet")))))
+  tg <- tg[technology %in% names(GREEN_GLOSS)]
+  tg[, pri := match(technology, names(GREEN_GLOSS))]
+  setorder(tg, docdb_family_id, pri)
+  tg[, .(green_tags = paste(technology, collapse = "|")), by = docdb_family_id]
+})
+enr <- merge(enr, green_tags, by = "docdb_family_id", all.x = TRUE)
+```
+
+```{r patent-texts}
+# ── Title, abstract and a drawing from Google Patents (cached JSON) ──────────
+# One page per family is fetched (the publication iseapp stores). EP and WO pages
+# on Google Patents often carry no drawings, so when the page has none the family
+# members listed under "Also published as" are tried (US first), and the first
+# drawing of the first member that has one is kept, hot-linked from Google's
+# patent image store. Entries fetched before drawings were added (no `images`
+# field) are fetched again once.
+texts_file <- file.path(cache_dir, "patent_texts.json")
+texts <- if (file.exists(texts_file)) fromJSON(texts_file, simplifyVector = FALSE) else list()
+# PATSTAT writes US pre-grant publications without the leading zero of the serial
+# (US2016105321); Google Patents and Espacenet want the 11-digit form (US20160105321).
+gp_number <- function(pubno) sub("^US((19|20)[0-9]{2})([0-9]{6})$", "US\\10\\3", pubno)
+gp_get <- function(pubno) {
+  u <- sprintf("https://patents.google.com/patent/%s/en", gp_number(pubno))
+  h <- tryCatch(readLines(url(u, headers = c(`User-Agent` = "Mozilla/5.0 (Macintosh) AppleWebKit/537.36 Chrome/124 Safari/537.36")), warn = FALSE, encoding = "UTF-8"),
+                error = function(e) NULL)
+  if (is.null(h)) NULL else paste(h, collapse = "\n")
+}
+gp_images <- function(h) {
+  m <- regmatches(h, gregexpr('<meta itemprop="full" content="[^"]*"', h))[[1]]
+  unique(sub('"$', "", sub('<meta itemprop="full" content="', "", m)))
+}
+gp_family <- function(h) {
+  rows <- regmatches(h, gregexpr('<tr itemprop="docdbFamily"[\\s\\S]*?</tr>', h, perl = TRUE))[[1]]
+  pn <- unlist(lapply(rows, function(r) regmatches(r, regexpr('(?<=<span itemprop="publicationNumber">)[A-Z]{2}[0-9A-Z]+', r, perl = TRUE))))
+  unique(pn)
+}
+unesc <- function(x) { x <- gsub("&amp;", "&", x); x <- gsub("&lt;", "<", x); x <- gsub("&gt;", ">", x); x <- gsub("&quot;", "\"", x); gsub("&#39;", "'", x) }
+fetch_gp <- function(pubno) {
+  h <- gp_get(pubno)
+  if (is.null(h)) return(NULL)
+  title <- regmatches(h, regexpr('<span itemprop="title"[^>]*>[^<]*', h))
+  title <- if (length(title)) trimws(sub('<span itemprop="title"[^>]*>', "", title)) else NA_character_
+  abs <- regmatches(h, regexpr('<meta name="description" content="[^"]*"', h))
+  abs <- if (length(abs)) trimws(sub('<meta name="description" content="', "", sub('"$', "", abs))) else NA_character_
+  cpc <- regmatches(h, gregexpr('<span itemprop="Code">[^<]*</span>&mdash;<span itemprop="Description">[^<]*</span>', h))[[1]]
+  cpc_code <- sub('</span>.*', "", sub('<span itemprop="Code">', "", cpc))
+  cpc_desc <- unesc(sub('</span>$', "", sub('.*<span itemprop="Description">', "", cpc)))
+  keep <- grepl("^Y02|^Y04S", cpc_code)
+  gc <- unique(data.table(code = cpc_code[keep], desc = cpc_desc[keep]))
+  # keep the most specific codes: drop a code that is a prefix of another listed code
+  if (nrow(gc) > 1) gc <- gc[!vapply(seq_len(nrow(gc)), function(i) any(startsWith(gc$code[-i], gc$code[i]) & gc$code[-i] != gc$code[i]), TRUE)]
+  green_codes <- lapply(seq_len(min(nrow(gc), 5)), function(i) list(code = gc$code[i], desc = gc$desc[i]))
+  imgs <- gp_images(h); img_from <- pubno
+  if (!length(imgs)) {
+    fam <- setdiff(gp_family(h), pubno)
+    fam <- fam[order(!grepl("^US", fam), !grepl("^WO", fam))]
+    for (f in head(fam, 3)) {
+      Sys.sleep(0.4); hh <- gp_get(f)
+      if (!is.null(hh)) { imgs <- gp_images(hh); if (length(imgs)) { img_from <- f; break } }
+    }
+  }
+  list(title = unesc(title), abstract = unesc(abs),
+       image = if (length(imgs)) imgs[1] else NA_character_, image_from = if (length(imgs)) img_from else NA_character_,
+       n_images = length(imgs), images = as.list(head(imgs, 6)), green_codes = green_codes, fetched = format(Sys.Date()))
+}
+has_images_field <- function(p) !is.null(texts[[p]]) && !is.null(texts[[p]]$n_images)
+has_green_field  <- function(p) !is.null(texts[[p]]) && !is.null(texts[[p]]$green_codes)
+green_ids <- fam[is_green == TRUE, docdb_family_id]
+todo <- enr[!is.na(pubno) & (!pubno %in% names(texts) | !vapply(pubno, has_images_field, TRUE) |
+                             (docdb_family_id %in% green_ids & !vapply(pubno, has_green_field, TRUE))), pubno]
+if (params$fetch_abstracts && length(todo)) {
+  cat("Fetching", length(todo), "patent pages from Google Patents ...\n")
+  for (k in seq_along(todo)) {
+    r <- fetch_gp(todo[k]); if (!is.null(r) && !is.na(r$title)) texts[[todo[k]]] <- r
+    Sys.sleep(0.6)
+  }
+  write_json(texts, texts_file, auto_unbox = TRUE, pretty = TRUE)
+}
+getx <- function(p, what) { v <- texts[[p]][[what]]; if (is.null(v) || length(v) == 0 || is.na(v) || !nzchar(v)) NA_character_ else as.character(v) }
+enr[, title    := vapply(pubno, getx, "", what = "title")]
+enr[, abstract := vapply(pubno, getx, "", what = "abstract")]
+enr[, image    := vapply(pubno, getx, "", what = "image")]
+enr[, image_from := vapply(pubno, getx, "", what = "image_from")]
+# the Y02 / Y04S classes of the fetched publication, "code — description" lines
+enr[, green_codes := vapply(pubno, function(p) { g <- texts[[p]]$green_codes; if (is.null(g) || !length(g)) NA_character_ else paste(vapply(g, function(x) paste0(x$code, " \u2014 ", x$desc), ""), collapse = "|") }, "")]
+# drawing orientation: image_rotations.json maps a drawing URL to the clockwise rotation
+# (0/90/180/270) that makes it upright, from tesseract's orientation detection
+rot_file <- file.path(cache_dir, "image_rotations.json")
+rots <- if (file.exists(rot_file)) fromJSON(rot_file, simplifyVector = FALSE) else list()
+enr[, rotate := vapply(image, function(u) { r <- if (is.na(u)) NULL else rots[[u]]; if (is.null(r) || is.null(r$rotate)) 0L else as.integer(r$rotate) }, 0L)]
+cat(sum(!is.na(enr$title)), "of", nrow(enr), "families have a title and abstract;", sum(!is.na(enr$image)), "have a drawing\n")
+```
+
+```{r summaries}
+# ── Non-technical summaries (cached JSON) ─────────────────────────────────────
+# patent_summaries.json maps a publication number to {headline, summary}: a plain-
+# English phrase of at most 8 words and 2-3 sentences for a general reader, written
+# from the title and abstract. Families without one are summarised through the
+# Anthropic API when ANTHROPIC_API_KEY is set (model: params$summary_model);
+# otherwise they are listed in summaries_todo.json for the next session to fill.
+summ_file <- file.path(cache_dir, "patent_summaries.json")
+summ <- if (file.exists(summ_file)) fromJSON(summ_file, simplifyVector = FALSE) else list()
+SUMMARY_PROMPT <- paste(
+  "Write a non-technical description of the patented invention below for a general reader (an economist or journalist, not an engineer).",
+  "Return only a JSON object {\"headline\": ..., \"summary\": ...}. \"headline\": a plain-English phrase of at most 8 words saying what the invention does, no jargon, no full stop.",
+  "\"summary\": 2-3 sentences, at most 60 words, explaining in everyday language what problem it addresses and roughly how it solves it; British spelling;",
+  "do not start with 'This patent' or 'The invention relates to'; do not name the firm; do not invent facts the title and abstract do not support.\n\nTitle: %s\n\nAbstract: %s")
+ask_claude <- function(title, abstract, model = params$summary_model) {
+  body <- toJSON(list(model = model, max_tokens = 300,
+                      messages = list(list(role = "user", content = sprintf(SUMMARY_PROMPT, title, abstract)))), auto_unbox = TRUE)
+  tf <- tempfile(fileext = ".json"); writeLines(body, tf, useBytes = TRUE)
+  out <- tryCatch(system2("curl", c("-s", "https://api.anthropic.com/v1/messages",
+                                    "-H", shQuote(paste0("x-api-key: ", Sys.getenv("ANTHROPIC_API_KEY"))),
+                                    "-H", shQuote("anthropic-version: 2023-06-01"), "-H", shQuote("content-type: application/json"),
+                                    "--data-binary", paste0("@", tf)), stdout = TRUE), error = function(e) NULL)
+  r <- tryCatch(fromJSON(paste(out, collapse = "")), error = function(e) NULL)
+  txt <- tryCatch(r$content$text[1], error = function(e) NULL)
+  if (is.null(txt)) return(NULL)
+  j <- tryCatch(fromJSON(regmatches(txt, regexpr("\\{[\\s\\S]*\\}", txt, perl = TRUE))), error = function(e) NULL)
+  if (is.null(j) || is.null(j$summary)) NULL else list(headline = sub("\\.$", "", trimws(j$headline)), summary = trimws(j$summary), source = paste(model, format(Sys.Date())))
+}
+need <- enr[!is.na(title) & !pubno %in% names(summ), .(pubno, title, abstract)]
+if (nrow(need) && nzchar(Sys.getenv("ANTHROPIC_API_KEY"))) {
+  cat("Summarising", nrow(need), "patents through the Anthropic API ...\n")
+  for (k in seq_len(nrow(need))) { r <- ask_claude(need$title[k], need$abstract[k]); if (!is.null(r)) summ[[need$pubno[k]]] <- r }
+  write_json(summ, summ_file, auto_unbox = TRUE, pretty = TRUE)
+} else if (nrow(need)) {
+  write_json(need, file.path(cache_dir, "summaries_todo.json"), auto_unbox = TRUE, pretty = TRUE)
+  cat(nrow(need), "patents have no summary yet; their titles and abstracts are in", file.path(cache_dir, "summaries_todo.json"),
+      "(set ANTHROPIC_API_KEY to fill them automatically)\n")
+}
+gets <- function(p, what) { v <- summ[[p]][[what]]; if (is.null(v) || !nzchar(v)) NA_character_ else v }
+enr[, headline := vapply(pubno, gets, "", what = "headline")]
+enr[, summary  := vapply(pubno, gets, "", what = "summary")]
+cat(sum(!is.na(enr$summary)), "of", nrow(enr), "families have a non-technical summary\n")
+```
+
+```{r write-static}
+# flat CSVs of every list, for the paper appendix and for anyone without a browser
+fwrite(merge(merge(top_inno, fam[, .(docdb_family_id, companies, fam_year, is_green, countries, n_hic_c, n_emde_c, n_cn_c, labs)], by = "docdb_family_id"),
+             enr, by = "docdb_family_id")[order(sample, measure, rank)], file.path(cache_dir, "top_innovations.csv"))
+fwrite(top_firm[order(sample, measure, min_n, rank)], file.path(cache_dir, "top_companies.csv"))
+```
+
+```{r payload}
+cname <- function(iso) { x <- countrycode(iso, "iso2c", "country.name", warn = FALSE); fifelse(is.na(x), iso, x) }
+fam_json <- merge(fam[docdb_family_id %in% fam_sel, c("docdb_family_id", "companies", "fam_year", "is_green", "HICinno", "EMDENOCNinno", "CNinno",
+                                                       "n_ctry_map", "countries", "ctry_line", "n_hic_c", "n_emde_c", "n_cn_c", "labs", names(MEASURES)), with = FALSE],
+                  enr, by = "docdb_family_id", all.x = TRUE)
+fam_json[, `:=`(
+  espacenet = fifelse(is.na(pubno), NA_character_, sprintf("https://worldwide.espacenet.com/patent/search?q=pn%%3D%s", gp_number(pubno))),
+  google    = fifelse(is.na(pubno), NA_character_, sprintf("https://patents.google.com/patent/%s/en", gp_number(pubno))))]
+
+cfg <- list(
+  topN = TOP_N,
+  measures = lapply(names(MEASURES), function(m) c(list(key = m), MEASURES[[m]])),
+  samples  = lapply(names(SAMPLES), function(s) list(key = s, label = SAMPLES[[s]]$label,
+                      n = fam[eval(in_sample[[s]]), .N])),
+  minN = MIN_N,
+  sample_means = rbindlist(lapply(names(SAMPLES), function(s) rbindlist(lapply(names(MEASURES), function(m)
+    data.table(sample = s, measure = m, mean = fam[eval(in_sample[[s]]), mean(get(m), na.rm = TRUE)]))))),
+  innovations = top_inno[, .(sample, measure, rank, id = docdb_family_id, value)],
+  families = fam_json,
+  firm_mix = {
+    fm <- fci[company_raw %in% unique(top_firm$company_raw) & !is.na(ctry_code) & nzchar(ctry_code)]
+    fm[, ctry_code := toupper(ctry_code)]
+    setorder(fm, company_raw, -n_families, -n_inventors)
+    fm <- fm[, head(.SD, 15), by = company_raw]       # at most 15 countries per firm
+    tot <- unique(fci[company_raw %in% fm$company_raw, .(company_raw, total_inventors, total_families)])[, .SD[1], by = company_raw]
+    out <- fm[, .(mix = list(.SD[, .(iso = ctry_code, n_inv = as.integer(n_inventors), n_fam = as.integer(n_families))])), by = company_raw]
+    out <- merge(out, tot, by = "company_raw")
+    setNames(lapply(seq_len(nrow(out)), function(i) list(total_inventors = as.integer(out$total_inventors[i]), total_families = as.integer(out$total_families[i]), mix = out$mix[[i]])), out$company_raw)
+  },
+  green_gloss = as.list(GREEN_GLOSS),
+  companies = top_firm[, .(sample, measure, min_n, rank, company = company_raw, n, avg, best_fam, best,
+                           hq = fifelse(is.na(hq_iso), "", hq_iso), hq_name = cname(hq_iso), sector = fifelse(is.na(sector), "", sector),
+                           n_families, emde_share = share_dev_nocn_innos)],
+  names = { isos <- sort(unique(c(cm$iso, toupper(fci$ctry_code), unlist(strsplit(enr$rec_countries[!is.na(enr$rec_countries)], ","))))); isos <- isos[!is.na(isos) & nzchar(isos)]; as.list(setNames(cname(isos), isos)) },
+  groups = { isos <- sort(unique(c(cm$iso, toupper(fci$ctry_code), unlist(strsplit(enr$rec_countries[!is.na(enr$rec_countries)], ","))))); isos <- isos[!is.na(isos) & nzchar(isos)]; as.list(setNames(ctry_group(isos), isos)) },
+  built = format(Sys.Date(), "%d %B %Y"))
+```
+
+```{r widget_assets, include=FALSE}
+# NOTE: no blank lines inside the emitted HTML -- pandoc would otherwise leave
+# the raw-HTML block and start interpreting the contents as markdown.
+css <- paste0(
+'<style>',
+'.ex{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;margin:14px 0 6px;}',
+'.ex-bar{display:flex;flex-wrap:wrap;align-items:center;gap:14px 22px;padding:10px 14px;border:1px solid #e3e3df;border-radius:5px;background:#faf9f6;font-size:13px;color:#333;}',
+'.ex-bar label{font-weight:600;margin-right:6px;}',
+'.ex-bar select{font:inherit;font-size:13px;padding:3px 6px;}',
+'.ex-btn{font:inherit;font-size:12px;padding:5px 11px;border:1px solid #c9c9c4;border-radius:4px;background:#fff;color:#2b5a8c;cursor:pointer;margin-left:auto;}',
+'.ex-btn:hover{background:#f0f4f9;border-color:#2b5a8c;}',
+'.ex-cap{font-size:13px;color:#555;margin:12px 0 6px;}',
+'.ex-table{width:100%;border-collapse:collapse;font-size:12.5px;}',
+'.ex-table th{text-align:left;border-bottom:2px solid #d8d8d3;padding:6px 7px;font-weight:600;vertical-align:bottom;}',
+'.ex-table td{border-bottom:1px solid #eeeee9;padding:6px 7px;vertical-align:top;}',
+'.ex-table td.num,.ex-table th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}',
+'.ex-table td.rk{color:#888;width:2em;text-align:right;}',
+'.ex-title{font-weight:600;}',
+'.ex-title a{color:#1a4e8a;text-decoration:none;}',
+'.ex-title a:hover{text-decoration:underline;}',
+'.ex-meta{color:#666;font-size:11.5px;margin-top:2px;}',
+'.ex-abs{color:#333;font-size:12px;line-height:1.45;margin-top:5px;max-width:78ch;}',
+'.ex-tag{display:inline-block;font-size:10.5px;padding:1px 6px;border-radius:9px;border:1px solid #ccc;color:#555;margin-left:4px;vertical-align:middle;}',
+'.ex-tag.g{border-color:#5a9b5a;color:#2e6b2e;background:#eef7ee;}',
+'.ex-tag.e{border-color:#c0803a;color:#7a4b12;background:#fbf3e8;}',
+'.ex-tag.l{border-color:#4a7ab5;color:#1f4f85;background:#eaf1fa;}',
+'.ex-team{white-space:nowrap;}',
+'.ex-ctry{font-size:12px;margin-top:2px;max-width:26ch;line-height:1.4;}',
+'.ex-emde{color:#7a4b12;}',
+'.ex-foot{font-size:12px;color:#666;margin-top:8px;}',
+'.ex-view{display:inline-flex;border:1px solid #c9c9c4;border-radius:4px;overflow:hidden;}',
+'.ex-view button{font:inherit;font-size:12px;padding:4px 10px;border:0;background:#fff;color:#2b5a8c;cursor:pointer;}',
+'.ex-view button.on{background:#2b5a8c;color:#fff;}',
+'.ex-gal{position:relative;margin-top:10px;}',
+'.ex-card{display:grid;grid-template-columns:minmax(200px,300px) 1fr;gap:22px;border:1px solid #e3e3df;border-radius:8px;background:#fff;padding:20px 22px;min-height:360px;}',
+'@media (max-width:700px){.ex-card{grid-template-columns:1fr;}}',
+'.ex-fig{display:flex;align-items:center;justify-content:center;background:#fafaf8;border:1px solid #eeeee9;border-radius:6px;min-height:260px;padding:8px;}',
+'.ex-fig img{max-width:100%;max-height:360px;object-fit:contain;}',
+'.ex-fig .nofig{color:#aaa;font-size:12px;text-align:center;padding:30px 10px;}',
+'.ex-figcap{font-size:10.5px;color:#999;text-align:center;margin-top:4px;}',
+'.ex-rank{font-size:11.5px;color:#888;letter-spacing:.04em;text-transform:uppercase;}',
+'.ex-head{font-size:22px;font-weight:650;line-height:1.2;margin:4px 0 6px;color:#1d1d1d;}',
+'.ex-sub{font-size:13px;color:#444;margin-bottom:4px;}',
+'.ex-sub a{color:#1a4e8a;text-decoration:none;}.ex-sub a:hover{text-decoration:underline;}',
+'.ex-sum{font-size:14.5px;line-height:1.5;color:#222;margin:10px 0 12px;max-width:70ch;}',
+'.ex-vals{display:flex;flex-wrap:wrap;gap:8px 18px;margin:6px 0 10px;}',
+'.ex-val{font-size:12px;color:#666;}.ex-val b{display:block;font-size:17px;color:#1d1d1d;font-variant-numeric:tabular-nums;}',
+'.ex-val.main b{color:#2b5a8c;}',
+'.ex-teamrow{display:flex;align-items:center;gap:16px;margin-top:10px;padding-top:10px;border-top:1px solid #eeeee9;}',
+'.ex-donut{flex:0 0 auto;}',
+'.ex-leg{font-size:12px;color:#333;line-height:1.5;}',
+'.ex-leg .sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px;}',
+'.ex-leg .t{font-size:11.5px;color:#666;}',
+'.ex-nav{position:absolute;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:50%;border:1px solid #c9c9c4;background:#fff;color:#2b5a8c;font-size:20px;line-height:36px;text-align:center;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.12);user-select:none;}',
+'.ex-nav:hover{background:#f0f4f9;}.ex-nav.l{left:-19px;}.ex-nav.r{right:-19px;}',
+'.ex-dots{display:flex;justify-content:center;gap:6px;margin:12px 0 4px;flex-wrap:wrap;}',
+'.ex-dot{width:9px;height:9px;border-radius:50%;background:#d6d6d0;cursor:pointer;border:0;padding:0;}',
+'.ex-dot.on{background:#2b5a8c;transform:scale(1.25);}',
+'.ex-abs details{margin-top:8px;}.ex-abs summary{cursor:pointer;color:#2b5a8c;font-size:12px;}',
+'.ex-fig canvas{max-width:100%;max-height:360px;}',
+'.ex-rot{font:inherit;font-size:11px;color:#2b5a8c;background:none;border:0;cursor:pointer;padding:0 4px;}.ex-rot:hover{text-decoration:underline;}',
+'.ex-green{border-left:3px solid #5a9b5a;background:#f3f9f3;padding:8px 12px;margin:10px 0 4px;font-size:12.5px;line-height:1.45;color:#23402a;border-radius:0 4px 4px 0;}',
+'.ex-green b{color:#2e6b2e;}.ex-green .code{display:block;font-size:11.5px;color:#4b6b4b;margin-top:3px;}',
+'.ex-fcard{display:grid;grid-template-columns:minmax(220px,1fr) minmax(280px,1.4fr);gap:24px;border:1px solid #e3e3df;border-radius:8px;background:#fff;padding:20px 22px;min-height:300px;}',
+'@media (max-width:700px){.ex-fcard{grid-template-columns:1fr;}}',
+'.ex-fname{font-size:24px;font-weight:650;line-height:1.15;margin:4px 0 2px;}',
+'.ex-ratio{font-size:12.5px;color:#444;margin-top:4px;}.ex-ratio b{color:#2b5a8c;}',
+'.ex-best{border:1px solid #eeeee9;border-radius:6px;background:#fafaf8;padding:12px 14px;}',
+'.ex-best .lbl{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;}',
+'.ex-best .bimg{float:right;width:38%;max-width:200px;margin:0 0 8px 12px;background:#fff;border:1px solid #eeeee9;border-radius:4px;padding:4px;text-align:center;}',
+'.ex-best .bimg canvas{max-width:100%;max-height:170px;display:block;margin:0 auto;}',
+'.ex-best .bhead{font-size:16px;font-weight:600;line-height:1.25;}',
+'.ex-best .bsum{font-size:13px;line-height:1.45;color:#222;margin-top:6px;}',
+'.ex-best:after{content:"";display:block;clear:both;}',
+'</style>')
+inno_html <- paste0(css,
+'<div class="ex" id="ex-inno">',
+'<div class="ex-bar">',
+'<span><label for="ex-i-measure">Measure</label><select id="ex-i-measure"></select></span>',
+'<span><label for="ex-i-sample">Sample</label><select id="ex-i-sample"></select></span>',
+'<span class="ex-view"><button type="button" id="ex-i-vgal" class="on">Gallery</button><button type="button" id="ex-i-vtab">Table</button></span>',
+'<button class="ex-btn" id="ex-i-dl" type="button">Download this list (CSV)</button>',
+'</div>',
+'<div class="ex-cap" id="ex-i-cap"></div>',
+'<div class="ex-gal" id="ex-i-gal"><div class="ex-nav l" id="ex-i-prev" title="Previous (left arrow)">&#8249;</div><div id="ex-i-card"></div><div class="ex-nav r" id="ex-i-next" title="Next (right arrow)">&#8250;</div><div class="ex-dots" id="ex-i-dots"></div></div>',
+'<div id="ex-i-out" style="display:none"></div>',
+'<div class="ex-foot fignote">Headlines and summaries are non-technical paraphrases written by Claude from the patent’s title and abstract; the drawing is the first figure Google Patents holds for the family (hot-linked; drawings that tesseract judged to be on their side are turned upright, and the rotate button turns a drawing a further quarter turn, remembered in this browser only). “Why it counts as green”: the paper’s green flag comes from the EPO’s Y02/Y04S climate-change classes; the plain-English line is the iseapp technology tag built from them, the codes are the patent’s own Y02/Y04S classes with the EPO’s descriptions. Titles and abstracts are the patent documents’ own, retrieved from Google Patents for one publication of each family; the Espacenet link opens the family’s full record. Countries: every country of an inventor or applicant on the family in the harmonised PATSTAT mapping (iseapp countrymap) — the variable from which the paper’s HIC / EMDE (excl. China) / China flags are built; EMDE countries are marked. The second line gives the raw inventor records and how many carry no country code. “EMDERLT lab”: the firm has a verified lab in an EMDE country on the record.</div>',
+'</div>')
+firm_html <- paste0(
+'<div class="ex" id="ex-firm">',
+'<div class="ex-bar">',
+'<span><label for="ex-f-measure">Measure</label><select id="ex-f-measure"></select></span>',
+'<span><label for="ex-f-sample">Sample</label><select id="ex-f-sample"></select></span>',
+'<span><label for="ex-f-minn">At least</label><select id="ex-f-minn"></select> innovations in the sample</span>',
+'<span><label for="ex-f-mix">Country mix</label><select id="ex-f-mix"><option value="fam">innovation-weighted</option><option value="inv">inventor headcount</option></select></span>',
+'<span class="ex-view"><button type="button" id="ex-f-vgal" class="on">Gallery</button><button type="button" id="ex-f-vtab">Table</button></span>',
+'<button class="ex-btn" id="ex-f-dl" type="button">Download this list (CSV)</button>',
+'</div>',
+'<div class="ex-cap" id="ex-f-cap"></div>',
+'<div class="ex-gal" id="ex-f-gal"><div class="ex-nav l" id="ex-f-prev" title="Previous (left arrow)">&#8249;</div><div id="ex-f-card"></div><div class="ex-nav r" id="ex-f-next" title="Next (right arrow)">&#8250;</div><div class="ex-dots" id="ex-f-dots"></div></div>',
+'<div id="ex-f-out" style="display:none"></div>',
+'<div class="ex-foot fignote">Averages are simple means over the firm’s innovations in the chosen sample. “EMDE share” is the share of all the firm’s 2013–2022 innovations that involve an EMDE inventor, the explanatory variable of the paper. The country mix covers all of the firm’s 2013–2022 innovations (pipeline firm × country indicators): innovation-weighted counts each innovation once for every country in which it has an inventor; inventor headcount counts distinct inventors by country of residence. The best innovation is the firm’s single highest-scoring one in the sample on the chosen measure. Drawings that tesseract judged to be on their side are turned upright automatically; the rotate button under a drawing turns it a further quarter turn and remembers that in this browser only.</div>',
+'</div>')
+js <- r"----(<script>
+(function(){
+var C=window.EX_CFG; if(!C) return;
+var M={}; C.measures.forEach(function(m){M[m.key]=m;});
+var S={}; C.samples.forEach(function(s){S[s.key]=s;});
+var F={}; C.families.forEach(function(f){F[f.docdb_family_id]=f;});
+var B=F;
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function fmtv(v,m){if(v==null||isNaN(v))return"";var x=v*(m.scale||1);return x.toLocaleString("en-US",{minimumFractionDigits:m.fmt,maximumFractionDigits:m.fmt});}
+function lc(t){return t.charAt(0).toLowerCase()+t.slice(1);}
+// --- drawings: hot-linked images drawn into a canvas so they can be rotated (auto-detected
+// orientation from the build, plus a per-viewer manual quarter turn kept in localStorage) ---
+function manualRot(u){try{return +(localStorage.getItem("exrot:"+u)||0);}catch(e){return 0;}}
+function setManualRot(u,v){try{localStorage.setItem("exrot:"+u,String(v));}catch(e){}}
+function figHTML(f,cls){
+  if(!f||!f.image)return'<div class="nofig">No drawing available for this family</div>';
+  return'<canvas class="'+cls+'" data-src="'+esc(f.image)+'" data-rot="'+((+f.rotate||0)+manualRot(f.image))%360+'" width="10" height="10" aria-label="Patent drawing"></canvas>';
+}
+function drawCanvases(root){
+  root.querySelectorAll("canvas[data-src]").forEach(function(c){
+    var img=new Image(); var deg=(+c.getAttribute("data-rot")||0)%360; if(deg<0)deg+=360;
+    img.onload=function(){var w=img.naturalWidth,h=img.naturalHeight,sw=(deg===90||deg===270);c.width=sw?h:w;c.height=sw?w:h;var ctx=c.getContext("2d");ctx.fillStyle="#fff";ctx.fillRect(0,0,c.width,c.height);ctx.translate(c.width/2,c.height/2);ctx.rotate(deg*Math.PI/180);ctx.drawImage(img,-w/2,-h/2);};
+    img.onerror=function(){c.outerHTML='<div class="nofig">Drawing could not be loaded</div>';};
+    img.src=c.getAttribute("data-src");
+  });
+}
+function rotBtn(f){return f&&f.image?'<button type="button" class="ex-rot" data-url="'+esc(f.image)+'" title="Turn the drawing a quarter turn clockwise (remembered in this browser)">&#8635; rotate</button>':'';}
+document.addEventListener("click",function(e){var b=e.target.closest(".ex-rot");if(!b)return;var u=b.getAttribute("data-url");setManualRot(u,(manualRot(u)+90)%360);
+  document.querySelectorAll('canvas[data-src="'+u.replace(/"/g,'\\"')+'"]').forEach(function(c){var f={image:u,rotate:+c.getAttribute("data-base")||0};});
+  if(typeof renderGallery==="function")renderGallery(); if(typeof renderFirmGallery==="function")renderFirmGallery();});
+// --- green explanation ---
+function greenBlock(f){
+  if(!f||!f.is_green)return"";
+  var tags=(f.green_tags||"").split("|").filter(Boolean), gl=C.green_gloss||{};
+  var h='<div class="ex-green"><b>Why it counts as green.</b> ';
+  if(tags.length){h+='The EPO files it under its climate-change-mitigation classes; iseapp tags it as <b>'+esc(tags.join(", "))+'</b>: '+esc(tags.map(function(t){return gl[t]||t;}).join("; "))+'.';}
+  else h+='The EPO files it under its Y02/Y04S climate-change-mitigation classes.';
+  if(f.green_codes)f.green_codes.split("|").forEach(function(c){h+='<span class="code">'+esc(c)+'</span>';});
+  return h+'</div>';
+}
+// --- URL state: every control is mirrored into the address bar so a view can be bookmarked ---
+function readHash(){var o={};location.hash.replace(/^#/,"").split("&").forEach(function(kv){if(!kv)return;var i=kv.indexOf("=");if(i<0)return;o[decodeURIComponent(kv.slice(0,i))]=decodeURIComponent(kv.slice(i+1));});return o;}
+var H0=readHash();
+function writeHash(o){var q=Object.keys(o).filter(function(k){return o[k]!=null&&o[k]!=="";}).map(function(k){return encodeURIComponent(k)+"="+encodeURIComponent(o[k]);}).join("&");if(history.replaceState)history.replaceState(null,"","#"+q);else location.hash=q;}
+var hashState={}; function syncHash(part){Object.keys(part).forEach(function(k){hashState[k]=part[k];});writeHash(hashState);}
+function fill(sel,items,val){sel.innerHTML="";items.forEach(function(it){var o=document.createElement("option");o.value=it[0];o.textContent=it[1];if(String(it[0])===String(val))o.selected=true;sel.appendChild(o);});}
+function teamCell(f){
+  if(!f||(!f.n_ctry_map&&!f.n_inventors))return'<span class="ex-team" style="color:#999">n/a</span>';
+  var h="";
+  if(f.n_ctry_map){
+    var parts=[]; if(f.n_hic_c)parts.push(f.n_hic_c+" HIC"); if(f.n_emde_c)parts.push(f.n_emde_c+" EMDE"); if(f.n_cn_c)parts.push(f.n_cn_c+" China");
+    var line=esc(f.ctry_line||"").replace(/([A-Z]{2})\*/g,'<b class="ex-emde">$1</b>');
+    h+='<span class="ex-team">'+f.n_ctry_map+(f.n_ctry_map==1?" country":" countries")+'</span> <span class="ex-meta">('+esc(parts.join(", "))+')</span><div class="ex-ctry">'+line+'</div>';
+  }
+  if(f.n_inventors){
+    h+='<div class="ex-meta" title="Raw PATSTAT inventor records: headcount, and the country code given on the record">'+f.n_inventors+" inventor record"+(f.n_inventors==1?"":"s")+(f.n_known<f.n_inventors?', '+(f.n_inventors-f.n_known)+' without a country code':'')+(f.team?' · '+esc(f.team):'')+'</div>';
+  }
+  return h;
+}
+function tags(f){var t="";if(f.is_green)t+='<span class="ex-tag g">green</span>';if(f.EMDENOCNinno)t+='<span class="ex-tag e">EMDE inventor</span>';if(f.labs)t+='<span class="ex-tag l">EMDERLT lab</span>';return t;}
+function titleCell(f,m){
+  var t=f.title||("Family "+f.docdb_family_id+(f.pubno?" ("+f.pubno+")":""));
+  var h='<div class="ex-title">'+(f.espacenet?'<a href="'+f.espacenet+'" target="_blank" rel="noopener">'+esc(t)+'</a>':esc(t))+tags(f)+'</div>';
+  h+='<div class="ex-meta">'+esc(f.companies)+(f.fam_year?' · filed '+f.fam_year:'')+(f.pubno?' · '+esc(f.pubno):'')+(f.google?' · <a href="'+f.google+'" target="_blank" rel="noopener">Google Patents</a>':'')+'</div>';
+  if(f.labs)h+='<div class="ex-meta">Verified lab: '+esc(f.labs)+'</div>';
+  if(f.summary)h+='<div class="ex-abs"><b>'+esc(f.headline||"")+'</b>'+(f.headline?' — ':'')+esc(f.summary)+(f.abstract?'<details><summary>Patent abstract</summary>'+esc(f.abstract)+'</details>':'')+'</div>';
+  else if(f.abstract)h+='<div class="ex-abs">'+esc(f.abstract)+'</div>';
+  h+=greenBlock(f);
+  return h;
+}
+function otherCols(f,mkey){
+  var keys=["ev_global","ev_HIC","ev_EMDENOCN","pv"].filter(function(k){return k!==mkey;});
+  return keys.map(function(k){return'<span title="'+esc(M[k].label)+'">'+esc(M[k].label.replace("Global knowledge spillover","Global").replace("Spillover to HIC inventors","to HIC").replace("Spillover to EMDE inventors","to EMDE").replace("Private value","PV"))+" "+fmtv(f[k],M[k])+'</span>';}).join('<br>');
+}
+// ---- innovations ----
+var im=document.getElementById("ex-i-measure"), is_=document.getElementById("ex-i-sample");
+fill(im,C.measures.map(function(m){return[m.key,m.label];}),H0.m||"istrax_EMDENOCN");
+fill(is_,C.samples.map(function(s){return[s.key,s.label];}),H0.s||"lab_green");
+var view=(H0.v==="table"?"table":"gallery"), cur=Math.max(0,(+H0.i||1)-1);
+if(view==="table"){document.getElementById("ex-i-vtab").classList.add("on");document.getElementById("ex-i-vgal").classList.remove("on");}
+function curRows(){var mk=im.value, sk=is_.value;return C.innovations.filter(function(r){return r.measure===mk&&r.sample===sk;}).sort(function(a,b){return a.rank-b.rank;});}
+function setCap(rows){var m=M[im.value], sk=is_.value;document.getElementById("ex-i-cap").textContent="Top "+rows.length+" of "+S[sk].n.toLocaleString("en-US")+" "+lc(S[sk].label)+", ranked by "+lc(m.label)+" ("+m.unit+").";}
+// team donut: inventor records by country (share of inventors), grouped HIC / EMDE / China / other, unknown in grey
+var GCOL={HIC:["#2b5a8c","#4f7fb0","#7aa3cc","#a6c3df","#c9d9ea"],EMDE:["#c0803a","#d49a5a","#e3b57f","#edcba3"],China:["#b23a3a","#cf6b6b"],other:["#7a7a7a","#a3a3a3"],unknown:["#dedcd6"]};
+function parseTeam(f){
+  var out=[]; if(f.team){f.team.split(",").forEach(function(t){var p=t.trim().split(/\s+/);if(p.length===2&&+p[1]>0)out.push({iso:p[0],n:+p[1],grp:C.groups[p[0]]||"other"});});}
+  var known=out.reduce(function(a,b){return a+b.n;},0); var unk=(f.n_inventors||0)-known; if(unk>0)out.push({iso:"unknown",n:unk,grp:"unknown"});
+  var idx={}; out.forEach(function(d){idx[d.grp]=(idx[d.grp]||0);d.col=GCOL[d.grp][Math.min(idx[d.grp],GCOL[d.grp].length-1)];idx[d.grp]++;});
+  return out;
+}
+function donut(parts,total){
+  var R=44,r=27,cx=50,cy=50,a0=-Math.PI/2,h='<svg class="ex-donut" width="100" height="100" viewBox="0 0 100 100" role="img" aria-label="Share of inventors by country">';
+  if(parts.length===1){h+='<circle cx="50" cy="50" r="'+((R+r)/2)+'" fill="none" stroke="'+parts[0].col+'" stroke-width="'+(R-r)+'"/>';}
+  else parts.forEach(function(p){var a1=a0+2*Math.PI*p.n/total;var x0=cx+R*Math.cos(a0),y0=cy+R*Math.sin(a0),x1=cx+R*Math.cos(a1),y1=cy+R*Math.sin(a1),xi0=cx+r*Math.cos(a1),yi0=cy+r*Math.sin(a1),xi1=cx+r*Math.cos(a0),yi1=cy+r*Math.sin(a0),lg=(a1-a0)>Math.PI?1:0;
+    h+='<path d="M'+x0.toFixed(2)+' '+y0.toFixed(2)+'A'+R+' '+R+' 0 '+lg+' 1 '+x1.toFixed(2)+' '+y1.toFixed(2)+'L'+xi0.toFixed(2)+' '+yi0.toFixed(2)+'A'+r+' '+r+' 0 '+lg+' 0 '+xi1.toFixed(2)+' '+yi1.toFixed(2)+'Z" fill="'+p.col+'" stroke="#fff" stroke-width="1"><title>'+esc(p.iso)+': '+p.n+' ('+Math.round(100*p.n/total)+'%)</title></path>';a0=a1;});
+  h+='<text x="50" y="47" text-anchor="middle" font-size="15" font-weight="600" fill="#1d1d1d">'+total+'</text><text x="50" y="61" text-anchor="middle" font-size="8.5" fill="#777">inventors</text></svg>';
+  return h;
+}
+function teamBlock(f){
+  if(!f||(!f.n_inventors&&!f.n_ctry_map))return'<div class="ex-meta">Inventor team: n/a</div>';
+  var parts=parseTeam(f), total=parts.reduce(function(a,b){return a+b.n;},0), h='<div class="ex-teamrow">';
+  if(total>0)h+=donut(parts,total);
+  h+='<div class="ex-leg">';
+  if(total>0){var shown=parts.slice(0,8);h+=shown.map(function(p){return'<span class="sw" style="background:'+p.col+'"></span>'+esc(p.iso==="unknown"?"no country code":C.names[p.iso]||p.iso)+' <span class="t">'+Math.round(100*p.n/total)+'%'+(p.grp!=="unknown"?' · '+p.grp:'')+'</span>';}).join('<br>');if(parts.length>8)h+='<br><span class="t">+'+(parts.length-8)+' more</span>';}
+  if(f.n_ctry_map){var line=esc(f.ctry_line||"").replace(/([A-Z]{2})\*/g,'<b class="ex-emde">$1</b>');h+='<div class="t" style="margin-top:4px">Countries on the harmonised record (basis of the flags): '+line+'</div>';}
+  if(f.labs)h+='<div class="t">Verified lab: '+esc(f.labs)+'</div>';
+  return h+'</div></div>';
+}
+function card(r,rows){
+  var f=F[r.id]||{docdb_family_id:r.id}, m=M[im.value], t=f.title||("Family "+f.docdb_family_id);
+  var h='<div class="ex-card"><div><div class="ex-fig">'+figHTML(f,"")+'</div>'+(f.image?'<div class="ex-figcap">Drawing from '+esc(f.image_from||f.pubno)+' '+rotBtn(f)+'</div>':'')+'</div><div>';
+  h+='<div class="ex-rank">'+r.rank+' of '+rows.length+' · '+esc(m.label)+'</div>';
+  h+='<div class="ex-head">'+esc(f.headline||t)+tags(f)+'</div>';
+  h+='<div class="ex-sub">'+(f.espacenet?'<a href="'+f.espacenet+'" target="_blank" rel="noopener">'+esc(t)+'</a>':esc(t))+'</div>';
+  h+='<div class="ex-meta">'+esc(f.companies)+(f.fam_year?' · filed '+f.fam_year:'')+(f.pubno?' · '+esc(f.pubno):'')+(f.google?' · <a href="'+f.google+'" target="_blank" rel="noopener">Google Patents</a>':'')+'</div>';
+  if(f.summary)h+='<div class="ex-sum">'+esc(f.summary)+'</div>';
+  else if(f.abstract)h+='<div class="ex-sum" style="font-size:12.5px;color:#444">'+esc(f.abstract)+'</div>';
+  h+='<div class="ex-vals"><div class="ex-val main">'+esc(m.label)+'<b>'+fmtv(r.value,m)+'</b><span>'+esc(m.unit)+'</span></div>';
+  ["ev_global","ev_HIC","ev_EMDENOCN","pv"].filter(function(k){return k!==im.value;}).forEach(function(k){h+='<div class="ex-val">'+esc(M[k].label)+'<b>'+fmtv(f[k],M[k])+'</b></div>';});
+  h+='</div>';
+  if(f.summary&&f.abstract)h+='<div class="ex-abs"><details><summary>Patent abstract</summary><div style="font-size:12px;color:#444;margin-top:4px">'+esc(f.abstract)+'</div></details></div>';
+  h+=greenBlock(f);
+  h+=teamBlock(f)+'</div></div>';
+  return h;
+}
+function renderGallery(){
+  var rows=curRows(); if(!rows.length){document.getElementById("ex-i-card").innerHTML='<div class="ex-card">No innovations in this sample.</div>';document.getElementById("ex-i-dots").innerHTML="";return;}
+  if(cur>=rows.length)cur=0; if(cur<0)cur=rows.length-1;
+  document.getElementById("ex-i-card").innerHTML=card(rows[cur],rows); drawCanvases(document.getElementById("ex-i-card"));
+  syncHash({m:im.value,s:is_.value,v:view,i:cur+1});
+  document.getElementById("ex-i-dots").innerHTML=rows.map(function(r,i){return'<button type="button" class="ex-dot'+(i===cur?" on":"")+'" data-i="'+i+'" title="'+r.rank+': '+esc((F[r.id]||{}).headline||(F[r.id]||{}).title||"")+'"></button>';}).join("");
+  var nx=rows[cur+1]; if(nx&&F[nx.id]&&F[nx.id].image){var pre=new Image();pre.src=F[nx.id].image;}
+}
+function renderTable(){
+  var mk=im.value, m=M[mk], rows=curRows();
+  var h='<table class="ex-table"><thead><tr><th></th><th>Innovation</th><th class="num">'+esc(m.label)+'<br><span style="font-weight:400">'+esc(m.unit)+'</span></th><th class="num">Other values</th><th>Inventor team</th></tr></thead><tbody>';
+  rows.forEach(function(r){var f=F[r.id]||{docdb_family_id:r.id};
+    h+='<tr><td class="rk">'+r.rank+'</td><td>'+titleCell(f,m)+'</td><td class="num"><b>'+fmtv(r.value,m)+'</b></td><td class="num" style="font-size:11px;color:#555">'+otherCols(f,mk)+'</td><td>'+teamCell(f)+'</td></tr>';});
+  document.getElementById("ex-i-out").innerHTML=h+'</tbody></table>';
+}
+function renderInno(){var rows=curRows();setCap(rows);syncHash({m:im.value,s:is_.value,v:view});
+  document.getElementById("ex-i-gal").style.display=view==="gallery"?"":"none";document.getElementById("ex-i-out").style.display=view==="table"?"":"none";
+  if(view==="gallery")renderGallery();else renderTable();}
+im.addEventListener("change",function(){cur=0;renderInno();}); is_.addEventListener("change",function(){cur=0;renderInno();}); renderInno();
+document.getElementById("ex-i-prev").addEventListener("click",function(){cur--;renderGallery();});
+document.getElementById("ex-i-next").addEventListener("click",function(){cur++;renderGallery();});
+document.getElementById("ex-i-dots").addEventListener("click",function(e){var d=e.target.closest(".ex-dot");if(d){cur=+d.getAttribute("data-i");renderGallery();}});
+function nearest(id){var ids=["ex-i-gal","ex-f-gal"],best=null,bd=1e9,mid=window.innerHeight/2;ids.forEach(function(x){var el=document.getElementById(x);if(!el||el.style.display==="none")return;var rc=el.getBoundingClientRect();if(rc.bottom<0||rc.top>window.innerHeight)return;var d=Math.abs((rc.top+rc.bottom)/2-mid);if(d<bd){bd=d;best=x;}});return best===id;}
+document.addEventListener("keydown",function(e){if(view!=="gallery"||!nearest("ex-i-gal"))return;if(e.key==="ArrowLeft"){cur--;renderGallery();}else if(e.key==="ArrowRight"){cur++;renderGallery();}});
+(function(){var tx=0;var g=document.getElementById("ex-i-gal");g.addEventListener("touchstart",function(e){tx=e.changedTouches[0].clientX;},{passive:true});g.addEventListener("touchend",function(e){var dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50){cur+=dx<0?1:-1;renderGallery();}},{passive:true});})();
+document.getElementById("ex-i-vgal").addEventListener("click",function(){view="gallery";this.classList.add("on");document.getElementById("ex-i-vtab").classList.remove("on");renderInno();});
+document.getElementById("ex-i-vtab").addEventListener("click",function(){view="table";this.classList.add("on");document.getElementById("ex-i-vgal").classList.remove("on");renderInno();});
+document.getElementById("ex-i-dl").addEventListener("click",function(){
+  var mk=im.value, sk=is_.value, rows=curRows();
+  var q=function(s){return'"'+String(s==null?"":s).replace(/"/g,'""')+'"';};
+  var out=[["rank","docdb_family_id","publication","companies","filing_year",mk,"ev_global","ev_HIC","ev_EMDENOCN","istrax_global","istrax_HIC","istrax_EMDENOCN","pv","countries","n_hic_countries","n_emde_countries","n_cn_countries","emderlt_labs","n_inventor_records","n_with_country_code","inventor_record_countries","headline","summary","green_tags","green_classes","title","abstract","drawing","espacenet"].join(",")];
+  rows.forEach(function(r){var f=F[r.id]||{};out.push([r.rank,r.id,f.pubno,f.companies,f.fam_year,r.value,f.ev_global,f.ev_HIC,f.ev_EMDENOCN,f.istrax_global,f.istrax_HIC,f.istrax_EMDENOCN,f.pv,f.countries,f.n_hic_c,f.n_emde_c,f.n_cn_c,f.labs,f.n_inventors,f.n_known,f.team,f.headline,f.summary,f.green_tags,f.green_codes,f.title,f.abstract,f.image,f.espacenet].map(q).join(","));});
+  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"}));a.download="top_innovations_"+mk+"_"+sk+".csv";a.click();
+});
+// ---- companies ----
+var fm=document.getElementById("ex-f-measure"), fs=document.getElementById("ex-f-sample"), fn=document.getElementById("ex-f-minn");
+fill(fm,C.measures.map(function(m){return[m.key,m.label];}),H0.fm||"istrax_EMDENOCN");
+fill(fs,C.samples.map(function(s){return[s.key,s.label];}),H0.fs||"lab_green");
+fill(fn,C.minN.map(function(n){return[n,String(n)];}),H0.fn||C.minN[Math.min(1,C.minN.length-1)]);
+var fmixSel=document.getElementById("ex-f-mix"); if(H0.fmix==="inv")fmixSel.value="inv";
+var fview=(H0.fv==="table"?"table":"gallery"), fcur=Math.max(0,(+H0.fi||1)-1);
+if(fview==="table"){document.getElementById("ex-f-vtab").classList.add("on");document.getElementById("ex-f-vgal").classList.remove("on");}
+function firmMixParts(company){
+  var fx=(C.firm_mix||{})[company]; if(!fx||!fx.mix||!fx.mix.length)return null;
+  var w=fmixSel.value==="inv"?"n_inv":"n_fam", parts=fx.mix.map(function(d){return{iso:d.iso,n:d[w]||0,grp:C.groups[d.iso]||"other"};}).filter(function(d){return d.n>0;}).sort(function(a,b){return b.n-a.n;});
+  var total=parts.reduce(function(a,b){return a+b.n;},0); if(!total)return null;
+  var idx={}; parts.forEach(function(d){idx[d.grp]=(idx[d.grp]||0);d.col=GCOL[d.grp][Math.min(idx[d.grp],GCOL[d.grp].length-1)];idx[d.grp]++;});
+  return {parts:parts,total:total,fx:fx};
+}
+function firmMixBlock(company){
+  var mx=firmMixParts(company); if(!mx)return'<div class="ex-meta" style="margin-top:10px">Country mix: n/a</div>';
+  var inv=fmixSel.value==="inv", shown=mx.parts.slice(0,8), byg={};
+  mx.parts.forEach(function(p){byg[p.grp]=(byg[p.grp]||0)+p.n;});
+  var h='<div class="ex-teamrow"><svg class="ex-donut" width="100" height="100" viewBox="0 0 100 100" role="img" aria-label="Country mix">';
+  var R=44,r=27,cx=50,cy=50,a0=-Math.PI/2;
+  if(mx.parts.length===1)h+='<circle cx="50" cy="50" r="'+((R+r)/2)+'" fill="none" stroke="'+mx.parts[0].col+'" stroke-width="'+(R-r)+'"/>';
+  else mx.parts.forEach(function(p){var a1=a0+2*Math.PI*p.n/mx.total;var x0=cx+R*Math.cos(a0),y0=cy+R*Math.sin(a0),x1=cx+R*Math.cos(a1),y1=cy+R*Math.sin(a1),xi0=cx+r*Math.cos(a1),yi0=cy+r*Math.sin(a1),xi1=cx+r*Math.cos(a0),yi1=cy+r*Math.sin(a0),lg=(a1-a0)>Math.PI?1:0;
+    h+='<path d="M'+x0.toFixed(2)+' '+y0.toFixed(2)+'A'+R+' '+R+' 0 '+lg+' 1 '+x1.toFixed(2)+' '+y1.toFixed(2)+'L'+xi0.toFixed(2)+' '+yi0.toFixed(2)+'A'+r+' '+r+' 0 '+lg+' 0 '+xi1.toFixed(2)+' '+yi1.toFixed(2)+'Z" fill="'+p.col+'" stroke="#fff" stroke-width="1"><title>'+esc(C.names[p.iso]||p.iso)+': '+Math.round(100*p.n/mx.total)+'%</title></path>';a0=a1;});
+  var centre=inv?(mx.fx.total_inventors||mx.total):(mx.fx.total_families||mx.total);
+  h+='<text x="50" y="47" text-anchor="middle" font-size="'+(centre>=10000?"11":"14")+'" font-weight="600" fill="#1d1d1d">'+centre.toLocaleString("en-US")+'</text><text x="50" y="61" text-anchor="middle" font-size="8.5" fill="#777">'+(inv?"inventors":"innovations")+'</text></svg>';
+  h+='<div class="ex-leg"><div class="t" style="margin-bottom:2px">'+(inv?"Distinct inventors by country of residence, all 2013\u20132022 innovations":"Innovations by inventor country (an innovation counts once per country), all 2013\u20132022 innovations")+'</div>';
+  h+=shown.map(function(p){return'<span class="sw" style="background:'+p.col+'"></span>'+esc(C.names[p.iso]||p.iso)+' <span class="t">'+(100*p.n/mx.total<0.5?"&lt;1":Math.round(100*p.n/mx.total))+'% \u00b7 '+p.grp+'</span>';}).join('<br>');
+  if(mx.parts.length>8)h+='<br><span class="t">+'+(mx.parts.length-8)+' more</span>';
+  var gl=["HIC","EMDE","China","other"].filter(function(g){return byg[g];}).map(function(g){return g+" "+Math.round(100*byg[g]/mx.total)+"%";}).join(" \u00b7 ");
+  h+='<div class="t" style="margin-top:4px">'+esc(gl)+'</div></div></div>';
+  return h;
+}
+function firmRows(){var mk=fm.value, sk=fs.value, k=+fn.value;return C.companies.filter(function(r){return r.measure===mk&&r.sample===sk&&r.min_n===k;}).sort(function(a,b){return a.rank-b.rank;});}
+function sampleMean(){var mk=fm.value, sk=fs.value;var r=(C.sample_means||[]).filter(function(x){return x.measure===mk&&x.sample===sk;})[0];return r?r.mean:null;}
+function firmCap(rows){var m=M[fm.value], sk=fs.value, k=+fn.value;document.getElementById("ex-f-cap").textContent="Top "+rows.length+" Scoreboard firms by average "+lc(m.label)+" ("+m.unit+") over their "+lc(S[sk].label).replace("all Scoreboard innovations","innovations")+", firms with at least "+k+" such innovations.";}
+function firmCard(r,rows){
+  var m=M[fm.value], b=B[r.best_fam]||{}, mean=sampleMean(), bt=b.title||("Family "+r.best_fam+(b.pubno?" ("+b.pubno+")":""));
+  var h='<div class="ex-fcard"><div>';
+  h+='<div class="ex-rank">'+r.rank+' of '+rows.length+' · '+esc(m.label)+'</div>';
+  h+='<div class="ex-fname">'+esc(r.company)+'</div>';
+  h+='<div class="ex-meta" style="font-size:12.5px">'+esc(r.hq_name||r.hq)+(r.sector?' · '+esc(r.sector):'')+'</div>';
+  h+='<div class="ex-vals" style="margin-top:14px"><div class="ex-val main">Average '+esc(lc(m.label))+'<b>'+fmtv(r.avg,m)+'</b><span>'+esc(m.unit)+'</span></div>';
+  if(mean!=null)h+='<div class="ex-val">Sample average<b>'+fmtv(mean,m)+'</b></div>';
+  h+='<div class="ex-val">Innovations in sample / total<b>'+r.n.toLocaleString("en-US")+' <span style="font-weight:400;color:#888;font-size:13px">/ '+(r.n_families||0).toLocaleString("en-US")+'</span></b></div>';
+  h+='<div class="ex-val">EMDE share of all innovations<b>'+(r.emde_share==null?"":(100*r.emde_share).toFixed(1)+"%")+'</b></div></div>';
+  if(mean!=null&&mean>0&&r.avg!=null)h+='<div class="ex-ratio">The firm’s innovations in this sample score <b>'+(r.avg/mean).toFixed(1)+'×</b> the sample average on '+esc(lc(m.label))+'.</div>';
+  h+=firmMixBlock(r.company);
+  h+='</div><div><div class="ex-best"><div class="lbl">Best innovation in the sample</div>';
+  if(b.image)h+='<div class="bimg">'+figHTML(b,"")+'<div>'+rotBtn(b)+'</div></div>';
+  h+='<div class="bhead">'+esc(b.headline||bt)+tags(b)+'</div>';
+  h+='<div class="ex-meta">'+(b.espacenet?'<a href="'+b.espacenet+'" target="_blank" rel="noopener">'+esc(bt)+'</a>':esc(bt))+'</div>';
+  h+='<div class="ex-meta">'+fmtv(r.best,m)+' '+esc(m.unit)+(b.fam_year?' · filed '+b.fam_year:'')+(b.pubno?' · '+esc(b.pubno):'')+(b.google?' · <a href="'+b.google+'" target="_blank" rel="noopener">Google Patents</a>':'')+'</div>';
+  if(b.summary)h+='<div class="bsum">'+esc(b.summary)+'</div>'; else if(b.abstract)h+='<div class="bsum" style="color:#555;font-size:12px">'+esc(b.abstract)+'</div>';
+  if(b.n_ctry_map){var line=esc(b.ctry_line||"").replace(/([A-Z]{2})\*/g,'<b class="ex-emde">$1</b>');h+='<div class="ex-meta" style="margin-top:6px">Countries on the record: '+line+(b.n_inventors?' · '+b.n_inventors+' inventor record'+(b.n_inventors==1?'':'s'):'')+'</div>';}
+  if(b.labs)h+='<div class="ex-meta">Verified lab: '+esc(b.labs)+'</div>';
+  h+=greenBlock(b);
+  h+='</div></div></div>';
+  return h;
+}
+function renderFirmGallery(){
+  var rows=firmRows(); if(!rows.length){document.getElementById("ex-f-card").innerHTML='<div class="ex-fcard">No firm has that many innovations in this sample.</div>';document.getElementById("ex-f-dots").innerHTML="";return;}
+  if(fcur>=rows.length)fcur=0; if(fcur<0)fcur=rows.length-1;
+  document.getElementById("ex-f-card").innerHTML=firmCard(rows[fcur],rows); drawCanvases(document.getElementById("ex-f-card"));
+  syncHash({fm:fm.value,fs:fs.value,fn:fn.value,fmix:fmixSel.value,fv:fview,fi:fcur+1});
+  document.getElementById("ex-f-dots").innerHTML=rows.map(function(r,i){return'<button type="button" class="ex-dot'+(i===fcur?" on":"")+'" data-i="'+i+'" title="'+r.rank+': '+esc(r.company)+'"></button>';}).join("");
+}
+function renderFirmTable(){
+  var m=M[fm.value], rows=firmRows();
+  var h='<table class="ex-table"><thead><tr><th></th><th>Firm</th><th class="num">Average<br><span style="font-weight:400">'+esc(m.unit)+'</span></th><th class="num">Innovations<br><span style="font-weight:400">in sample / total</span></th><th class="num">EMDE share</th><th>Best innovation in the sample</th></tr></thead><tbody>';
+  rows.forEach(function(r){var b=B[r.best_fam]||{};
+    var bt=b.title||("Family "+r.best_fam+(b.pubno?" ("+b.pubno+")":""));
+    h+='<tr><td class="rk">'+r.rank+'</td><td><div class="ex-title">'+esc(r.company)+'</div><div class="ex-meta">'+esc(r.hq_name||r.hq)+(r.sector?' · '+esc(r.sector):'')+'</div></td>'+
+       '<td class="num"><b>'+fmtv(r.avg,m)+'</b></td><td class="num">'+r.n.toLocaleString("en-US")+' / '+(r.n_families||0).toLocaleString("en-US")+'</td><td class="num">'+(r.emde_share==null?"":(100*r.emde_share).toFixed(1)+"%")+'</td>'+
+       '<td><div style="font-size:12px">'+(b.espacenet?'<a href="'+b.espacenet+'" target="_blank" rel="noopener">'+esc(b.headline||bt)+'</a>':esc(b.headline||bt))+'</div><div class="ex-meta">'+fmtv(r.best,m)+' '+esc(m.unit)+(b.fam_year?' · filed '+b.fam_year:'')+'</div></td></tr>';});
+  document.getElementById("ex-f-out").innerHTML=h+'</tbody></table>';
+}
+function renderFirm(){var rows=firmRows();firmCap(rows);syncHash({fm:fm.value,fs:fs.value,fn:fn.value,fmix:fmixSel.value,fv:fview});
+  document.getElementById("ex-f-gal").style.display=fview==="gallery"?"":"none";document.getElementById("ex-f-out").style.display=fview==="table"?"":"none";
+  if(fview==="gallery")renderFirmGallery();else renderFirmTable();}
+[fm,fs,fn].forEach(function(e){e.addEventListener("change",function(){fcur=0;renderFirm();});}); fmixSel.addEventListener("change",function(){renderFirm();}); renderFirm();
+document.getElementById("ex-f-prev").addEventListener("click",function(){fcur--;renderFirmGallery();});
+document.getElementById("ex-f-next").addEventListener("click",function(){fcur++;renderFirmGallery();});
+document.getElementById("ex-f-dots").addEventListener("click",function(e){var d=e.target.closest(".ex-dot");if(d){fcur=+d.getAttribute("data-i");renderFirmGallery();}});
+document.addEventListener("keydown",function(e){if(fview!=="gallery"||!nearest("ex-f-gal"))return;if(e.key==="ArrowLeft"){fcur--;renderFirmGallery();}else if(e.key==="ArrowRight"){fcur++;renderFirmGallery();}});
+(function(){var tx=0;var g=document.getElementById("ex-f-gal");g.addEventListener("touchstart",function(e){tx=e.changedTouches[0].clientX;},{passive:true});g.addEventListener("touchend",function(e){var dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50){fcur+=dx<0?1:-1;renderFirmGallery();}},{passive:true});})();
+document.getElementById("ex-f-vgal").addEventListener("click",function(){fview="gallery";this.classList.add("on");document.getElementById("ex-f-vtab").classList.remove("on");renderFirm();});
+document.getElementById("ex-f-vtab").addEventListener("click",function(){fview="table";this.classList.add("on");document.getElementById("ex-f-vgal").classList.remove("on");renderFirm();});
+document.getElementById("ex-f-dl").addEventListener("click",function(){
+  var mk=fm.value, sk=fs.value, k=+fn.value, rows=firmRows();
+  var q=function(s){return'"'+String(s==null?"":s).replace(/"/g,'""')+'"';};
+  var out=[["rank","company","hq","sector","n_in_sample","n_families","emde_share","avg_"+mk,"sample_mean_"+mk,"country_mix_innovation_weighted","country_mix_inventors","best_family","best_value","best_headline","best_title","best_publication"].join(",")];
+  var mean=sampleMean();
+  function mixStr(c,w){var fx=(C.firm_mix||{})[c];if(!fx)return"";var t=fx.mix.reduce(function(a,d){return a+(d[w]||0);},0);if(!t)return"";return fx.mix.slice().sort(function(a,b){return (b[w]||0)-(a[w]||0);}).filter(function(d){return d[w]>0;}).map(function(d){return d.iso+" "+(100*d[w]/t).toFixed(1)+"%";}).join("; ");}
+  rows.forEach(function(r){var b=B[r.best_fam]||{};out.push([r.rank,r.company,r.hq,r.sector,r.n,r.n_families,r.emde_share,r.avg,mean,mixStr(r.company,"n_fam"),mixStr(r.company,"n_inv"),r.best_fam,r.best,b.headline,b.title,b.pubno].map(q).join(","));});
+  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([out.join("\n")],{type:"text/csv"}));a.download="top_companies_"+mk+"_"+sk+"_min"+k+".csv";a.click();
+});
+})();
+</script>)----"
+```
+
+## The highest-scoring innovations
+
+Pick a measure and a sample, then step through the gallery with the arrows, the dots
+or the left/right keys. Each card is one patent family: a drawing from the patent, a
+plain-English headline and summary, the patent's own title (linking to the family on
+Espacenet), the Scoreboard firm(s) it is linked to, the filing year and publication
+used, the values on every measure, and the inventor team as a donut of inventors by
+country; green innovations carry a short note on why they count as green. Every control
+is mirrored in the page address, so a particular view can be bookmarked or sent as a link.
+The table view lists the countries on the family's harmonised PATSTAT record --- the
+same table from which the paper's HIC, EMDE and China flags are computed, so an
+"EMDE inventor" tag can always be traced to a marked country --- and, below it, the
+raw inventor headcount and how many of those records carry no country code at all
+(the harmonisation fills these from the inventor's other patents, which is where the
+two views can differ).
+
+```{r widget_inno, results="asis"}
+cat(paste0('<script>var EX_CFG = ', toJSON(cfg, dataframe = "rows", auto_unbox = TRUE, digits = NA, na = "null"), ';</script>'), "\n")
+cat(inno_html, "\n")
+```
+
+## The firms that do best on average
+
+The same measures averaged over each firm's innovations in the chosen sample, again as
+a gallery (arrows, dots or the keyboard) with a table view alongside. Each card gives the
+firm's average against the sample average, its number of innovations in the sample and
+overall, its EMDE share, a donut of the countries its inventors work in (over all of the
+firm's 2013--2022 innovations, innovation-weighted or by headcount), and its single best
+innovation in the sample with drawing and summary. Because a firm with two spectacular patents would otherwise top every list, the
+menu sets a minimum number of innovations in the sample; `r MIN_N[2]` is the default.
+
+```{r widget_firm, results="asis"}
+cat(firm_html, "\n")
+cat(js, "\n")
+```
+
+## How the lists are built
+
+```{r method, results="asis"}
+cat(sprintf(paste0(
+"The universe is every patent family filed in 2013--2022 that the LMICinnovation pipeline links to a Scoreboard firm ",
+"(`firmmap_2025`, %s families, of which %s involve at least one EMDE-excl.-China inventor and %s of those are green). ",
+"Values come from `bigX_family_level`: knowledge spillovers (`ev_*`) and marginal returns (`istrax_*`) by recipient group, and private value (`pv`), ",
+"all as in the paper. A family linked to several Scoreboard firms counts for each of them in the firm averages and is listed once, with all its firms, in the innovation lists. ",
+"The country composition is the family's row set in iseapp's `countrymap` (every country of an inventor or applicant after the name-based harmonisation of `build_countries_harm_duck.R`), ",
+"which is exactly the input from which `innopaper_results1.rmd` derives the `HICinno` / `CNinno` / `EMDENOCNinno` flags; %s of the families here have a flag that does not agree with this table. ",
+"The raw inventor records (`inventors_2025`, `persons_2025`, `persons_addr_inferred`) feed the donut (inventors by country of residence; records without a country code in grey). ",
+"Headlines and summaries (`patent_summaries.json`) are non-technical paraphrases of the title and abstract written by Claude; drawings are the first figure Google Patents holds for the family, hot-linked from Google's patent image store, taken from a family member when the fetched publication has none. ",
+"The EMDERLT samples use `mnc_rd_labs_data/emde_rd_labs_map.json` (%s verified labs outside China): an innovation is lab-linked when one of its Scoreboard firms has a verified lab in an EMDE country on the family's record --- %s innovations, %s of them green. ",
+"Publication numbers are those the Innovation Strategy Explorer stores per family; titles and abstracts were retrieved from Google Patents on %s for the %s families that appear in a list. ",
+"Flat CSVs of every list are in `%s/`. Built %s."),
+  format(nrow(fam), big.mark = ","), format(fam[EMDENOCNinno == TRUE, .N], big.mark = ","), format(fam[EMDENOCNinno == TRUE & is_green == TRUE, .N], big.mark = ","),
+  format(mism, big.mark = ","), format(nrow(labs), big.mark = ","), format(fam[lab_linked == TRUE, .N], big.mark = ","), format(fam[lab_linked == TRUE & is_green == TRUE, .N], big.mark = ","),
+  format(Sys.Date(), "%d %B %Y"), format(length(fam_sel), big.mark = ","), cache_dir, format(Sys.Date(), "%d %B %Y")), "\n")
+```
