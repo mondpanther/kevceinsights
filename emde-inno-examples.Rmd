@@ -10,6 +10,7 @@ params:
   top_n: 20
   fetch_abstracts: true
   summary_model: "claude-sonnet-4-5"
+  paper_dir: "../LMICinnovation_paper"
   min_n_choices: !r c(10, 30, 100)
 output:
   html_document:
@@ -39,9 +40,9 @@ h1.title {
   line-height: 1.08;
   letter-spacing: -0.015em;
 }
-h3.subtitle { font-size: 1.25rem; color: #555; font-weight: 400; line-height: 1.35; }
-h4.author  { font-size: 0.95rem; color: #555; font-weight: 400; line-height: 1.4; max-width: 70ch; }
-h4.date    { font-size: 0.9rem; color: #79808d; font-weight: 400; }
+h3.subtitle { font-size: 21px; color: #555; font-weight: 400; line-height: 1.4; margin-top: 10px; }
+h4.author  { font-size: 17px; color: #444; font-weight: 400; line-height: 1.5; max-width: 80ch; margin-top: 14px; }
+h4.date    { font-size: 16px; color: #79808d; font-weight: 400; margin-bottom: 18px; }
 .fignote {
   font-size: 12px;
   line-height: 1.4;
@@ -64,7 +65,7 @@ h4.date    { font-size: 0.9rem; color: #79808d; font-weight: 400; }
 .toc-content { float: left; }
 </style>
 
-<div style="font-size:0.85em;color:#555;margin-top:-6px;margin-bottom:18px;">
+<div style="font-size:0.95em;color:#555;margin-top:-6px;margin-bottom:22px;">
 <sup>*</sup> This data tool accompanies the paper
 &ldquo;Innovation partnerships for development along green value chains&rdquo;
 by Samuel Edet, Ralf Martin, Golvine de Rochambeau, Trang Thu Tran and Dennis Verhoeven (2026), and is powered by the
@@ -159,7 +160,16 @@ SAMPLES <- list(
   emde       = list(label = "Innovations with at least one EMDE inventor"),
   emde_green = list(label = "Green innovations with at least one EMDE inventor"),
   lab        = list(label = "Innovations linked to a verified EMDERLT lab"),
-  lab_green  = list(label = "Green innovations linked to a verified EMDERLT lab"))
+  lab_green  = list(label = "Green innovations linked to a verified EMDERLT lab"),
+  highlights = list(label = "Highlighted examples (paper appendix)"))
+
+# Curated examples: a Scoreboard firm and one of its green, lab-linked innovations
+# (publication number as stored by iseapp). They form the "highlights" sample, are
+# the cards shown first when the page is opened without a bookmarked view, and are
+# written out as the paper's appendix of concrete examples (appendix_examples.tex).
+HIGHLIGHTS <- data.table(
+  company_raw = c("SIEMENS",   "HONEYWELL", "ABB",       "BRASKEM",      "VESTEL ELEKTRONIK", "GENERAL ELECTRIC"),
+  pubno       = c("EP2937523", "EP3271891", "EP3207432", "WO2020069590", "EP3880506",         "EP3300238"))
 ```
 
 ## What this page shows
@@ -198,11 +208,21 @@ fci <- as.data.table(read_parquet(file.path(bigdata, "firm_country_indicators.pa
 cf <- merge(firmmap, bigX, by = "docdb_family_id")                 # (company, family) rows
 cf <- merge(cf, fy, by = "docdb_family_id", all.x = TRUE)
 cf <- cf[!is.na(ev_global)]
+# publication number -> family for the curated highlights (iseapp patent_database)
+HIGHLIGHTS <- merge(HIGHLIGHTS, local({
+  con <- dbConnect(duckdb::duckdb()); on.exit(dbDisconnect(con, shutdown = TRUE), add = TRUE)
+  as.data.table(dbGetQuery(con, sprintf("SELECT DISTINCT appln_id AS pubno, docdb_family_id FROM read_parquet('%s') WHERE appln_id IN (%s)",
+    normalizePath(file.path(params$iseapp_data, "patent_database.parquet")), paste(sprintf("'%s'", HIGHLIGHTS$pubno), collapse = ","))))
+}), by = "pubno", all.x = TRUE)
+if (anyNA(HIGHLIGHTS$docdb_family_id)) warning("highlight publication(s) not found in patent_database: ", paste(HIGHLIGHTS[is.na(docdb_family_id), pubno], collapse = ", "))
+HIGHLIGHTS <- HIGHLIGHTS[!is.na(docdb_family_id)]
+HIGHLIGHT_FAMS <- HIGHLIGHTS$docdb_family_id
 in_sample <- list(all        = quote(TRUE),
                   emde       = quote(EMDENOCNinno == TRUE),
                   emde_green = quote(EMDENOCNinno == TRUE & is_green == TRUE),
                   lab        = quote(lab_linked == TRUE),
-                  lab_green  = quote(lab_linked == TRUE & is_green == TRUE))
+                  lab_green  = quote(lab_linked == TRUE & is_green == TRUE),
+                  highlights = quote(docdb_family_id %in% HIGHLIGHT_FAMS))
 
 # one row per family, with the list of Scoreboard firms it is linked to
 fam <- cf[, .(companies = paste(sort(unique(company_raw)), collapse = "; ")), by = docdb_family_id]
@@ -289,13 +309,22 @@ cat(length(fam_sel), "distinct families across the top lists\n")
 ```{r top-companies}
 # ── Top-N firms by average measure per (sample, measure, min n) ──────────────
 top_firm <- rbindlist(lapply(names(SAMPLES), function(s) rbindlist(lapply(names(MEASURES), function(m) rbindlist(lapply(MIN_N, function(k) {
+  if (s == "highlights") {
+    # the curated firms, with their statistics over the green lab-linked sample and the
+    # curated innovation as "best"; the minimum-n menu does not apply
+    d <- cf[eval(in_sample$lab_green) & !is.na(get(m)) & company_raw %in% HIGHLIGHTS$company_raw, .(n = .N, avg = mean(get(m))), by = company_raw]
+    d <- merge(d, HIGHLIGHTS[, .(company_raw, best_fam = docdb_family_id)], by = "company_raw")
+    d <- merge(d, fam[, .(best_fam = docdb_family_id, best = get(m))], by = "best_fam")
+    d <- d[order(-avg)]
+    return(data.table(sample = s, measure = m, min_n = k, rank = seq_len(nrow(d)), company_raw = d$company_raw, n = d$n, avg = d$avg, best_fam = d$best_fam, best = d$best))
+  }
   d <- cf[eval(in_sample[[s]]) & !is.na(get(m)), .(n = .N, avg = mean(get(m)), best_fam = docdb_family_id[which.max(get(m))], best = max(get(m))), by = company_raw][n >= k]
   d <- d[order(-avg)][seq_len(min(TOP_N, nrow(d)))]
   data.table(sample = s, measure = m, min_n = k, rank = seq_len(nrow(d)), company_raw = d$company_raw, n = d$n, avg = d$avg, best_fam = d$best_fam, best = d$best)
 }))))))
 top_firm <- merge(top_firm, sb, by = "company_raw", all.x = TRUE, sort = FALSE)
 # the firms' best innovations are enriched and fetched alongside the top innovations
-fam_sel <- sort(union(fam_sel, unique(top_firm$best_fam)))
+fam_sel <- sort(union(union(fam_sel, unique(top_firm$best_fam)), HIGHLIGHT_FAMS))
 cat(length(fam_sel), "distinct families to enrich, including the firms' best innovations\n")
 ```
 
@@ -492,6 +521,69 @@ fwrite(merge(merge(top_inno, fam[, .(docdb_family_id, companies, fam_year, is_gr
 fwrite(top_firm[order(sample, measure, min_n, rank)], file.path(cache_dir, "top_companies.csv"))
 ```
 
+```{r appendix-tex}
+# ── The paper's appendix of concrete examples (LaTeX), one block per highlighted
+#    firm, with the drawing saved to figures2025/examples/ ────────────────────────
+paper_dir <- params$paper_dir
+if (dir.exists(paper_dir) && nrow(HIGHLIGHTS)) {
+  fig_dir <- file.path(paper_dir, "figures2025", "examples"); dir.create(fig_dir, showWarnings = FALSE, recursive = TRUE)
+  tex_esc <- function(x) { x <- gsub("\\\\", "\\\\textbackslash{}", x); x <- gsub("([&%$#_{}])", "\\\\\\1", x); x <- gsub("~", "\\\\textasciitilde{}", x); gsub("\u2014", "---", x) }
+  fmt <- function(v, m) { if (is.na(v)) return("n/a"); x <- v * (if (is.null(m$scale)) 1 else m$scale); formatC(x, format = "f", digits = m$fmt, big.mark = ",") }
+  hx <- merge(HIGHLIGHTS, fam[, c("docdb_family_id", "companies", "fam_year", "is_green", "labs", "ctry_line", names(MEASURES)), with = FALSE], by = "docdb_family_id")
+  hx <- merge(hx, enr[, .(docdb_family_id, title, headline, summary, image, image_from, rotate, n_inventors, team, green_tags, green_codes)], by = "docdb_family_id")
+  hx <- merge(hx, sb[, .(company_raw, hq_iso, sector, n_families, share_dev_nocn_innos)], by = "company_raw", all.x = TRUE)
+  firm_lg <- cf[eval(in_sample$lab_green), .(n_lab_green = .N, avg_istrax_emde = mean(istrax_EMDENOCN, na.rm = TRUE), avg_ev_global = mean(ev_global, na.rm = TRUE)), by = company_raw]
+  hx <- merge(hx, firm_lg, by = "company_raw", all.x = TRUE)
+  setorder(hx, -avg_istrax_emde)
+  hx[, firm_pos := seq_len(.N)]                                          # position in the firm gallery's highlights sample
+  hx <- merge(hx, top_inno[sample == "highlights" & measure == "istrax_EMDENOCN", .(docdb_family_id, inno_pos = rank)], by = "docdb_family_id", all.x = TRUE)
+  setorder(hx, firm_pos)
+  TOOL <- "https://mondpanther.github.io/kevceinsights/emde-inno-examples.html"
+  firm_link <- function(i) sprintf("%s\\#fm=istrax_EMDENOCN\\&fs=highlights\\&fn=%d\\&fmix=fam\\&fv=gallery\\&fi=%d", TOOL, MIN_N[1], i)
+  inno_link <- function(i) sprintf("%s\\#m=istrax_EMDENOCN\\&s=highlights\\&v=gallery\\&i=%d", TOOL, i)
+  lab_green_mean <- fam[eval(in_sample$lab_green), .(istrax = mean(istrax_EMDENOCN, na.rm = TRUE), ev = mean(ev_global, na.rm = TRUE))]
+  n_top_firms <- top_firm[sample == "lab_green" & measure == "istrax_EMDENOCN" & min_n == 30, .N]
+  blocks <- lapply(seq_len(nrow(hx)), function(i) {
+    r <- hx[i]
+    figfile <- NA_character_
+    if (!is.na(r$image)) {
+      figfile <- file.path(fig_dir, paste0(gsub("[^A-Za-z0-9]", "", r$pubno), ".png"))
+      if (!file.exists(figfile)) try(download.file(r$image, figfile, mode = "wb", quiet = TRUE), silent = TRUE)
+      if (!file.exists(figfile)) figfile <- NA_character_
+    }
+    firm_name <- tools::toTitleCase(tolower(r$company_raw)); firm_name <- gsub("\\bAbb\\b", "ABB", firm_name)
+    mix <- fci[company_raw == r$company_raw & !is.na(ctry_code)][order(-n_families)][1:min(4, .N)]
+    mix_txt <- if (nrow(mix)) paste(sprintf("%s %.0f\\%%", cname(toupper(mix$ctry_code)), 100 * mix$n_families / sum(fci[company_raw == r$company_raw, n_families])), collapse = ", ") else ""
+    paste0(
+      "\\subsection*{", tex_esc(firm_name), " (", tex_esc(cname(r$hq_iso)), if (!is.na(r$sector)) paste0("; ", tex_esc(r$sector)) else "", ")",
+      "\\hfill{\\normalfont\\small\\href{", firm_link(r$firm_pos), "}{firm card}", if (!is.na(r$inno_pos)) paste0(" $\\cdot$ \\href{", inno_link(r$inno_pos), "}{innovation card}") else "", "}}\n",
+      if (!is.na(figfile)) paste0("\\begin{wrapfigure}{r}{0.34\\textwidth}\\vspace{-10pt}\\centering\\includegraphics[width=0.32\\textwidth", if (r$rotate %in% c(90, 270)) sprintf(",angle=%d", -r$rotate) else "", "]{figures2025/examples/", basename(figfile), "}\\vspace{-16pt}\\end{wrapfigure}\n") else "",
+      "\\textbf{", tex_esc(r$headline), ".} ", tex_esc(r$summary), " ",
+      "(\\emph{", tex_esc(r$title), "}, ", tex_esc(r$pubno), ", filed ", r$fam_year, if (!is.na(r$labs)) paste0("; verified lab: ", tex_esc(r$labs)) else "", ".) ",
+      "Inventor countries on the record: ", tex_esc(gsub("\\*", "", r$ctry_line)), ". ",
+      "Spillover value per innovation: USD ", fmt(r$ev_global, MEASURES$ev_global), "M globally, ", fmt(r$ev_HIC, MEASURES$ev_HIC), "M to HIC and ", fmt(r$ev_EMDENOCN, MEASURES$ev_EMDENOCN), "M to EMDE inventors; ",
+      "marginal return to EMDE ", fmt(r$istrax_EMDENOCN, MEASURES$istrax_EMDENOCN), "\\% against ", fmt(lab_green_mean$istrax, MEASURES$istrax_EMDENOCN), "\\% for the average green lab-linked innovation. ",
+      if (!is.na(r$green_tags)) paste0("It counts as green because the EPO files it under its climate-change-mitigation classes (", tex_esc(gsub("\\|", ", ", r$green_tags)), if (!is.na(r$green_codes)) paste0("; ", tex_esc(gsub("\\|", "; ", r$green_codes))) else "", "). ") else "",
+      "\\par\\smallskip\\noindent\\emph{The firm:} ", format(r$n_families, big.mark = ","), " innovations in 2013--2022, of which ", sprintf("%.1f", 100 * r$share_dev_nocn_innos), "\\% with an EMDE inventor",
+      if (nzchar(mix_txt)) paste0(" (inventor countries, innovation-weighted: ", mix_txt, ")") else "", "; ",
+      format(r$n_lab_green, big.mark = ","), " green innovations tied to a verified EMDERLT lab, with an average marginal return to EMDE of ", fmt(r$avg_istrax_emde, MEASURES$istrax_EMDENOCN), "\\% and an average global spillover value of USD ", fmt(r$avg_ev_global, MEASURES$ev_global), "M per innovation.\n")
+  })
+  tex <- paste0(
+    "% Generated by kevceinsights/emde-inno-examples.Rmd on ", format(Sys.Date()), " -- do not edit by hand; edit HIGHLIGHTS in the Rmd and re-knit.\n",
+    "% Requires \\usepackage{wrapfig} in the preamble.\n",
+    "\\section{Concrete examples of EMDE-linked innovation by leading R\\&D firms}\\label{app:examples}\n\n",
+    "This appendix puts faces to the aggregate results. The firms below are a selection from the ", n_top_firms, " Scoreboard firms with the highest average marginal return of spillovers to EMDE inventors across their green innovations that can be tied to a verified research lab in an EMDE ",
+    "(labs from the EMDE R\\&D Lab Tracker, \\href{https://mondpanther.github.io/kevceinsights/mnc-rd-labs-map.html}{EMDERLT}; firms with at least 30 such innovations). ",
+    "For each firm we show one of those innovations, invented with the firm's EMDE-based inventors, together with its spillover values and marginal returns as used in the paper. ",
+    "The full ranking, and the top twenty innovations and firms on every measure and sample, can be browsed in the interactive companion to this paper at \\href{", TOOL, "}{", gsub("https://", "", TOOL, fixed = TRUE), "}, which also carries the patent drawing and a non-technical summary of every listed innovation; ",
+    "the links next to each heading open the firm's and the innovation's card there. ",
+    "Summaries are paraphrases of the patent abstracts; values are from the paper's data (spillover values in USD million per innovation, marginal returns in percent).\n\n",
+    paste(blocks, collapse = "\n"))
+  writeLines(tex, file.path(paper_dir, "appendix_examples.tex"), useBytes = TRUE)
+  cat("Wrote", file.path(paper_dir, "appendix_examples.tex"), "with", nrow(hx), "examples\n")
+}
+```
+
 ```{r payload}
 cname <- function(iso) { x <- countrycode(iso, "iso2c", "country.name", warn = FALSE); fifelse(is.na(x), iso, x) }
 fam_json <- merge(fam[docdb_family_id %in% fam_sel, c("docdb_family_id", "companies", "fam_year", "is_green", "HICinno", "EMDENOCNinno", "CNinno",
@@ -654,11 +746,22 @@ function figHTML(f,cls){
 function drawCanvases(root){
   root.querySelectorAll("canvas[data-src]").forEach(function(c){
     var img=new Image(); var deg=(+c.getAttribute("data-rot")||0)%360; if(deg<0)deg+=360;
-    img.onload=function(){var w=img.naturalWidth,h=img.naturalHeight,sw=(deg===90||deg===270);c.width=sw?h:w;c.height=sw?w:h;var ctx=c.getContext("2d");ctx.fillStyle="#fff";ctx.fillRect(0,0,c.width,c.height);ctx.translate(c.width/2,c.height/2);ctx.rotate(deg*Math.PI/180);ctx.drawImage(img,-w/2,-h/2);};
+    img.onload=function(){
+      // draw at the displayed size (times the device pixel ratio) rather than at the
+      // image's own size: a 2000px canvas squeezed to 250px by CSS loses thin lines
+      var w=img.naturalWidth,h=img.naturalHeight,sw=(deg===90||deg===270),rw=sw?h:w,rh=sw?w:h;
+      var box=c.parentNode, maxW=Math.max(120,(box.clientWidth||300)-2), maxH=+(c.getAttribute("data-maxh")||360);
+      var sc=Math.min(1,maxW/rw,maxH/rh), dpr=Math.min(3,window.devicePixelRatio||1), dw=Math.round(rw*sc), dh=Math.round(rh*sc);
+      c.width=Math.round(dw*dpr); c.height=Math.round(dh*dpr); c.style.width=dw+"px"; c.style.height=dh+"px";
+      var ctx=c.getContext("2d"); ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality="high";
+      ctx.fillStyle="#fff"; ctx.fillRect(0,0,c.width,c.height);
+      ctx.translate(c.width/2,c.height/2); ctx.rotate(deg*Math.PI/180); ctx.scale(sc*dpr,sc*dpr); ctx.drawImage(img,-w/2,-h/2);
+    };
     img.onerror=function(){c.outerHTML='<div class="nofig">Drawing could not be loaded</div>';};
     img.src=c.getAttribute("data-src");
   });
 }
+(function(){var t=null;window.addEventListener("resize",function(){clearTimeout(t);t=setTimeout(function(){["ex-i-card","ex-f-card"].forEach(function(id){var el=document.getElementById(id);if(el)drawCanvases(el);});},200);});})();
 function rotBtn(f){return f&&f.image?'<button type="button" class="ex-rot" data-url="'+esc(f.image)+'" title="Turn the drawing a quarter turn clockwise (remembered in this browser)">&#8635; rotate</button>':'';}
 document.addEventListener("click",function(e){var b=e.target.closest(".ex-rot");if(!b)return;var u=b.getAttribute("data-url");setManualRot(u,(manualRot(u)+90)%360);
   document.querySelectorAll('canvas[data-src="'+u.replace(/"/g,'\\"')+'"]').forEach(function(c){var f={image:u,rotate:+c.getAttribute("data-base")||0};});
@@ -709,12 +812,15 @@ function otherCols(f,mkey){
 }
 // ---- innovations ----
 var im=document.getElementById("ex-i-measure"), is_=document.getElementById("ex-i-sample");
+var FRESH=!location.hash.replace(/^#/,"");   // no bookmarked view: open on a random highlighted example
+function nHighlights(key){return C.innovations.filter(function(r){return r.sample==="highlights"&&r.measure===key;}).length;}
 fill(im,C.measures.map(function(m){return[m.key,m.label];}),H0.m||"istrax_EMDENOCN");
-fill(is_,C.samples.map(function(s){return[s.key,s.label];}),H0.s||"lab_green");
+fill(is_,C.samples.map(function(s){return[s.key,s.label];}),H0.s||(nHighlights("istrax_EMDENOCN")?"highlights":"lab_green"));
 var view=(H0.v==="table"?"table":"gallery"), cur=Math.max(0,(+H0.i||1)-1);
+if(FRESH&&is_.value==="highlights")cur=Math.floor(Math.random()*nHighlights(im.value));
 if(view==="table"){document.getElementById("ex-i-vtab").classList.add("on");document.getElementById("ex-i-vgal").classList.remove("on");}
 function curRows(){var mk=im.value, sk=is_.value;return C.innovations.filter(function(r){return r.measure===mk&&r.sample===sk;}).sort(function(a,b){return a.rank-b.rank;});}
-function setCap(rows){var m=M[im.value], sk=is_.value;document.getElementById("ex-i-cap").textContent="Top "+rows.length+" of "+S[sk].n.toLocaleString("en-US")+" "+lc(S[sk].label)+", ranked by "+lc(m.label)+" ("+m.unit+").";}
+function setCap(rows){var m=M[im.value], sk=is_.value;document.getElementById("ex-i-cap").textContent=(sk==="highlights"?rows.length+" highlighted examples (the firms and innovations discussed in the paper\u2019s appendix), ordered by ":"Top "+rows.length+" of "+S[sk].n.toLocaleString("en-US")+" "+lc(S[sk].label)+", ranked by ")+lc(m.label)+" ("+m.unit+").";}
 // team donut: inventor records by country (share of inventors), grouped HIC / EMDE / China / other, unknown in grey
 var GCOL={HIC:["#2b5a8c","#4f7fb0","#7aa3cc","#a6c3df","#c9d9ea"],EMDE:["#c0803a","#d49a5a","#e3b57f","#edcba3"],China:["#b23a3a","#cf6b6b"],other:["#7a7a7a","#a3a3a3"],unknown:["#dedcd6"]};
 function parseTeam(f){
@@ -794,11 +900,13 @@ document.getElementById("ex-i-dl").addEventListener("click",function(){
 });
 // ---- companies ----
 var fm=document.getElementById("ex-f-measure"), fs=document.getElementById("ex-f-sample"), fn=document.getElementById("ex-f-minn");
+var nHiFirms=C.companies.filter(function(r){return r.sample==="highlights"&&r.measure==="istrax_EMDENOCN"&&r.min_n===C.minN[0];}).length;
 fill(fm,C.measures.map(function(m){return[m.key,m.label];}),H0.fm||"istrax_EMDENOCN");
-fill(fs,C.samples.map(function(s){return[s.key,s.label];}),H0.fs||"lab_green");
+fill(fs,C.samples.map(function(s){return[s.key,s.label];}),H0.fs||(nHiFirms?"highlights":"lab_green"));
 fill(fn,C.minN.map(function(n){return[n,String(n)];}),H0.fn||C.minN[Math.min(1,C.minN.length-1)]);
 var fmixSel=document.getElementById("ex-f-mix"); if(H0.fmix==="inv")fmixSel.value="inv";
 var fview=(H0.fv==="table"?"table":"gallery"), fcur=Math.max(0,(+H0.fi||1)-1);
+if(FRESH&&fs.value==="highlights")fcur=Math.floor(Math.random()*nHiFirms);
 if(fview==="table"){document.getElementById("ex-f-vtab").classList.add("on");document.getElementById("ex-f-vgal").classList.remove("on");}
 function firmMixParts(company){
   var fx=(C.firm_mix||{})[company]; if(!fx||!fx.mix||!fx.mix.length)return null;
@@ -826,8 +934,8 @@ function firmMixBlock(company){
   return h;
 }
 function firmRows(){var mk=fm.value, sk=fs.value, k=+fn.value;return C.companies.filter(function(r){return r.measure===mk&&r.sample===sk&&r.min_n===k;}).sort(function(a,b){return a.rank-b.rank;});}
-function sampleMean(){var mk=fm.value, sk=fs.value;var r=(C.sample_means||[]).filter(function(x){return x.measure===mk&&x.sample===sk;})[0];return r?r.mean:null;}
-function firmCap(rows){var m=M[fm.value], sk=fs.value, k=+fn.value;document.getElementById("ex-f-cap").textContent="Top "+rows.length+" Scoreboard firms by average "+lc(m.label)+" ("+m.unit+") over their "+lc(S[sk].label).replace("all Scoreboard innovations","innovations")+", firms with at least "+k+" such innovations.";}
+function sampleMean(){var mk=fm.value, sk=fs.value==="highlights"?"lab_green":fs.value;var r=(C.sample_means||[]).filter(function(x){return x.measure===mk&&x.sample===sk;})[0];return r?r.mean:null;}
+function firmCap(rows){var m=M[fm.value], sk=fs.value, k=+fn.value;document.getElementById("ex-f-cap").textContent=(sk==="highlights"?rows.length+" highlighted firms (those discussed in the paper\u2019s appendix), ordered by their average "+lc(m.label)+" ("+m.unit+") over their green innovations linked to a verified EMDERLT lab; the best innovation shown is the one discussed in the appendix.":"Top "+rows.length+" Scoreboard firms by average "+lc(m.label)+" ("+m.unit+") over their "+lc(S[sk].label).replace("all Scoreboard innovations","innovations")+", firms with at least "+k+" such innovations.");}
 function firmCard(r,rows){
   var m=M[fm.value], b=B[r.best_fam]||{}, mean=sampleMean(), bt=b.title||("Family "+r.best_fam+(b.pubno?" ("+b.pubno+")":""));
   var h='<div class="ex-fcard"><div>';
@@ -841,7 +949,7 @@ function firmCard(r,rows){
   if(mean!=null&&mean>0&&r.avg!=null)h+='<div class="ex-ratio">The firm’s innovations in this sample score <b>'+(r.avg/mean).toFixed(1)+'×</b> the sample average on '+esc(lc(m.label))+'.</div>';
   h+=firmMixBlock(r.company);
   h+='</div><div><div class="ex-best"><div class="lbl">Best innovation in the sample</div>';
-  if(b.image)h+='<div class="bimg">'+figHTML(b,"")+'<div>'+rotBtn(b)+'</div></div>';
+  if(b.image)h+='<div class="bimg">'+figHTML(b,"").replace('<canvas ','<canvas data-maxh="170" ')+'<div>'+rotBtn(b)+'</div></div>';
   h+='<div class="bhead">'+esc(b.headline||bt)+tags(b)+'</div>';
   h+='<div class="ex-meta">'+(b.espacenet?'<a href="'+b.espacenet+'" target="_blank" rel="noopener">'+esc(bt)+'</a>':esc(bt))+'</div>';
   h+='<div class="ex-meta">'+fmtv(r.best,m)+' '+esc(m.unit)+(b.fam_year?' · filed '+b.fam_year:'')+(b.pubno?' · '+esc(b.pubno):'')+(b.google?' · <a href="'+b.google+'" target="_blank" rel="noopener">Google Patents</a>':'')+'</div>';
