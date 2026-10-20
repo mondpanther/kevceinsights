@@ -468,6 +468,23 @@ enr[, green_codes := vapply(pubno, function(p) { g <- texts[[p]]$green_codes; if
 rot_file <- file.path(cache_dir, "image_rotations.json")
 rots <- if (file.exists(rot_file)) fromJSON(rot_file, simplifyVector = FALSE) else list()
 enr[, rotate := vapply(image, function(u) { r <- if (is.na(u)) NULL else rots[[u]]; if (is.null(r) || is.null(r$rotate)) 0L else as.integer(r$rotate) }, 0L)]
+# hand-picked illustrations (illustrations.json, keyed by publication number): a picture from
+# an openly licensed source that shows what the innovation is about, shown instead of the
+# patent drawing, with its credit. Files live in _cache_emde_inno_examples/illustrations/
+# and are embedded as data URIs so the page stays self-contained.
+ill_file <- file.path(cache_dir, "illustrations.json")
+ills <- if (file.exists(ill_file)) fromJSON(ill_file, simplifyVector = FALSE) else list()
+ill_uri <- function(f) { f <- file.path(cache_dir, f); if (!file.exists(f)) return(NA_character_)
+  ext <- tolower(tools::file_ext(f)); mime <- c(jpg = "image/jpeg", jpeg = "image/jpeg", png = "image/png", gif = "image/gif", webp = "image/webp", svg = "image/svg+xml")[ext]
+  paste0("data:", mime, ";base64,", jsonlite::base64_enc(readBin(f, "raw", file.info(f)$size))) }
+getill <- function(p, what) { v <- ills[[p]][[what]]; if (is.null(v) || !nzchar(v)) NA_character_ else v }
+enr[, ill_img    := vapply(pubno, function(p) if (is.null(ills[[p]])) NA_character_ else ill_uri(ills[[p]]$file), "")]
+enr[, ill_file   := vapply(pubno, getill, "", what = "file")]
+enr[, ill_caption := vapply(pubno, getill, "", what = "caption")]
+enr[, ill_credit := vapply(pubno, getill, "", what = "credit")]
+enr[, ill_url    := vapply(pubno, getill, "", what = "url")]
+enr[, ill_note   := vapply(pubno, getill, "", what = "note")]
+cat(sum(!is.na(enr$ill_img)), "families have a hand-picked illustration\n")
 cat(sum(!is.na(enr$title)), "of", nrow(enr), "families have a title and abstract;", sum(!is.na(enr$image)), "have a drawing\n")
 ```
 
@@ -531,7 +548,7 @@ if (dir.exists(paper_dir) && nrow(HIGHLIGHTS)) {
   tex_esc <- function(x) { x <- gsub("\\\\", "\\\\textbackslash{}", x); x <- gsub("([&%$#_{}])", "\\\\\\1", x); x <- gsub("~", "\\\\textasciitilde{}", x); gsub("\u2014", "---", enc2utf8(x), fixed = TRUE) }
   fmt <- function(v, m) { if (is.na(v)) return("n/a"); x <- v * (if (is.null(m$scale)) 1 else m$scale); formatC(x, format = "f", digits = m$fmt, big.mark = ",") }
   hx <- merge(HIGHLIGHTS, fam[, c("docdb_family_id", "companies", "fam_year", "is_green", "labs", "ctry_line", names(MEASURES)), with = FALSE], by = "docdb_family_id")
-  hx <- merge(hx, enr[, .(docdb_family_id, title, headline, summary, image, image_from, rotate, n_inventors, team, green_tags, green_codes)], by = "docdb_family_id")
+  hx <- merge(hx, enr[, .(docdb_family_id, title, headline, summary, image, image_from, rotate, n_inventors, team, green_tags, green_codes, ill_file, ill_credit, ill_url)], by = "docdb_family_id")
   hx <- merge(hx, sb[, .(company_raw, hq_iso, sector, n_families, share_dev_nocn_innos)], by = "company_raw", all.x = TRUE)
   firm_lg <- cf[eval(in_sample$lab_green), .(n_lab_green = .N, avg_istrax_emde = mean(istrax_EMDENOCN, na.rm = TRUE), avg_ev_global = mean(ev_global, na.rm = TRUE)), by = company_raw]
   hx <- merge(hx, firm_lg, by = "company_raw", all.x = TRUE)
@@ -546,8 +563,12 @@ if (dir.exists(paper_dir) && nrow(HIGHLIGHTS)) {
   n_top_firms <- top_firm[sample == "lab_green" & measure == "istrax_EMDENOCN" & min_n == 30, .N]
   blocks <- lapply(seq_len(nrow(hx)), function(i) {
     r <- hx[i]
-    figfile <- NA_character_
-    if (!is.na(r$image)) {
+    figfile <- NA_character_; fig_credit <- ""
+    if (!is.na(r$ill_file) && file.exists(file.path(cache_dir, r$ill_file))) {
+      figfile <- file.path(fig_dir, paste0(gsub("[^A-Za-z0-9]", "", r$pubno), "_illustration.", tools::file_ext(r$ill_file)))
+      file.copy(file.path(cache_dir, r$ill_file), figfile, overwrite = TRUE)
+      fig_credit <- paste0(" (Illustration: ", tex_esc(r$ill_credit), if (!is.na(r$ill_url)) paste0(", \\url{", r$ill_url, "}") else "", ".)")
+    } else if (!is.na(r$image)) {
       figfile <- file.path(fig_dir, paste0(gsub("[^A-Za-z0-9]", "", r$pubno), ".png"))
       if (!file.exists(figfile)) { op <- options(timeout = 30); on.exit(options(op), add = TRUE)
         ok <- try(download.file(r$image, figfile, mode = "wb", quiet = TRUE, method = "libcurl"), silent = TRUE)
@@ -560,10 +581,10 @@ if (dir.exists(paper_dir) && nrow(HIGHLIGHTS)) {
     paste0(
       "\\subsection*{", tex_esc(firm_name), " (", tex_esc(cname(r$hq_iso)), if (!is.na(r$sector)) paste0("; ", tex_esc(r$sector)) else "", ")}\n",
       "\\noindent{\\small Online: \\href{", firm_link(r$firm_pos), "}{firm card}", if (!is.na(r$inno_pos)) paste0(" $\\cdot$ \\href{", inno_link(r$inno_pos), "}{innovation card}") else "", "}\\par\\smallskip\n",
-      if (!is.na(figfile)) paste0("\\begin{wrapfigure}{r}{0.34\\textwidth}\\vspace{-10pt}\\centering\\includegraphics[width=0.32\\textwidth", if (r$rotate %in% c(90, 270)) sprintf(",angle=%d", -r$rotate) else "", "]{figures2025/examples/", basename(figfile), "}\\vspace{-16pt}\\end{wrapfigure}\n") else "",
+      if (!is.na(figfile)) paste0("\\begin{wrapfigure}{r}{0.34\\textwidth}\\vspace{-10pt}\\centering\\includegraphics[", if (nzchar(fig_credit)) "width=0.32\\textwidth" else if (r$rotate %in% c(90, 270)) sprintf("height=0.32\\textwidth,angle=%d", -r$rotate) else "width=0.32\\textwidth", "]{figures2025/examples/", basename(figfile), "}\\vspace{-16pt}\\end{wrapfigure}\n") else "",
       "\\textbf{", tex_esc(r$headline), ".} ", tex_esc(r$summary), " ",
       "(\\emph{", tex_esc(r$title), "}, ", tex_esc(r$pubno), ", filed ", r$fam_year, if (!is.na(r$labs)) paste0("; verified lab: ", tex_esc(r$labs)) else "", ".) ",
-      "Inventor countries on the record: ", tex_esc(gsub("\\*", "", r$ctry_line)), ". ",
+      "Inventor countries on the record: ", tex_esc(gsub("\\*", "", r$ctry_line)), ".", fig_credit, " ",
       "Spillover value per innovation: USD ", fmt(r$ev_global, MEASURES$ev_global), "M globally, ", fmt(r$ev_HIC, MEASURES$ev_HIC), "M to HIC and ", fmt(r$ev_EMDENOCN, MEASURES$ev_EMDENOCN), "M to EMDE inventors; ",
       "marginal return to EMDE ", fmt(r$istrax_EMDENOCN, MEASURES$istrax_EMDENOCN), "\\% against ", fmt(lab_green_mean$istrax, MEASURES$istrax_EMDENOCN), "\\% for the average green lab-linked innovation. ",
       if (!is.na(r$green_tags)) paste0("It counts as green because the EPO files it under its climate-change-mitigation classes (", tex_esc(gsub("\\|", ", ", r$green_tags)), if (!is.na(r$green_codes)) paste0("; ", tex_esc(gsub("\\|", "; ", r$green_codes))) else "", "). ") else "",
@@ -578,7 +599,7 @@ if (dir.exists(paper_dir) && nrow(HIGHLIGHTS)) {
     "This appendix puts faces to the aggregate results. The firms below are a selection from the ", n_top_firms, " Scoreboard firms with the highest average marginal return of spillovers to EMDE inventors across their green innovations that can be tied to a verified research lab in an EMDE ",
     "(labs from the EMDE R\\&D Lab Tracker, \\href{https://mondpanther.github.io/kevceinsights/mnc-rd-labs-map.html}{EMDERLT}; firms with at least 30 such innovations). ",
     "For each firm we show one of those innovations, invented with the firm's EMDE-based inventors, together with its spillover values and marginal returns as used in the paper. ",
-    "The full ranking, and the top twenty innovations and firms on every measure and sample, can be browsed in the interactive companion to this paper at \\href{", TOOL, "}{", gsub("https://", "", TOOL, fixed = TRUE), "}, which also carries the patent drawing and a non-technical summary of every listed innovation; ",
+    "The full ranking, and the top twenty innovations and firms on every measure and sample, can be browsed in the interactive companion to this paper at \\href{", TOOL, "}{\\nolinkurl{", gsub("https://", "", TOOL, fixed = TRUE), "}}, which also carries the patent drawing and a non-technical summary of every listed innovation; ",
     "the links next to each heading open the firm's and the innovation's card there. ",
     "Summaries are paraphrases of the patent abstracts; values are from the paper's data (spillover values in USD million per innovation, marginal returns in percent).\n\n",
     paste(blocks, collapse = "\n"))
@@ -684,6 +705,9 @@ css <- paste0(
 '.ex-dot.on{background:#2b5a8c;transform:scale(1.25);}',
 '.ex-abs details{margin-top:8px;}.ex-abs summary{cursor:pointer;color:#2b5a8c;font-size:12px;}',
 '.ex-fig canvas{max-width:100%;max-height:360px;}',
+'.ex-fig img.ex-ill{max-width:100%;max-height:360px;object-fit:contain;}',
+'.ex-best .bimg img.ex-ill{max-width:100%;max-height:170px;display:block;margin:0 auto;}',
+'.ex-figcap a{color:#1a4e8a;}',
 '.ex-rot{font:inherit;font-size:11px;color:#2b5a8c;background:none;border:0;cursor:pointer;padding:0 4px;}.ex-rot:hover{text-decoration:underline;}',
 '.ex-green{border-left:3px solid #5a9b5a;background:#f3f9f3;padding:8px 12px;margin:10px 0 4px;font-size:12.5px;line-height:1.45;color:#23402a;border-radius:0 4px 4px 0;}',
 '.ex-green b{color:#2e6b2e;}.ex-green .code{display:block;font-size:11.5px;color:#4b6b4b;margin-top:3px;}',
@@ -710,7 +734,7 @@ inno_html <- paste0(css,
 '<div class="ex-cap" id="ex-i-cap"></div>',
 '<div class="ex-gal" id="ex-i-gal"><div class="ex-nav l" id="ex-i-prev" title="Previous (left arrow)">&#8249;</div><div id="ex-i-card"></div><div class="ex-nav r" id="ex-i-next" title="Next (right arrow)">&#8250;</div><div class="ex-dots" id="ex-i-dots"></div></div>',
 '<div id="ex-i-out" style="display:none"></div>',
-'<div class="ex-foot fignote">Headlines and summaries are non-technical paraphrases written by Claude from the patent’s title and abstract; the drawing is the first figure Google Patents holds for the family (hot-linked; drawings that tesseract judged to be on their side are turned upright, and the rotate button turns a drawing a further quarter turn, remembered in this browser only). “Why it counts as green”: the paper’s green flag comes from the EPO’s Y02/Y04S climate-change classes; the plain-English line is the iseapp technology tag built from them, the codes are the patent’s own Y02/Y04S classes with the EPO’s descriptions. Titles and abstracts are the patent documents’ own, retrieved from Google Patents for one publication of each family; the Espacenet link opens the family’s full record. Countries: every country of an inventor or applicant on the family in the harmonised PATSTAT mapping (iseapp countrymap) — the variable from which the paper’s HIC / EMDE (excl. China) / China flags are built; EMDE countries are marked. The second line gives the raw inventor records and how many carry no country code. “EMDERLT lab”: the firm has a verified lab in an EMDE country on the record.</div>',
+'<div class="ex-foot fignote">Headlines and summaries are non-technical paraphrases written by Claude from the patent’s title and abstract; the drawing is the first figure Google Patents holds for the family (hot-linked; drawings that tesseract judged to be on their side are turned upright, and the rotate button turns a drawing a further quarter turn, remembered in this browser only; for a few innovations an openly licensed photograph or figure is shown instead, with its credit). “Why it counts as green”: the paper’s green flag comes from the EPO’s Y02/Y04S climate-change classes; the plain-English line is the iseapp technology tag built from them, the codes are the patent’s own Y02/Y04S classes with the EPO’s descriptions. Titles and abstracts are the patent documents’ own, retrieved from Google Patents for one publication of each family; the Espacenet link opens the family’s full record. Countries: every country of an inventor or applicant on the family in the harmonised PATSTAT mapping (iseapp countrymap) — the variable from which the paper’s HIC / EMDE (excl. China) / China flags are built; EMDE countries are marked. The second line gives the raw inventor records and how many carry no country code. “EMDERLT lab”: the firm has a verified lab in an EMDE country on the record.</div>',
 '</div>')
 firm_html <- paste0(
 '<div class="ex" id="ex-firm">',
@@ -742,6 +766,7 @@ function lc(t){return t.charAt(0).toLowerCase()+t.slice(1);}
 function manualRot(u){try{return +(localStorage.getItem("exrot:"+u)||0);}catch(e){return 0;}}
 function setManualRot(u,v){try{localStorage.setItem("exrot:"+u,String(v));}catch(e){}}
 function figHTML(f,cls){
+  if(f&&f.ill_img)return'<img class="ex-ill" src="'+f.ill_img+'" alt="'+esc(f.ill_caption||"Illustration")+'">';
   if(!f||!f.image)return'<div class="nofig">No drawing available for this family</div>';
   return'<canvas class="'+cls+'" data-src="'+esc(f.image)+'" data-rot="'+((+f.rotate||0)+manualRot(f.image))%360+'" width="10" height="10" aria-label="Patent drawing"></canvas>';
 }
@@ -764,7 +789,8 @@ function drawCanvases(root){
   });
 }
 (function(){var t=null;window.addEventListener("resize",function(){clearTimeout(t);t=setTimeout(function(){["ex-i-card","ex-f-card"].forEach(function(id){var el=document.getElementById(id);if(el)drawCanvases(el);});},200);});})();
-function rotBtn(f){return f&&f.image?'<button type="button" class="ex-rot" data-url="'+esc(f.image)+'" title="Turn the drawing a quarter turn clockwise (remembered in this browser)">&#8635; rotate</button>':'';}
+function illCap(f){if(!f||!f.ill_img)return"";return'<div class="ex-figcap">'+(f.ill_caption?esc(f.ill_caption)+'. ':'')+'Illustration: '+(f.ill_url?'<a href="'+esc(f.ill_url)+'" target="_blank" rel="noopener">'+esc(f.ill_credit||"source")+'</a>':esc(f.ill_credit||""))+(f.ill_note?' \u2014 '+esc(f.ill_note):'')+(f.image?' (the patent drawing is on Google Patents)':'')+'</div>';}
+function rotBtn(f){return f&&f.image&&!f.ill_img?'<button type="button" class="ex-rot" data-url="'+esc(f.image)+'" title="Turn the drawing a quarter turn clockwise (remembered in this browser)">&#8635; rotate</button>':'';}
 document.addEventListener("click",function(e){var b=e.target.closest(".ex-rot");if(!b)return;var u=b.getAttribute("data-url");setManualRot(u,(manualRot(u)+90)%360);
   document.querySelectorAll('canvas[data-src="'+u.replace(/"/g,'\\"')+'"]').forEach(function(c){var f={image:u,rotate:+c.getAttribute("data-base")||0};});
   if(typeof renderGallery==="function")renderGallery(); if(typeof renderFirmGallery==="function")renderFirmGallery();});
@@ -851,7 +877,7 @@ function teamBlock(f){
 }
 function card(r,rows){
   var f=F[r.id]||{docdb_family_id:r.id}, m=M[im.value], t=f.title||("Family "+f.docdb_family_id);
-  var h='<div class="ex-card"><div><div class="ex-fig">'+figHTML(f,"")+'</div>'+(f.image?'<div class="ex-figcap">Drawing from '+esc(f.image_from||f.pubno)+' '+rotBtn(f)+'</div>':'')+'</div><div>';
+  var h='<div class="ex-card"><div><div class="ex-fig">'+figHTML(f,"")+'</div>'+(f.ill_img?illCap(f):(f.image?'<div class="ex-figcap">Drawing from '+esc(f.image_from||f.pubno)+' '+rotBtn(f)+'</div>':''))+'</div><div>';
   h+='<div class="ex-rank">'+r.rank+' of '+rows.length+' · '+esc(m.label)+'</div>';
   h+='<div class="ex-head">'+esc(f.headline||t)+tags(f)+'</div>';
   h+='<div class="ex-sub">'+(f.espacenet?'<a href="'+f.espacenet+'" target="_blank" rel="noopener">'+esc(t)+'</a>':esc(t))+'</div>';
@@ -951,7 +977,7 @@ function firmCard(r,rows){
   if(mean!=null&&mean>0&&r.avg!=null)h+='<div class="ex-ratio">The firm’s innovations in this sample score <b>'+(r.avg/mean).toFixed(1)+'×</b> the sample average on '+esc(lc(m.label))+'.</div>';
   h+=firmMixBlock(r.company);
   h+='</div><div><div class="ex-best"><div class="lbl">Best innovation in the sample</div>';
-  if(b.image)h+='<div class="bimg">'+figHTML(b,"").replace('<canvas ','<canvas data-maxh="170" ')+'<div>'+rotBtn(b)+'</div></div>';
+  if(b.image||b.ill_img)h+='<div class="bimg">'+figHTML(b,"").replace('<canvas ','<canvas data-maxh="170" ')+'<div>'+(b.ill_img?illCap(b):rotBtn(b))+'</div></div>';
   h+='<div class="bhead">'+esc(b.headline||bt)+tags(b)+'</div>';
   h+='<div class="ex-meta">'+(b.espacenet?'<a href="'+b.espacenet+'" target="_blank" rel="noopener">'+esc(bt)+'</a>':esc(bt))+'</div>';
   h+='<div class="ex-meta">'+fmtv(r.best,m)+' '+esc(m.unit)+(b.fam_year?' · filed '+b.fam_year:'')+(b.pubno?' · '+esc(b.pubno):'')+(b.google?' · <a href="'+b.google+'" target="_blank" rel="noopener">Google Patents</a>':'')+'</div>';
