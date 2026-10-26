@@ -1069,18 +1069,17 @@ cat(js, "\n")
 
 ```{r method, results="asis"}
 cat(sprintf(paste0(
-"The universe is every patent family filed in 2013--2022 that the LMICinnovation pipeline links to a Scoreboard firm ",
-"(`firmmap_2025`, %s families, of which %s involve at least one EMDE-excl.-China inventor and %s of those are green). ",
-"Values come from `bigX_family_level`: knowledge spillovers (`ev_*`) and marginal returns (`istrax_*`) by recipient group, and private value (`pv`), ",
-"all as in the paper. A family linked to several Scoreboard firms counts for each of them in the firm averages and is listed once, with all its firms, in the innovation lists. ",
-"The country composition is the family's row set in iseapp's `countrymap` (every country of an inventor or applicant after the name-based harmonisation of `build_countries_harm_duck.R`), ",
-"which is exactly the input from which `innopaper_results1.rmd` derives the `HICinno` / `CNinno` / `EMDENOCNinno` flags; %s of the families here have a flag that does not agree with this table. ",
-"The raw inventor records (`inventors_2025`, `persons_2025`, `persons_addr_inferred`) feed the donut (inventors by country of residence; records without a country code in grey). ",
-"Headlines and summaries (`patent_summaries.json`) are non-technical paraphrases of the title and abstract written by Claude; drawings are the first figure Google Patents holds for the family, hot-linked from Google's patent image store, taken from a family member when the fetched publication has none. ",
-"The EMDERLT samples use `mnc_rd_labs_data/emde_rd_labs_map.json` (%s verified labs outside China): an innovation is lab-linked when one of its Scoreboard firms has a verified lab in an EMDE country on the family's record --- %s innovations, %s of them green. ",
-"Publication numbers are those the Innovation Strategy Explorer stores per family; titles and abstracts were retrieved from Google Patents on %s for the %s families that appear in a list. ",
-"Flat CSVs of every list are in `%s/`. Built %s."),
+"The universe is every patent family filed in 2013--2022 that we link to one of the top R&D investors of the EU R&D Scoreboard ",
+"(%s families, of which %s involve at least one inventor from an emerging or developing economy other than China, and %s of those are green). ",
+"Knowledge spillovers and marginal returns by recipient group, and private values, are the family-level measures used in the paper. ",
+"A family linked to several Scoreboard firms counts for each of them in the firm averages and is listed once, with all its firms, in the innovation lists. ",
+"The country composition of a family is the set of countries of its inventors and applicants after the name-based harmonisation used in the paper, ",
+"i.e. exactly the information from which the paper classifies an innovation as HIC, Chinese or EMDE-excl.-China; %s of the families shown here have a classification that disagrees with this set. ",
+"The donut charts use the underlying inventor records (inventors by country of residence; records without a country code in grey). ",
+"Headlines and summaries are non-technical paraphrases of the title and abstract written by Claude; drawings are the first figure Google Patents holds for the family, hot-linked from Google's patent image store, taken from a family member when the fetched publication has none. ",
+"The EMDERLT samples draw on the Emerging and Developing Economies Research Lab Tracker (%s verified labs outside China): an innovation is lab-linked when one of its Scoreboard firms has a verified lab in an EMDE country on the family's record --- %s innovations, %s of them green. ",
+"Publication numbers are those the Innovation Strategy Explorer stores per family; titles and abstracts were retrieved from Google Patents on %s for the %s families that appear in a list. Built %s."),
   format(nrow(fam), big.mark = ","), format(fam[EMDENOCNinno == TRUE, .N], big.mark = ","), format(fam[EMDENOCNinno == TRUE & is_green == TRUE, .N], big.mark = ","),
   format(mism, big.mark = ","), format(nrow(labs), big.mark = ","), format(fam[lab_linked == TRUE, .N], big.mark = ","), format(fam[lab_linked == TRUE & is_green == TRUE, .N], big.mark = ","),
-  format(Sys.Date(), "%d %B %Y"), format(length(fam_sel), big.mark = ","), cache_dir, format(Sys.Date(), "%d %B %Y")), "\n")
+  format(Sys.Date(), "%d %B %Y"), format(length(fam_sel), big.mark = ","), format(Sys.Date(), "%d %B %Y")), "\n")
 ```
