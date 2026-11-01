@@ -4,6 +4,10 @@ subtitle: "Big Issues · Imperial College Business School"
 author: "Ralf Martin"
 date: 2026-11-02
 date-format: "D MMMM YYYY"
+title-slide-attributes:
+  data-background-image: wb_storm.jpeg
+  data-background-size: cover
+  data-background-opacity: "1"
 format:
   revealjs:
     theme: [simple, wb_climate.scss]

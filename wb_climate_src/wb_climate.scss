@@ -21,3 +21,12 @@ $presentation-heading-font-weight: 600;
 .reveal .thanks { text-align: center; font-size: 1.1em; font-weight: 600; color: #00538a; margin-top: 0.3em; }
 .reveal table { font-size: 0.7em; }
 .reveal .footer { font-size: 0.45em; color: #888; }
+
+/* Title slide over the storm photo: text in the dark sky, upper left */
+.reveal #title-slide { text-align: left; padding-left: 0; margin-top: -2.2em; }
+.reveal #title-slide .title { color: #fff; font-size: 2.3em; text-shadow: 0 2px 12px rgba(0,0,0,.85); max-width: 60%; line-height: 1.05; }
+.reveal #title-slide .subtitle,
+.reveal #title-slide .quarto-title-author-name,
+.reveal #title-slide .date { color: #f0f0f0; text-shadow: 0 1px 8px rgba(0,0,0,.9); }
+.reveal #title-slide .quarto-title-authors { justify-content: flex-start; }
+.reveal #title-slide .quarto-title-author { padding-left: 0; }
