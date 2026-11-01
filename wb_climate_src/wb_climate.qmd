@@ -1,5 +1,5 @@
 ---
-title: "The World Bank and climate"
+title: "The World Bank and climate change"
 subtitle: "Big Issues · Imperial College Business School"
 author: "Ralf Martin"
 date: 2026-11-02
@@ -13,7 +13,7 @@ format:
     width: 1280
     height: 720
     margin: 0.06
-    footer: "Ralf Martin · The World Bank and climate"
+    footer: "Ralf Martin · The World Bank and climate change"
 execute:
   echo: false
   warning: false
