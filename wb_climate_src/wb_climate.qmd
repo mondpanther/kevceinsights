@@ -33,6 +33,7 @@ knitr:
 library(data.table)
 library(ggplot2)
 library(scales)
+library(maps)
 
 ink    <- "#1d1d1d"
 accent <- "#00538a"   # World Bank blue
@@ -291,6 +292,54 @@ b. **for climate solutions that fit** — technologies designed for local climat
 - Tech transfer alone isn't enough: imported technology is designed for rich-country conditions and prices.
 - Green tech is a new field where incumbents' lead is smaller, so it's a window for developing countries.
 - Development finance has largely funded deployment (building solar farms); much less goes to R&D and innovation capability in developing countries.
+:::
+
+## Why imported technology often doesn't fit {.smaller}
+
+:::: {.columns}
+::: {.column width="60%"}
+```{r pests, fig.width=8, fig.height=4.5}
+pests <- fread("data/gbif_pests.csv")
+world <- as.data.table(map_data("world"))[region != "Antarctica"]
+pests[, species := factor(species, c("Western corn rootworm (Diabrotica virgifera)",
+                                     "African maize stalk borer (Busseola fusca)"))]
+ggplot() +
+  geom_polygon(data = world, aes(long, lat, group = group), fill = "#e9e9e4", colour = "white", linewidth = .15) +
+  geom_point(data = pests[species %like% "rootworm"], aes(lon, lat, colour = species), size = 1.1, alpha = .5) +
+  geom_point(data = pests[species %like% "stalk"], aes(lon, lat, colour = species), size = 2.4, alpha = .85) +
+  scale_colour_manual(values = c(accent, warm), name = NULL) +
+  guides(colour = guide_legend(ncol = 1, override.aes = list(size = 4, alpha = 1))) +
+  coord_quickmap(ylim = c(-40, 65), expand = FALSE) +
+  labs(title = "Two maize pests, two different worlds",
+       subtitle = "Recorded occurrences",
+       caption = "Source: GBIF.org occurrence records (accessed Nov 2026).") +
+  theme_void(base_size = 18) +
+  theme(legend.position = "top", legend.justification = "left", legend.text = element_text(size = 15),
+        plot.title = element_text(face = "bold", size = 19), plot.subtitle = element_text(colour = muted, size = 14),
+        plot.caption = element_text(colour = muted, size = 11, hjust = 0), plot.title.position = "plot")
+```
+:::
+
+::: {.column width="40%"}
+**Maize is attacked by different pests in different places.**
+
+- **US/Europe:** western corn rootworm (~\$1bn a year in US losses) — a prime target of R&D, e.g. Bt maize
+- **Sub-Saharan Africa:** African maize stalk borer destroys ~**10% of Kenya's maize** every year — absent from the US, and Bt maize works less well against it
+
+R&D follows rich-country problems: patents on pests present in the US outnumber those on other pests **more than 5 to 1**.
+
+Climate change shifts pests, diseases and growing conditions — so the mismatch matters more.
+
+[Moscona & Sastry, *Inappropriate Technology: Evidence from Global Agriculture*, NBER WP 33500]{.cite}
+:::
+::::
+
+::: notes
+- Moscona & Sastry measure "pest mismatch" between countries using CABI data on ~5,000 crop pests and pathogens. Mismatch with the technology frontier (US/Western Europe) cuts transfer of crop varieties by ~30% and lowers output; their (deliberately extreme) counterfactual puts the productivity loss from inappropriate technology at 58% of global agricultural productivity.
+- Other examples of climate innovation built for developing-country conditions:
+  - "Scuba rice" (Swarna-Sub1, IRRI): survives ~2 weeks under water. In Odisha, farmers who got it also invested more (fertiliser, land), so gains were roughly double the direct flood protection (Emerick, de Janvry, Sadoulet & Dar, AER 2016).
+  - Drought-tolerant maize varieties bred for Africa (CIMMYT).
+  - Pay-as-you-go solar irrigation pumps for smallholders (e.g. in Kenya).
 :::
 
 ## New: who does innovation in developing countries?
