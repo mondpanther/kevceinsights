@@ -1,9 +1,13 @@
 ---
-title: "The World Bank and climate"
+title: "The World Bank and climate change"
 subtitle: "Big Issues · Imperial College Business School"
 author: "Ralf Martin"
 date: 2026-11-02
 date-format: "D MMMM YYYY"
+title-slide-attributes:
+  data-background-image: wb_storm.jpeg
+  data-background-size: cover
+  data-background-opacity: "1"
 format:
   revealjs:
     theme: [simple, wb_climate.scss]
@@ -13,7 +17,7 @@ format:
     width: 1280
     height: 720
     margin: 0.06
-    footer: "Ralf Martin · The World Bank and climate"
+    footer: "Ralf Martin · The World Bank and climate change"
 execute:
   echo: false
   warning: false
@@ -29,6 +33,7 @@ knitr:
 library(data.table)
 library(ggplot2)
 library(scales)
+library(maps)
 
 ink    <- "#1d1d1d"
 accent <- "#00538a"   # World Bank blue
@@ -156,6 +161,54 @@ In the poorest (IDA) countries, **over half** goes to **adaptation**.
 - IDA FY25: 53% adaptation; IBRD: 34% adaptation.
 :::
 
+## Where the climate money goes
+
+```{r dept}
+dept <- data.table(
+  dept = c("Agriculture and Food", "Digital Development", "Education", "Energy and Extractives",
+           "Environment & Blue Economy", "Finance, Competitiveness & Innovation", "Governance",
+           "Health, Nutrition & Population", "Macroeconomics, Trade & Investment", "Poverty and Equity",
+           "Social Protection and Jobs", "Social Sustainability & Inclusion", "Transport",
+           "Urban, Resilience & Land", "Water"),
+  adaptation = c(835, 118, 392, 1055, 360, 1589, 296, 1066, 1150, 25, 1340, 343, 3697, 2717, 1627),
+  mitigation = c(781, 202, 477, 5914, 906, 1068, 211, 1034, 4648, 268, 101, 126, 3855, 1283, 1693))
+grp <- c("Agriculture and Food" = "Agriculture, food & environment",
+         "Environment & Blue Economy" = "Agriculture, food & environment",
+         "Energy and Extractives" = "Energy",
+         "Transport" = "Transport",
+         "Macroeconomics, Trade & Investment" = "Policy loans (macro & fiscal reform)",
+         "Urban, Resilience & Land" = "Cities, resilience & land",
+         "Water" = "Water",
+         "Finance, Competitiveness & Innovation" = "Finance & private sector")
+dept[, group := fifelse(dept %in% names(grp), grp[dept], "Health, education, social & other")]
+g <- dept[, .(Adaptation = sum(adaptation) / 1e3, Mitigation = sum(mitigation) / 1e3), by = group]
+g[, total := Adaptation + Mitigation]
+g[, group := factor(group, g[order(total), group])]
+gl <- melt(g, id.vars = c("group", "total"), variable.name = "type")
+tot <- sum(g$total)
+```
+
+```{r dept-plot, fig.width=12.5, fig.height=5.3}
+ggplot(gl, aes(value, group, fill = type)) +
+  geom_col(width = .7) +
+  geom_text(data = g, aes(total, group, label = paste0("$", round(total, 1), "bn  (", percent(total / tot, 1), ")")),
+            inherit.aes = FALSE, hjust = -0.08, size = 5.5, colour = ink) +
+  scale_fill_manual(values = c(Adaptation = "#7ab8b0", Mitigation = accent), name = NULL) +
+  scale_x_continuous(labels = NULL, expand = expansion(mult = c(0, .32))) +
+  labs(x = NULL, y = NULL,
+       title = sprintf("World Bank (IBRD + IDA) climate finance, FY25: $%.1fbn by department", tot),
+       caption = "Source: World Bank, Climate Finance 2025 (project-level data). Grouped by the Bank department running the project, not by sector:\ne.g. energy reforms inside budget-support (policy) loans count under Macroeconomics. Excludes IFC and MIGA.") +
+  theme_slides + theme(panel.grid.major = element_blank(), axis.text.y = element_text(size = 17),
+                       plot.title.position = "plot", plot.caption.position = "plot")
+```
+
+::: notes
+- Energy is the single biggest mitigation item ($5.9bn of $22.6bn mitigation), but at ~18% of the total it is not the bulk: transport is as large, and adaptation-heavy areas (cities, water, agriculture, social protection) add up.
+- "Policy loans" are budget-support operations (Development Policy Financing) whose reforms count as climate finance — e.g. cutting fossil-fuel subsidies, renewable auctions, carbon pricing. A fair share of that is clean-energy related too.
+- So "clean energy" is roughly a fifth to a quarter of World Bank climate finance, depending on how you count policy loans.
+- Excludes IFC ($8.1bn) and MIGA ($3.5bn), where renewables and green credit lines via banks dominate.
+:::
+
 ## A pioneer in clean power markets
 
 ```{r ppi-prep}
@@ -201,7 +254,7 @@ knitr::kable(by_per[order(period), .(Period = period, `WBG share` = percent(wbg_
                         `Any MDB` = percent(mdb_share, 1))], align = "lrr")
 ```
 
-A country's **first** private solar/wind deals were **twice as likely** to have multilateral backing (`r percent(firsts[first == TRUE, mdb])` vs `r percent(firsts[first == FALSE, mdb])`).
+A country's **first** private solar/wind deals were **twice as likely** to have multilateral backing as its later deals (`r percent(firsts[first == TRUE, mdb])` vs `r percent(firsts[first == FALSE, mdb])`).
 :::
 ::::
 
@@ -214,52 +267,121 @@ A country's **first** private solar/wind deals were **twice as likely** to have 
 ## My work: innovation in green technologies {.smaller}
 
 :::: {.columns}
-::: {.column width="62%"}
+::: {.column width="44%"}
 **IFC Insights Report (2025): *Innovation in Green Technologies***
 
 - Developing countries (ex China) produce **< 1%** of global green innovation…
-- …but their green innovations are **cited more** than average, and match rich-country innovation in economic value
-
+- …but extra green R&D there has **high returns**: above average innovation in rich countries
 
 **My hypothesis:** developing countries need *more* of their own innovation —
 
 a. **for growth** — new technology waves (electronics in Korea and Taiwan, green tech in China) are how countries catch up
 
-b. **for climate solutions that fit** — technologies designed for local climate, conditions and adaptation needs that rich-country R&D won't prioritise
+b. **for climate solutions that fit** — technologies for local climate, conditions and adaptation needs that rich-country R&D won't prioritise
 :::
 
-::: {.column width="38%" .center-col}
-![](qr_ifc.svg){width="200"}
+::: {.column width="56%" .center-col}
+```{=html}
+<div class="arrowwrap">
+  <img src="green_returns.png" alt="Global returns to R&D by income group">
+  <svg class="fragment drop-in" viewBox="0 0 820 585" aria-hidden="true">
+    <defs><marker id="ah" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="3.2" markerHeight="3.2" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#d7191c"/></marker></defs>
+    <line x1="600" y1="-40" x2="452" y2="108" stroke="#d7191c" stroke-width="16" stroke-linecap="round" marker-end="url(#ah)"/>
+  </svg>
+</div>
+```
 
-[IFC report](https://www.ifc.org/en/insights-reports/2025/innovation-in-green-technologies)
+[Global returns to extra R&D, multi-country patents 2013–22; dotted line = average across all innovations. [Interactive version](https://mondpanther.github.io/kevceinsights/green-technology-innovation.html) · [IFC report](https://www.ifc.org/en/insights-reports/2025/innovation-in-green-technologies)]{.cite}
+
+::: {.coverrow}
+![](ifc_cover.png){height="125"}
+
+![](qr_ifc.svg){width="95"}
+:::
 :::
 ::::
 
 ::: notes
+- Figure: estimated global returns to an extra unit of R&D — green R&D in EMDE ex China ~121% vs 92% for all EMDE innovation and 108% for the average innovation overall.
 - Tech transfer alone isn't enough: imported technology is designed for rich-country conditions and prices.
 - Green tech is a new field where incumbents' lead is smaller, so it's a window for developing countries.
 - Development finance has largely funded deployment (building solar farms); much less goes to R&D and innovation capability in developing countries.
 :::
 
-## New: who does innovation in developing countries?
+## Why imported technology often doesn't fit {.smaller}
 
 :::: {.columns}
-::: {.column width="50%" .center-col}
-#### New paper — CEP DP 2223 (Oct 2026)
-*Innovation partnerships for development along green value chains*
-
-![](qr_dp2223.svg){width="220"}
-
-Partnerships with rich-country firms account for **~2%** of rich-country innovation but **almost half** of developing-country innovation — and produce the highest-value innovations.
+::: {.column width="60%"}
+```{r pests, fig.width=8, fig.height=4.5}
+pests <- fread("data/gbif_pests.csv")
+world <- as.data.table(map_data("world"))[region != "Antarctica"]
+pests[, species := factor(species, c("Western corn rootworm (Diabrotica virgifera)",
+                                     "African maize stalk borer (Busseola fusca)"))]
+ggplot() +
+  geom_polygon(data = world, aes(long, lat, group = group), fill = "#e9e9e4", colour = "white", linewidth = .15) +
+  geom_point(data = pests[species %like% "rootworm"], aes(lon, lat, colour = species), size = 1.1, alpha = .5) +
+  geom_point(data = pests[species %like% "stalk"], aes(lon, lat, colour = species), size = 2.4, alpha = .85) +
+  scale_colour_manual(values = c(accent, warm), name = NULL) +
+  guides(colour = guide_legend(ncol = 1, override.aes = list(size = 4, alpha = 1))) +
+  coord_quickmap(ylim = c(-40, 65), expand = FALSE) +
+  labs(title = "Two maize pests, two different worlds",
+       subtitle = "Recorded occurrences",
+       caption = "Source: GBIF.org occurrence records (accessed Nov 2026).") +
+  theme_void(base_size = 18) +
+  theme(legend.position = "top", legend.justification = "left", legend.text = element_text(size = 15),
+        plot.title = element_text(face = "bold", size = 19), plot.subtitle = element_text(colour = muted, size = 14),
+        plot.caption = element_text(colour = muted, size = 11, hjust = 0), plot.title.position = "plot")
+```
 :::
 
-::: {.column width="50%" .center-col}
-#### EMDERLT — Research Lab Tracker
-*Map of ~2,000 verified R&D labs in developing countries*
+::: {.column width="40%"}
+**Maize is attacked by different pests in different places.**
 
-![](qr_emderlt.svg){width="220"}
+- **US/Europe:** western corn rootworm (~\$1bn a year in US losses) — a prime target of R&D, e.g. Bt maize
+- **Sub-Saharan Africa:** African maize stalk borer destroys ~**10% of Kenya's maize** every year — absent from the US, and Bt maize works less well against it
 
-Who invents what, where — free to explore and download.
+R&D follows rich-country problems: patents on pests present in the US outnumber those on other pests **more than 5 to 1**.
+
+Climate change shifts pests, diseases and growing conditions — so the mismatch matters more.
+
+[Moscona & Sastry, *Inappropriate Technology: Evidence from Global Agriculture*, NBER WP 33500]{.cite}
+:::
+::::
+
+::: notes
+- Moscona & Sastry measure "pest mismatch" between countries using CABI data on ~5,000 crop pests and pathogens. Mismatch with the technology frontier (US/Western Europe) cuts transfer of crop varieties by ~30% and lowers output; their (deliberately extreme) counterfactual puts the productivity loss from inappropriate technology at 58% of global agricultural productivity.
+- Other examples of climate innovation built for developing-country conditions:
+  - "Scuba rice" (Swarna-Sub1, IRRI): survives ~2 weeks under water. In Odisha, farmers who got it also invested more (fertiliser, land), so gains were roughly double the direct flood protection (Emerick, de Janvry, Sadoulet & Dar, AER 2016).
+  - Drought-tolerant maize varieties bred for Africa (CIMMYT).
+  - Pay-as-you-go solar irrigation pumps for smallholders (e.g. in Kenya).
+:::
+
+## New: who does innovation in developing countries? {.smaller}
+
+:::: {.columns}
+::: {.column width="42%"}
+#### New paper: *Innovation partnerships for development along green value chains* (CEP DP 2223)
+
+![](inverted_u.png){height="320"}
+
+::: {.qrrow}
+![](qr_dp2223.svg){width="95"}
+
+Top R&D firms create the most knowledge spillovers when **~40%** of their innovations involve developing-country inventors. The average firm is at **2%**.
+:::
+:::
+
+::: {.column width="58%"}
+#### EMDERLT: ~2,000 verified R&D labs in developing countries
+
+![](emderlt_map.png){width="100%"}
+
+::: {.qrrow}
+![](qr_emderlt.svg){width="95"}
+
+Who invents what, where — coloured by patent quality. Free to explore and download.
+:::
 :::
 ::::
 
