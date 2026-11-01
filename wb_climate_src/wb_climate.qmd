@@ -156,6 +156,54 @@ In the poorest (IDA) countries, **over half** goes to **adaptation**.
 - IDA FY25: 53% adaptation; IBRD: 34% adaptation.
 :::
 
+## Where the climate money goes
+
+```{r dept}
+dept <- data.table(
+  dept = c("Agriculture and Food", "Digital Development", "Education", "Energy and Extractives",
+           "Environment & Blue Economy", "Finance, Competitiveness & Innovation", "Governance",
+           "Health, Nutrition & Population", "Macroeconomics, Trade & Investment", "Poverty and Equity",
+           "Social Protection and Jobs", "Social Sustainability & Inclusion", "Transport",
+           "Urban, Resilience & Land", "Water"),
+  adaptation = c(835, 118, 392, 1055, 360, 1589, 296, 1066, 1150, 25, 1340, 343, 3697, 2717, 1627),
+  mitigation = c(781, 202, 477, 5914, 906, 1068, 211, 1034, 4648, 268, 101, 126, 3855, 1283, 1693))
+grp <- c("Agriculture and Food" = "Agriculture, food & environment",
+         "Environment & Blue Economy" = "Agriculture, food & environment",
+         "Energy and Extractives" = "Energy",
+         "Transport" = "Transport",
+         "Macroeconomics, Trade & Investment" = "Policy loans (macro & fiscal reform)",
+         "Urban, Resilience & Land" = "Cities, resilience & land",
+         "Water" = "Water",
+         "Finance, Competitiveness & Innovation" = "Finance & private sector")
+dept[, group := fifelse(dept %in% names(grp), grp[dept], "Health, education, social & other")]
+g <- dept[, .(Adaptation = sum(adaptation) / 1e3, Mitigation = sum(mitigation) / 1e3), by = group]
+g[, total := Adaptation + Mitigation]
+g[, group := factor(group, g[order(total), group])]
+gl <- melt(g, id.vars = c("group", "total"), variable.name = "type")
+tot <- sum(g$total)
+```
+
+```{r dept-plot, fig.width=12.5, fig.height=5.3}
+ggplot(gl, aes(value, group, fill = type)) +
+  geom_col(width = .7) +
+  geom_text(data = g, aes(total, group, label = paste0("$", round(total, 1), "bn  (", percent(total / tot, 1), ")")),
+            inherit.aes = FALSE, hjust = -0.08, size = 5.5, colour = ink) +
+  scale_fill_manual(values = c(Adaptation = "#7ab8b0", Mitigation = accent), name = NULL) +
+  scale_x_continuous(labels = NULL, expand = expansion(mult = c(0, .32))) +
+  labs(x = NULL, y = NULL,
+       title = sprintf("World Bank (IBRD + IDA) climate finance, FY25: $%.1fbn by department", tot),
+       caption = "Source: World Bank, Climate Finance 2025 (project-level data). Grouped by the Bank department running the project, not by sector:\ne.g. energy reforms inside budget-support (policy) loans count under Macroeconomics. Excludes IFC and MIGA.") +
+  theme_slides + theme(panel.grid.major = element_blank(), axis.text.y = element_text(size = 17),
+                       plot.title.position = "plot", plot.caption.position = "plot")
+```
+
+::: notes
+- Energy is the single biggest mitigation item ($5.9bn of $22.6bn mitigation), but at ~18% of the total it is not the bulk: transport is as large, and adaptation-heavy areas (cities, water, agriculture, social protection) add up.
+- "Policy loans" are budget-support operations (Development Policy Financing) whose reforms count as climate finance — e.g. cutting fossil-fuel subsidies, renewable auctions, carbon pricing. A fair share of that is clean-energy related too.
+- So "clean energy" is roughly a fifth to a quarter of World Bank climate finance, depending on how you count policy loans.
+- Excludes IFC ($8.1bn) and MIGA ($3.5bn), where renewables and green credit lines via banks dominate.
+:::
+
 ## A pioneer in clean power markets
 
 ```{r ppi-prep}
@@ -201,7 +249,7 @@ knitr::kable(by_per[order(period), .(Period = period, `WBG share` = percent(wbg_
                         `Any MDB` = percent(mdb_share, 1))], align = "lrr")
 ```
 
-A country's **first** private solar/wind deals were **twice as likely** to have multilateral backing (`r percent(firsts[first == TRUE, mdb])` vs `r percent(firsts[first == FALSE, mdb])`).
+A country's **first** private solar/wind deals were **twice as likely** to have multilateral backing as its later deals (`r percent(firsts[first == TRUE, mdb])` vs `r percent(firsts[first == FALSE, mdb])`).
 :::
 ::::
 
