@@ -1,0 +1,277 @@
+---
+title: "The World Bank and climate"
+subtitle: "Big Issues · Imperial College Business School"
+author: "Ralf Martin"
+date: 2026-11-02
+date-format: "D MMMM YYYY"
+format:
+  revealjs:
+    theme: [simple, wb_climate.scss]
+    slide-number: true
+    embed-resources: true
+    transition: fade
+    width: 1280
+    height: 720
+    margin: 0.06
+    footer: "Ralf Martin · The World Bank and climate"
+execute:
+  echo: false
+  warning: false
+  message: false
+knitr:
+  opts_chunk:
+    dev: png
+    dpi: 200
+    fig.align: center
+---
+
+```{r setup}
+library(data.table)
+library(ggplot2)
+library(scales)
+
+ink    <- "#1d1d1d"
+accent <- "#00538a"   # World Bank blue
+warm   <- "#e07b39"
+muted  <- "#8a8a8a"
+
+theme_slides <- theme_minimal(base_size = 20) +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major.x = element_blank(),
+        plot.title = element_text(face = "bold", size = 20, colour = ink),
+        plot.subtitle = element_text(colour = muted, size = 15),
+        plot.caption = element_text(colour = muted, size = 11, hjust = 0),
+        axis.title = element_text(colour = muted, size = 15),
+        legend.position = "top")
+
+ppi <- fread("data/ppi_power_generation.csv")
+# Greenfield private solar & wind projects in low- and middle-income countries
+sw <- ppi[sw == 1 & ppitype == "Greenfield project"]
+```
+
+## One group, five institutions {.smaller}
+
+:::: {.columns}
+::: {.column width="50%"}
+### "The World Bank" — lends to governments
+
+- **IBRD** — middle-income countries, market-rate loans
+- **IDA** — the poorest ~75 countries, grants and near-zero-interest credits
+:::
+
+::: {.column width="50%"}
+### The rest of the World Bank Group
+
+- **IFC** — invests in the **private sector**: loans, equity, mobilising other investors *(where I worked)*
+- **MIGA** — political-risk insurance and guarantees
+- **ICSID** — investment dispute settlement
+:::
+::::
+
+<br>
+
+::: {.callout}
+189 member countries. Finance raised by borrowing on capital markets against members' capital, then lent on to developing countries.
+:::
+
+::: notes
+- "World Bank" in the narrow sense = IBRD + IDA: governments borrow for roads, power grids, schools, policy reforms.
+- IFC is the private-sector arm. It doesn't lend to governments; it puts money into firms and projects, often as the first serious investor, and brings in commercial banks alongside.
+- I'll talk about the Group as a whole; my own work was at IFC.
+:::
+
+## Mission: poverty *on a livable planet*
+
+<br>
+
+> **"To end extreme poverty and boost shared prosperity on a livable planet."**
+>
+> — World Bank Group mission, adopted 2023 (the "Evolution Roadmap")
+
+<br>
+
+:::: {.columns}
+::: {.column width="33%"}
+#### Why climate is in it
+The poor are hit first and hardest — floods, droughts, heat, crop failure.
+:::
+::: {.column width="33%"}
+#### Development needs energy
+Hundreds of millions still lack electricity. The question is *which* energy.
+:::
+::: {.column width="33%"}
+#### Mainstreamed, not a silo
+In FY25, **97%** of World Bank projects had a climate component.
+:::
+::::
+
+::: notes
+- Before 2023 the mission was poverty and shared prosperity; "livable planet" was added explicitly.
+- Climate is not a separate department; it's tracked as "co-benefits" across all lending (a road built to survive floods counts as adaptation).
+- Two halves: mitigation (cut emissions — e.g. solar, grids) and adaptation (cope with impacts — e.g. flood defences, drought-resistant agriculture).
+:::
+
+## The largest climate financier of developing countries
+
+:::: {.columns}
+::: {.column width="58%"}
+```{r cf, fig.width=7.2, fig.height=5}
+cf <- data.table(fy = paste0("FY", 21:25),
+                 climate = c(21.2, 26.2, 29.4, 31.0, 39.2),
+                 share   = c(.32, .37, .40, .45, .49))
+ggplot(cf, aes(fy, climate)) +
+  geom_col(fill = accent, width = .62) +
+  geom_text(aes(label = paste0("$", climate, "bn")), vjust = -.5, size = 6, colour = ink) +
+  geom_text(aes(y = 2.2, label = percent(share)), colour = "white", size = 5.5, fontface = "bold") +
+  scale_y_continuous(expand = expansion(mult = c(0, .12)), labels = NULL) +
+  labs(x = NULL, y = NULL,
+       title = "World Bank (IBRD + IDA) climate finance",
+       subtitle = "US$ billion; white figure = share of all lending",
+       caption = "Source: World Bank FY25 Climate-Related Disclosures.") +
+  theme_slides + theme(panel.grid.major.y = element_blank())
+```
+:::
+
+::: {.column width="42%"}
+::: {.bignum}
+$50.8bn
+:::
+Group-wide climate finance in FY25
+
+- IBRD $22.5bn · IDA $16.7bn
+- IFC $8.1bn · MIGA $3.5bn
+
+::: {.bignum .small}
+$190bn
+:::
+over FY21–25
+
+In the poorest (IDA) countries, **over half** goes to **adaptation**.
+:::
+::::
+
+::: notes
+- The target was 35% of lending for climate over 2021–25, raised in 2023 to 45% by FY25 — and it reached 48–49%.
+- The WBG on its own accounts for roughly half of all multilateral development bank climate finance. All MDBs together: record $163bn in 2025, $103bn of it in low- and middle-income countries.
+- IDA FY25: 53% adaptation; IBRD: 34% adaptation.
+:::
+
+## A pioneer in clean power markets
+
+```{r ppi-prep}
+sw[, period := cut(year, c(2004, 2010, 2015, 2020, 2024),
+                   labels = c("2005-10", "2011-15", "2016-20", "2021-24"))]
+by_year <- sw[year >= 2005, .(inv = sum(inv) / 1e3,
+                              inv_wbg = sum(inv[wbg == 1]) / 1e3), by = year]
+by_per  <- sw[!is.na(period), .(wbg_share = sum(inv[wbg == 1]) / sum(inv),
+                                mdb_share = sum(inv[mdb == 1]) / sum(inv)), by = period]
+
+# Each country's first year with a private solar/wind project vs later projects
+single <- sw[!grepl(",", country)]
+single[, first := year == min(year), by = country]
+firsts <- single[, .(wbg = mean(wbg), mdb = mean(mdb)), by = first]
+```
+
+:::: {.columns}
+::: {.column width="62%"}
+```{r ppi-plot, fig.width=7.6, fig.height=5}
+by_year[, other := inv - inv_wbg]
+yl <- melt(by_year, id.vars = "year", measure.vars = c("other", "inv_wbg"))
+yl[, variable := factor(variable, c("other", "inv_wbg"),
+                        c("Other private projects", "With World Bank Group participation"))]
+ggplot(yl, aes(year, value, fill = variable)) +
+  geom_col(width = .8) +
+  scale_fill_manual(values = c(muted, accent), name = NULL) +
+  scale_y_continuous(labels = label_dollar(suffix = "bn"), expand = expansion(mult = c(0, .05))) +
+  labs(x = NULL, y = NULL,
+       title = "Private solar & wind investment",
+       subtitle = "Low- & middle-income countries; greenfield projects, US$ billion",
+       caption = "Source: World Bank PPI database; own calculations. WBG = IFC, MIGA, IBRD or IDA support.") +
+  theme_slides + theme(legend.text = element_text(size = 14))
+```
+:::
+
+::: {.column width="38%"}
+**From ~$1bn a year in the mid-2000s to $34bn in 2024.**
+
+WBG share of that investment:
+
+```{r ppi-table}
+knitr::kable(by_per[order(period), .(Period = period, `WBG share` = percent(wbg_share, 1),
+                        `Any MDB` = percent(mdb_share, 1))], align = "lrr")
+```
+
+A country's **first** private solar/wind deals were **twice as likely** to have multilateral backing (`r percent(firsts[first == TRUE, mdb])` vs `r percent(firsts[first == FALSE, mdb])`).
+:::
+::::
+
+::: notes
+- The story is market creation: when almost nobody would finance solar or wind in a developing country, IFC/MIGA/World Bank took first-of-a-kind risk (e.g. early wind in Sri Lanka and Pakistan, Scaling Solar in Zambia).
+- Once the first projects prove the model, commercial money follows — and the WBG share falls. 2024: only ~2% of investment had WBG participation. That is a sign of success, not retreat.
+- Caveat: PPI covers projects with private participation only — not purely state-owned utility investment (e.g. most of China's).
+:::
+
+## My work: innovation in green technologies {.smaller}
+
+:::: {.columns}
+::: {.column width="62%"}
+**IFC Insights Report (2025): *Innovation in Green Technologies***
+
+- Developing countries (ex China) produce **< 1%** of global green innovation…
+- …but their green innovations are **cited more** than average, and match rich-country innovation in economic value
+
+
+**My hypothesis:** developing countries need *more* of their own innovation —
+
+a. **for growth** — new technology waves (electronics in Korea and Taiwan, green tech in China) are how countries catch up
+
+b. **for climate solutions that fit** — technologies designed for local climate, conditions and adaptation needs that rich-country R&D won't prioritise
+:::
+
+::: {.column width="38%" .center-col}
+![](qr_ifc.svg){width="200"}
+
+[IFC report](https://www.ifc.org/en/insights-reports/2025/innovation-in-green-technologies)
+:::
+::::
+
+::: notes
+- Tech transfer alone isn't enough: imported technology is designed for rich-country conditions and prices.
+- Green tech is a new field where incumbents' lead is smaller, so it's a window for developing countries.
+- Development finance has largely funded deployment (building solar farms); much less goes to R&D and innovation capability in developing countries.
+:::
+
+## New: who does innovation in developing countries?
+
+:::: {.columns}
+::: {.column width="50%" .center-col}
+#### New paper — CEP DP 2223 (Oct 2026)
+*Innovation partnerships for development along green value chains*
+
+![](qr_dp2223.svg){width="220"}
+
+Partnerships with rich-country firms account for **~2%** of rich-country innovation but **almost half** of developing-country innovation — and produce the highest-value innovations.
+:::
+
+::: {.column width="50%" .center-col}
+#### EMDERLT — Research Lab Tracker
+*Map of ~2,000 verified R&D labs in developing countries*
+
+![](qr_emderlt.svg){width="220"}
+
+Who invents what, where — free to explore and download.
+:::
+::::
+
+::: {.thanks}
+Questions?
+:::
+
+::: notes
+- Policy implications: R&D tax incentives in developing countries; development banks co-investing in R&D partnerships and labs — not just in deployment.
+- Links: cep.lse.ac.uk DP2223; mondpanther.github.io/kevceinsights/mnc-rd-labs-map.html
+
+Q&A prep:
+- "What about Trump / the US?" — In June 2026 the Bank dropped its 45% climate-finance target under US pressure; the climate action plan was extended. Climate projects continue, but there's no headline target.
+- "Does the Bank still fund fossil fuels?" — It stopped financing upstream oil & gas from 2019; in 2025 it lifted its ban on financing nuclear power and opened the door to upstream gas ("all of the above" energy).
+:::

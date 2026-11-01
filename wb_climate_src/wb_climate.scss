@@ -1,0 +1,23 @@
+/*-- scss:defaults --*/
+$body-bg: #fdfdfb;
+$body-color: #1d1d1d;
+$link-color: #00538a;
+$presentation-heading-color: #00538a;
+$font-family-sans-serif: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$presentation-font-size-root: 32px;
+$presentation-heading-font-weight: 600;
+
+/*-- scss:rules --*/
+.reveal h2 { font-size: 1.45em; margin-bottom: 0.4em; }
+.reveal h3 { font-size: 0.8em; color: #1d1d1d; margin-bottom: 0.4em; }
+.reveal .slides section.smaller h3 { font-size: 1.3em; color: #00538a; }
+.reveal h4 { font-size: 0.85em; color: #00538a; margin-bottom: 0.2em; }
+.reveal blockquote { width: 90%; font-size: 1.15em; border-left: 6px solid #00538a; box-shadow: none; background: #eef4f9; padding: 0.6em 1em; font-style: normal; }
+.reveal .bignum { font-size: 2.6em; font-weight: 700; color: #00538a; line-height: 1; margin-top: 0.3em; }
+.reveal .bignum.small { font-size: 1.8em; margin-top: 0.6em; }
+.reveal .callout { font-size: 0.75em; color: #555; border-top: 1px solid #ddd; padding-top: 0.5em; }
+.reveal .center-col { text-align: center; }
+.reveal .center-col p { font-size: 0.8em; }
+.reveal .thanks { text-align: center; font-size: 1.1em; font-weight: 600; color: #00538a; margin-top: 0.3em; }
+.reveal table { font-size: 0.7em; }
+.reveal .footer { font-size: 0.45em; color: #888; }
