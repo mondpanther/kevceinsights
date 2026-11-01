@@ -267,28 +267,30 @@ A country's **first** private solar/wind deals were **twice as likely** to have 
 ## My work: innovation in green technologies {.smaller}
 
 :::: {.columns}
-::: {.column width="62%"}
+::: {.column width="44%"}
 **IFC Insights Report (2025): *Innovation in Green Technologies***
 
 - Developing countries (ex China) produce **< 1%** of global green innovation…
-- …but their green innovations are **cited more** than average, and match rich-country innovation in economic value
-
+- …but extra green R&D there has **high returns**: above average innovation in rich countries
 
 **My hypothesis:** developing countries need *more* of their own innovation —
 
 a. **for growth** — new technology waves (electronics in Korea and Taiwan, green tech in China) are how countries catch up
 
-b. **for climate solutions that fit** — technologies designed for local climate, conditions and adaptation needs that rich-country R&D won't prioritise
+b. **for climate solutions that fit** — technologies for local climate, conditions and adaptation needs that rich-country R&D won't prioritise
 :::
 
-::: {.column width="38%" .center-col}
-![](qr_ifc.svg){width="200"}
+::: {.column width="56%" .center-col}
+![](green_returns.png){width="84%"}
 
-[IFC report](https://www.ifc.org/en/insights-reports/2025/innovation-in-green-technologies)
+[Global returns to extra R&D, multi-country patents 2013–22; dotted line = average across all innovations. [Interactive version](https://mondpanther.github.io/kevceinsights/green-technology-innovation.html) · [IFC report](https://www.ifc.org/en/insights-reports/2025/innovation-in-green-technologies)]{.cite}
+
+![](qr_ifc.svg){width="80"}
 :::
 ::::
 
 ::: notes
+- Figure: estimated global returns to an extra unit of R&D — green R&D in EMDE ex China ~121% vs 92% for all EMDE innovation and 108% for the average innovation overall.
 - Tech transfer alone isn't enough: imported technology is designed for rich-country conditions and prices.
 - Green tech is a new field where incumbents' lead is smaller, so it's a window for developing countries.
 - Development finance has largely funded deployment (building solar farms); much less goes to R&D and innovation capability in developing countries.
