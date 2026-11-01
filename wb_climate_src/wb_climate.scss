@@ -31,3 +31,6 @@ $presentation-heading-font-weight: 600;
 .reveal #title-slide .quarto-title-authors { justify-content: flex-start; }
 .reveal #title-slide .quarto-title-author { padding-left: 0; }
 .reveal .cite { font-size: 0.7em; color: #888; }
+.reveal .qrrow { display: flex; align-items: center; gap: 0.6em; text-align: left; }
+.reveal .qrrow p { margin: 0; font-size: 0.85em; }
+.reveal .qrrow p:first-child { flex: 0 0 auto; }
