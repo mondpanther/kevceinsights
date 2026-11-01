@@ -91,7 +91,7 @@ sw <- ppi[sw == 1 & ppitype == "Greenfield project"]
 
 > **"To end extreme poverty and boost shared prosperity on a livable planet."**
 >
-> — World Bank Group mission, adopted 2023 (the "Evolution Roadmap")
+> — World Bank Group mission, adopted 2023 (the ["Evolution Roadmap"](https://consultations.worldbank.org/content/dam/sites/consultations/doc/2023/WBG-Evolution-roadmap.pdf))
 
 <br>
 
@@ -131,10 +131,11 @@ ggplot(cf, aes(fy, climate)) +
   scale_y_continuous(expand = expansion(mult = c(0, .12)), labels = NULL) +
   labs(x = NULL, y = NULL,
        title = "World Bank (IBRD + IDA) climate finance",
-       subtitle = "US$ billion; white figure = share of all lending",
-       caption = "Source: World Bank FY25 Climate-Related Disclosures.") +
+       subtitle = "US$ billion; white figure = share of all lending") +
   theme_slides + theme(panel.grid.major.y = element_blank())
 ```
+
+[Source: [World Bank FY25 Climate-Related Disclosures](https://thedocs.worldbank.org/en/doc/f8a2c887929c44d9dab187f3fc1ad293-0040012025/original/WB-FY25-Climate-Related-Disclosures.pdf)]{.cite}
 :::
 
 ::: {.column width="42%"}
@@ -197,10 +198,12 @@ ggplot(gl, aes(value, group, fill = type)) +
   scale_x_continuous(labels = NULL, expand = expansion(mult = c(0, .32))) +
   labs(x = NULL, y = NULL,
        title = sprintf("World Bank (IBRD + IDA) climate finance, FY25: $%.1fbn by department", tot),
-       caption = "Source: World Bank, Climate Finance 2025 (project-level data). Grouped by the Bank department running the project, not by sector:\ne.g. energy reforms inside budget-support (policy) loans count under Macroeconomics. Excludes IFC and MIGA.") +
+       caption = "Grouped by the Bank department running the project, not by sector: e.g. energy reforms inside budget-support (policy) loans\ncount under Macroeconomics. Excludes IFC and MIGA.") +
   theme_slides + theme(panel.grid.major = element_blank(), axis.text.y = element_text(size = 17),
                        plot.title.position = "plot", plot.caption.position = "plot")
 ```
+
+[Source: [World Bank, Climate Finance 2025 — project-level data](https://thedocs.worldbank.org/en/doc/af985cf92e8b967ba707f43fb2dd9de7-0320012025/original/FY25-Project-Level-WB-CCB-data.pdf)]{.cite}
 
 ::: notes
 - Energy is the single biggest mitigation item ($5.9bn of $22.6bn mitigation), but at ~18% of the total it is not the bulk: transport is as large, and adaptation-heavy areas (cities, water, agriculture, social protection) add up.
@@ -239,9 +242,11 @@ ggplot(yl, aes(year, value, fill = variable)) +
   labs(x = NULL, y = NULL,
        title = "Private solar & wind investment",
        subtitle = "Low- & middle-income countries; greenfield projects, US$ billion",
-       caption = "Source: World Bank PPI database; own calculations. WBG = IFC, MIGA, IBRD or IDA support.") +
+       caption = "WBG = IFC, MIGA, IBRD or IDA support. Own calculations.") +
   theme_slides + theme(legend.text = element_text(size = 14))
 ```
+
+[Source: [World Bank Private Participation in Infrastructure (PPI) database](https://ppi.worldbank.org)]{.cite}
 :::
 
 ::: {.column width="38%"}
@@ -295,9 +300,9 @@ b. **for climate solutions that fit** — technologies for local climate, condit
 [Global returns to extra R&D, multi-country patents 2013–22; dotted line = average across all innovations. [Interactive version](https://mondpanther.github.io/kevceinsights/green-technology-innovation.html) · [IFC report](https://www.ifc.org/en/insights-reports/2025/innovation-in-green-technologies)]{.cite}
 
 ::: {.coverrow}
-![](ifc_cover.png){height="125"}
+[![](ifc_cover.png){height="125"}](https://www.ifc.org/en/insights-reports/2025/innovation-in-green-technologies)
 
-![](qr_ifc.svg){width="95"}
+[![](qr_ifc.svg){width="95"}](https://www.ifc.org/en/insights-reports/2025/innovation-in-green-technologies)
 :::
 :::
 ::::
@@ -327,12 +332,14 @@ ggplot() +
   coord_quickmap(ylim = c(-40, 65), expand = FALSE) +
   labs(title = "Two maize pests, two different worlds",
        subtitle = "Recorded occurrences",
-       caption = "Source: GBIF.org occurrence records (accessed Nov 2026).") +
+       caption = NULL) +
   theme_void(base_size = 18) +
   theme(legend.position = "top", legend.justification = "left", legend.text = element_text(size = 15),
         plot.title = element_text(face = "bold", size = 19), plot.subtitle = element_text(colour = muted, size = 14),
         plot.caption = element_text(colour = muted, size = 11, hjust = 0), plot.title.position = "plot")
 ```
+
+[Source: GBIF.org occurrence records for [western corn rootworm](https://www.gbif.org/species/1048497) and [African maize stalk borer](https://www.gbif.org/species/1768564), accessed Nov 2026]{.cite}
 :::
 
 ::: {.column width="40%"}
@@ -345,7 +352,7 @@ R&D follows rich-country problems: patents on pests present in the US outnumber 
 
 Climate change shifts pests, diseases and growing conditions — so the mismatch matters more.
 
-[Moscona & Sastry, *Inappropriate Technology: Evidence from Global Agriculture*, NBER WP 33500]{.cite}
+[Moscona & Sastry, [*Inappropriate Technology: Evidence from Global Agriculture*](https://www.nber.org/papers/w33500), NBER WP 33500]{.cite}
 :::
 ::::
 
@@ -361,26 +368,26 @@ Climate change shifts pests, diseases and growing conditions — so the mismatch
 
 :::: {.columns}
 ::: {.column width="42%"}
-#### New paper: *Innovation partnerships for development along green value chains* (CEP DP 2223)
+#### New paper: [*Innovation partnerships for development along green value chains*](https://cep.lse.ac.uk/_NEW/PUBLICATIONS/abstract.asp?index=12648) (CEP DP 2223)
 
-![](inverted_u.png){height="320"}
+[![](inverted_u.png){height="320"}](https://cep.lse.ac.uk/_NEW/PUBLICATIONS/abstract.asp?index=12648)
 
 ::: {.qrrow}
-![](qr_dp2223.svg){width="95"}
+[![](qr_dp2223.svg){width="95"}](https://cep.lse.ac.uk/_NEW/PUBLICATIONS/abstract.asp?index=12648)
 
-Top R&D firms create the most knowledge spillovers when **~40%** of their innovations involve developing-country inventors. The average firm is at **2%**.
+Top R&D firms create the most knowledge spillovers when **~40%** of their innovations involve developing-country inventors. The average firm is at **2%**. [Read the paper →](https://cep.lse.ac.uk/_NEW/PUBLICATIONS/abstract.asp?index=12648)
 :::
 :::
 
 ::: {.column width="58%"}
-#### EMDERLT: ~2,000 verified R&D labs in developing countries
+#### [EMDERLT](https://mondpanther.github.io/kevceinsights/mnc-rd-labs-map.html): ~2,000 verified R&D labs in developing countries
 
-![](emderlt_map.png){width="100%"}
+[![](emderlt_map.png){width="100%"}](https://mondpanther.github.io/kevceinsights/mnc-rd-labs-map.html)
 
 ::: {.qrrow}
-![](qr_emderlt.svg){width="95"}
+[![](qr_emderlt.svg){width="95"}](https://mondpanther.github.io/kevceinsights/mnc-rd-labs-map.html)
 
-Who invents what, where — coloured by patent quality. Free to explore and download.
+Who invents what, where — coloured by patent quality. Free to explore and download. [Open the tracker →](https://mondpanther.github.io/kevceinsights/mnc-rd-labs-map.html)
 :::
 :::
 ::::
