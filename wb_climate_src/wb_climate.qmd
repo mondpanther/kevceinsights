@@ -294,7 +294,11 @@ b. **for climate solutions that fit** — technologies for local climate, condit
 
 [Global returns to extra R&D, multi-country patents 2013–22; dotted line = average across all innovations. [Interactive version](https://mondpanther.github.io/kevceinsights/green-technology-innovation.html) · [IFC report](https://www.ifc.org/en/insights-reports/2025/innovation-in-green-technologies)]{.cite}
 
-![](qr_ifc.svg){width="80"}
+::: {.coverrow}
+![](ifc_cover.png){height="125"}
+
+![](qr_ifc.svg){width="95"}
+:::
 :::
 ::::
 
