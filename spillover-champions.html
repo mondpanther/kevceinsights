@@ -46,6 +46,18 @@
   .notes dd { margin: 0 0 0 0; color: #444; }
   button.dl { font: inherit; font-family: "Source Sans Pro","Helvetica Neue",Helvetica,Arial,sans-serif; font-size: .9rem; padding: 5px 10px; border: 1px solid #cfcfc9; border-radius: 4px; background: #fff; cursor: pointer; }
   button.dl:hover { border-color: var(--accent); color: var(--accent); }
+  .ms { position: relative; min-width: 230px; max-width: 360px; }
+  .ms .box { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; min-height: 29px; padding: 2px 4px; border: 1px solid #cfcfc9; border-radius: 4px; background: #fff; cursor: text; }
+  .ms .box:focus-within { border-color: var(--accent); }
+  .ms .chip { display: inline-flex; align-items: center; gap: 4px; background: #eef3ea; border: 1px solid #cfdcc8; border-radius: 3px; padding: 0 4px 0 6px; font-size: .82rem; line-height: 1.5; max-width: 200px; }
+  .ms .chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ms .chip b { cursor: pointer; font-weight: normal; color: var(--muted); padding: 0 2px; }
+  .ms .chip b:hover { color: #a33; }
+  .ms input { flex: 1 1 60px; min-width: 60px; border: 0 !important; outline: 0; padding: 2px 3px !important; font-size: .9rem !important; background: transparent; }
+  .ms .list { position: absolute; left: 0; right: 0; top: 100%; z-index: 20; max-height: 260px; overflow-y: auto; background: #fff; border: 1px solid #cfcfc9; border-radius: 0 0 4px 4px; box-shadow: 0 6px 16px rgba(0,0,0,.08); display: none; }
+  .ms .list div { padding: 4px 8px; font-size: .9rem; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ms .list div:hover, .ms .list div.hl { background: #eef3ea; }
+  .ms .list .none { color: var(--muted); cursor: default; font-style: italic; }
   .err { color: #a33; font-family: "Source Sans Pro",Helvetica,Arial,sans-serif; }
 </style>
 </head>
@@ -67,15 +79,17 @@
       <option value="pv">Private value</option>
     </select></div>
   <div class="ctl"><label for="topn">Firms shown</label>
-    <select id="topn"><option>10</option><option selected>20</option><option>30</option><option>50</option><option>100</option></select></div>
+    <select id="topn"><option>10</option><option selected>20</option><option>30</option><option>50</option><option>100</option><option value="0">Only pinned firms</option></select></div>
   <div class="ctl"><label for="minn">Min. innovations</label>
     <select id="minn"><option>10</option><option selected>30</option><option>100</option><option>300</option><option>1000</option></select></div>
   <div class="ctl"><label for="green">Firms</label>
     <select id="green"><option value="all">All Scoreboard firms</option><option value="green">Green-innovation firms only</option></select></div>
   <div class="ctl"><label for="hq">Headquarters</label>
     <select id="hq"><option value="all">Anywhere</option><option value="HIC">High-income</option><option value="EMDE excl. China">EMDE (excl. China)</option><option value="China">China</option></select></div>
-  <div class="ctl"><label for="sector">Sector</label>
-    <select id="sector"><option value="all">All sectors</option></select></div>
+  <div class="ctl"><label>Sectors <span style="text-transform:none;letter-spacing:0">(empty = all)</span></label>
+    <div class="ms" id="sector"></div></div>
+  <div class="ctl"><label>Firms to pin <span style="text-transform:none;letter-spacing:0">(always shown)</span></label>
+    <div class="ms" id="firms"></div></div>
   <div class="ctl"><label for="width">Bar width</label>
     <select id="width"><option value="equal">Equal</option><option value="logn">∝ log number of innovations</option><option value="n">∝ number of innovations</option></select></div>
   <div class="ctl check"><input type="checkbox" id="share"><label for="share" id="sharelab">Show share of global spillovers</label></div>
@@ -90,7 +104,7 @@
     <dt>Firms</dt><dd>Companies in the EU Industrial R&amp;D Scoreboard (the world's largest R&amp;D investors) matched to their patent families in PATSTAT; one bar per firm, averaged over its innovations (patent families, patents of invention only, filed 2013–2022) with a Watson valuation. The diamonds (optional, top axis) show the selected spillover as a share of the firm's global spillovers, i.e. the fraction of the knowledge flows its innovations generate that is received in the region selected; the dashed line marks the mean of that share across all firms passing the filters, not only the top ones shown. Bar width can be set proportional to the firm's number of innovations in the window, or to its logarithm, so that firms whose averages rest on large portfolios stand out; very thin bars are widened slightly so that their labels stay legible.</dd>
     <dt>Spillovers</dt><dd>The expected value of the knowledge flows an innovation generates for later innovations, in USD million per innovation, following the Patent Rank approach of <a href="https://cep.lse.ac.uk/pubs/download/dp2223.pdf">Martin, Verhoeven et al.</a>: "global" counts recipients anywhere, the regional variants only recipients located in the region named. EMDE excludes China throughout; the "excl. China &amp; India" variant additionally removes spillovers received in India.</dd>
     <dt>Private value</dt><dd>The expected private (stock-market) value of the innovation to its owner, USD million per innovation.</dd>
-    <dt>Caveats</dt><dd>Averages over few innovations are noisy, which is why the minimum portfolio size defaults to 30. Firm names are the Scoreboard's; subsidiaries are folded into the parent where the Scoreboard lists them together.</dd>
+    <dt>Caveats</dt><dd>Averages over few innovations are noisy, which is why the minimum portfolio size defaults to 30. Firm names are the Scoreboard's; subsidiaries are folded into the parent where the Scoreboard lists them together. Pinned firms are drawn in a darker green and are shown whatever the filters (minimum portfolio size included), appended below the ranked top-N if they do not make it; set "Firms shown" to "Only pinned firms" to compare just those.</dd>
   </dl>
   <p id="vintage"></p>
   <p>Browse individual innovations behind these numbers in the <a href="emde-inno-examples.html">EMDE innovation examples</a> tool. Data file: <a href="data/spillover_champions.json">spillover_champions.json</a>.</p>
@@ -108,7 +122,63 @@
   const hasShare = o => o in SHORT;
   const shareOf = (d, o) => (hasShare(o) && d.g > 0 && d[o] != null) ? d[o] / d.g : null;
   const $ = id => document.getElementById(id);
-  const ctl = { outcome: $('outcome'), topn: $('topn'), minn: $('minn'), green: $('green'), hq: $('hq'), sector: $('sector'), width: $('width'), share: $('share') };
+
+  // ---- minimal searchable multi-select (chips + filtered dropdown); no dependencies
+  function MultiSelect(el, options, placeholder, onChange) {
+    const self = { values: [] };
+    el.innerHTML = '<div class="box"><input type="text" autocomplete="off"></div><div class="list"></div>';
+    const box = el.querySelector('.box'), inp = el.querySelector('input'), list = el.querySelector('.list');
+    inp.placeholder = placeholder;
+    let hl = 0, matches = [];
+    function renderChips() {
+      box.querySelectorAll('.chip').forEach(c => c.remove());
+      for (const v of self.values) {
+        const c = document.createElement('span'); c.className = 'chip'; c.title = v;
+        c.innerHTML = '<span></span><b>×</b>'; c.firstChild.textContent = v;
+        c.lastChild.addEventListener('mousedown', e => { e.preventDefault(); remove(v); });
+        box.insertBefore(c, inp);
+      }
+      inp.placeholder = self.values.length ? '' : placeholder;
+    }
+    function renderList() {
+      const q = inp.value.trim().toLowerCase();
+      matches = options.filter(o => !self.values.includes(o) && (!q || o.toLowerCase().includes(q)));
+      // prefer prefix matches
+      if (q) matches.sort((a, b) => (b.toLowerCase() === q) - (a.toLowerCase() === q) || (b.toLowerCase().startsWith(q)) - (a.toLowerCase().startsWith(q)));
+      matches = matches.slice(0, 60);
+      hl = 0;
+      list.innerHTML = '';
+      if (!matches.length) { const d = document.createElement('div'); d.className = 'none'; d.textContent = 'no match'; list.appendChild(d); }
+      matches.forEach((m, i) => {
+        const d = document.createElement('div'); d.textContent = m; if (i === hl) d.className = 'hl';
+        d.addEventListener('mousedown', e => { e.preventDefault(); add(m); });
+        list.appendChild(d);
+      });
+      list.style.display = 'block';
+    }
+    function add(v) { if (!self.values.includes(v)) self.values.push(v); inp.value = ''; renderChips(); renderList(); inp.focus(); onChange(); }
+    function remove(v) { self.values = self.values.filter(x => x !== v); renderChips(); onChange(); }
+    self.set = arr => { self.values = arr.filter(v => options.includes(v)); renderChips(); };
+    box.addEventListener('mousedown', e => { if (e.target === box) { e.preventDefault(); inp.focus(); } });
+    inp.addEventListener('focus', renderList);
+    inp.addEventListener('input', renderList);
+    inp.addEventListener('blur', () => { list.style.display = 'none'; });
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault(); if (!matches.length) return;
+        hl = (hl + (e.key === 'ArrowDown' ? 1 : -1) + matches.length) % matches.length;
+        list.querySelectorAll('div').forEach((d, i) => d.classList.toggle('hl', i === hl));
+        list.children[hl].scrollIntoView({ block: 'nearest' });
+      } else if (e.key === 'Enter') { e.preventDefault(); if (matches.length) add(matches[hl]); }
+      else if (e.key === 'Escape') inp.blur();
+      else if (e.key === 'Backspace' && !inp.value && self.values.length) remove(self.values[self.values.length - 1]);
+    });
+    return self;
+  }
+
+  const ctl = { outcome: $('outcome'), topn: $('topn'), minn: $('minn'), green: $('green'), hq: $('hq'), width: $('width'), share: $('share') };
+  let MS = { sector: null, firms: null };   // multi-selects, built once the data is in
+  const SEP = '|';
   let DATA = null, shareTouched = false;
   function syncShareCtl() {
     const ok = hasShare(ctl.outcome.value);
@@ -122,15 +192,21 @@
   // ---- URL state: every control is in the query string, so a link restores the view
   function readURL() {
     const p = new URLSearchParams(location.search);
-    for (const k of ['outcome', 'topn', 'minn', 'green', 'hq', 'sector', 'width']) {
+    for (const k of ['outcome', 'topn', 'minn', 'green', 'hq', 'width']) {
       if (p.has(k)) { const v = p.get(k); if ([...ctl[k].options].some(o => o.value === v)) ctl[k].value = v; }
     }
+    // legacy single-sector links and the new multi-valued parameters
+    const sec = (p.get('sectors') || (p.get('sector') && p.get('sector') !== 'all' ? p.get('sector') : '')).split(SEP).filter(Boolean);
+    MS.sector.set(sec);
+    MS.firms.set((p.get('firms') || '').split(SEP).filter(Boolean));
     if (p.has('share')) { ctl.share.checked = p.get('share') === '1'; shareTouched = true; }
     syncShareCtl();
   }
   function writeURL() {
     const p = new URLSearchParams();
-    for (const k of ['outcome', 'topn', 'minn', 'green', 'hq', 'sector', 'width']) p.set(k, ctl[k].value);
+    for (const k of ['outcome', 'topn', 'minn', 'green', 'hq', 'width']) p.set(k, ctl[k].value);
+    if (MS.sector.values.length) p.set('sectors', MS.sector.values.join(SEP));
+    if (MS.firms.values.length) p.set('firms', MS.firms.values.join(SEP));
     if (hasShare(ctl.outcome.value)) p.set('share', ctl.share.checked ? '1' : '0');
     history.replaceState(null, '', location.pathname + '?' + p.toString());
   }
@@ -145,7 +221,7 @@
     let f = DATA.firms.filter(d => d.n >= minn && d[o] != null);
     if (ctl.green.value === 'green') f = f.filter(d => d.green);
     if (ctl.hq.value !== 'all') f = f.filter(d => d.hqg === ctl.hq.value);
-    if (ctl.sector.value !== 'all') f = f.filter(d => d.sector === ctl.sector.value);
+    if (MS.sector.values.length) { const S = new Set(MS.sector.values); f = f.filter(d => S.has(d.sector)); }
     const pool = f.length;
     let meanShare = null;
     if (hasShare(o)) {
@@ -153,12 +229,17 @@
       meanShare = sh.length ? sh.reduce((a, v) => a + v, 0) / sh.length : null;
     }
     f.sort((a, b) => b[o] - a[o]);
-    return { shown: f.slice(0, n), pool, meanShare };
+    // pinned firms: always shown (whatever the filters), appended after the top-N if not already in it
+    const pinned = new Set(MS.firms.values);
+    let shown = n > 0 ? f.slice(0, n) : [];
+    const extra = DATA.firms.filter(d => pinned.has(d.name) && d[o] != null && !shown.includes(d)).sort((a, b) => b[o] - a[o]);
+    shown = shown.concat(extra);
+    return { shown, pool, meanShare, pinned };
   }
 
   function draw() {
     const o = ctl.outcome.value;
-    const { shown, pool, meanShare } = selectFirms();
+    const { shown, pool, meanShare, pinned } = selectFirms();
     const showShare = ctl.share.checked && hasShare(o);
     const shareLabel = hasShare(o) ? `Share of global spillovers received in ${SHORT[o]}` : '';
     const names = shown.map(d => d.name.length > 34 ? d.name.slice(0, 32) + '…' : d.name);
@@ -182,11 +263,11 @@
       (o !== 'g' ? `<br>Global spillovers: ${fmtM(d.g)}` : '') +
       (o !== 'pv' ? `<br>Private value: ${fmtM(d.pv)}` : '') +
       `<br>R&amp;D per year: ${d.rnd == null ? '–' : fmtM(d.rnd)}` +
-      (d.green ? '<br><i>green-innovation firm</i>' : '') + '<extra></extra>');
+      (d.green ? '<br><i>green-innovation firm</i>' : '') + (pinned.has(d.name) ? '<br><i>pinned</i>' : '') + '<extra></extra>');
 
     const traces = [{
       type: 'bar', orientation: 'h', x: vals, y: pos, width: w.map(v => v * 0.72), name: LABEL[o],
-      marker: { color: 'rgb(90,158,90)' },
+      marker: { color: shown.map(d => pinned.has(d.name) ? 'rgb(44,100,44)' : 'rgb(90,158,90)') },
       text: vals.map(fmtM), textposition: 'outside', constraintext: 'none', textfont: { size: 11, color: '#2f6b2f' },
       cliponaxis: false, hovertemplate: hover, xaxis: 'x', yaxis: 'y'
     }];
@@ -234,11 +315,15 @@
     const filt = [];
     if (ctl.green.value === 'green') filt.push('green-innovation firms');
     if (ctl.hq.value !== 'all') filt.push('headquartered in ' + ctl.hq.options[ctl.hq.selectedIndex].text.toLowerCase());
-    if (ctl.sector.value !== 'all') filt.push(ctl.sector.value);
-    $('summary').textContent = `Top ${shown.length} of ${fmtN(pool)} firms with at least ${fmtN(+ctl.minn.value)} innovations` +
-      (filt.length ? ' (' + filt.join(', ') + ')' : '') + `, ranked by ${o === 'pv' ? 'private value' : LABEL[o].replace('Spillovers', 'spillovers').replace('Global', 'global')} per innovation.` +
-      (showShare && meanShare != null ? ` Diamonds: share of each firm's global spillovers received in ${SHORT[o]} (mean over the ${fmtN(pool)} firms: ${fmtPct(meanShare)}).` : '') +
-      (wmode !== 'equal' ? ` Bar width is proportional to the ${wmode === 'n' ? 'number' : 'log number'} of innovations.` : '');
+    if (MS.sector.values.length) filt.push(MS.sector.values.length === 1 ? MS.sector.values[0] : MS.sector.values.length + ' sectors');
+    const nTop = Math.min(+ctl.topn.value, pool), nPin = shown.length - (+ctl.topn.value > 0 ? nTop : 0);
+    const rankedBy = `ranked by ${o === 'pv' ? 'private value' : LABEL[o].replace('Spillovers', 'spillovers').replace('Global', 'global')} per innovation.`;
+    const poolTxt = `${fmtN(pool)} firms with at least ${fmtN(+ctl.minn.value)} innovations` + (filt.length ? ' (' + filt.join(', ') + ')' : '');
+    $('summary').textContent = (+ctl.topn.value > 0 ? `Top ${nTop} of ${poolTxt}, ${rankedBy}`
+        : (shown.length ? `${shown.length} pinned firm${shown.length === 1 ? '' : 's'}, ${rankedBy}` : 'No firms pinned: type a firm name in the "Firms to pin" box, or choose a number of firms to show.')) +
+      (showShare && meanShare != null ? ` Diamonds: share of each firm's global spillovers received in ${SHORT[o]} (mean over the ${poolTxt}: ${fmtPct(meanShare)}).` : '') +
+      (wmode !== 'equal' ? ` Bar width is proportional to the ${wmode === 'n' ? 'number' : 'log number'} of innovations.` : '') +
+      (+ctl.topn.value > 0 && nPin > 0 ? ` ${nPin} pinned firm${nPin === 1 ? '' : 's'} appended (darker bars).` : '');
     writeURL();
     window._shown = shown;
   }
@@ -246,7 +331,7 @@
   function downloadCSV() {
     const o = ctl.outcome.value, rows = window._shown || [];
     const cols = [['rank', (d, i) => i + 1], ['firm', d => d.name], ['sector', d => d.sector], ['hq_iso', d => d.hq], ['hq_group', d => d.hqg],
-      ['n_innovations_2013_2022', d => d.n], ['green_innovation_firm', d => d.green],
+      ['n_innovations_2013_2022', d => d.n], ['green_innovation_firm', d => d.green], ['pinned', d => MS.firms.values.includes(d.name)],
       ['ev_global_usd_m', d => d.g], ['ev_hic_usd_m', d => d.h], ['ev_emde_excl_cn_usd_m', d => d.e], ['ev_emde_excl_cn_in_usd_m', d => d.ei],
       ['ev_india_usd_m', d => d.ind], ['ev_china_usd_m', d => d.cn], ['private_value_usd_m', d => d.pv],
       ['emde_innovation_share', d => d.s], ['emde_inventor_share', d => d.si], ['rnd_per_year_usd_m', d => d.rnd]];
@@ -261,12 +346,13 @@
   fetch('data/spillover_champions.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(d => {
     DATA = d;
     const sectors = [...new Set(d.firms.map(f => f.sector).filter(Boolean))].sort();
-    for (const s of sectors) { const op = document.createElement('option'); op.value = s; op.textContent = s; ctl.sector.appendChild(op); }
+    MS.sector = MultiSelect($('sector'), sectors, 'type to add a sector…', draw);
+    MS.firms  = MultiSelect($('firms'), d.firms.map(f => f.name).sort(), 'type a firm name…', draw);
     readURL();
     $('vintage').textContent = `Data: ${fmtN(d.meta.n_firms)} Scoreboard firms, firm table built ${d.meta.firm_table_date} from PATSTAT 2025 and Watson valuations (window ${d.meta.window}); page data generated ${d.meta.built}.`;
     ctl.outcome.addEventListener('change', () => { syncShareCtl(); draw(); });
     ctl.share.addEventListener('change', () => { shareTouched = true; draw(); });
-    for (const k of ['topn', 'minn', 'green', 'hq', 'sector', 'width']) ctl[k].addEventListener('change', draw);
+    for (const k of ['topn', 'minn', 'green', 'hq', 'width']) ctl[k].addEventListener('change', draw);
     $('csv').addEventListener('click', downloadCSV);
     draw();
   }).catch(e => { $('chart').innerHTML = '<p class="err">Could not load data/spillover_champions.json (' + esc(e.message) + '). The page needs to be served over http(s), e.g. from GitHub Pages.</p>'; });
