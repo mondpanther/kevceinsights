@@ -408,17 +408,20 @@
         shapes.push({ type: 'line', xref: 'x2', yref: 'paper', x0: 100 * meanShare, x1: 100 * meanShare, y0: 0, y1: 1,
                       line: { color: '#f39c12', width: 1.5, dash: 'dash' } });
     }
-    const height = Math.max(380, 140 + rowH * acc + (showShare ? 50 : 0));
+    const mTop = showShare ? 60 : 30, mBot = showShare ? 120 : 55;
+    const height = Math.max(380, mTop + mBot + rowH * acc);
+    // legend sits below the x-axis title: a fixed pixel offset, converted to paper units of the plot area
+    const legendY = -(62 / (height - mTop - mBot));
     const xmax = Math.max(...vals, 0) * 1.18 || 1;
     const layout = {
-      height, margin: { l: 10, r: 70, t: showShare ? 60 : 30, b: showShare ? 90 : 55 },
+      height, margin: { l: 10, r: 70, t: mTop, b: mBot },
       paper_bgcolor: '#fff', plot_bgcolor: '#fff',
       font: { family: 'Lato,"Helvetica Neue",Helvetica,Arial,sans-serif', size: 14, color: '#2c3e50' },
       yaxis: { range: [acc + 0.1, -0.1], tickmode: 'array', tickvals: pos, ticktext: names, automargin: true,
                tickfont: { size: wmode === 'equal' ? 14 : 13 }, ticksuffix: '  ', fixedrange: true, showgrid: false, zeroline: false },
       xaxis: { title: { text: STATW[st] + ' ' + lc(LAB) + ' (' + unitTxt(me, st) + ')', font: { size: 14, color: '#128f76' } },
                range: [0, xmax], gridcolor: '#ecf0f1', zeroline: false, fixedrange: true },
-      showlegend: showShare, legend: { orientation: 'h', x: 0, y: -0.09, xanchor: 'left', yanchor: 'top', font: { size: 13 } },
+      showlegend: showShare, legend: { orientation: 'h', x: 0, y: legendY, xanchor: 'left', yanchor: 'top', font: { size: 13 } },
       shapes,
       annotations: (showShare && meanShare != null) ? [{
         xref: 'x2', yref: 'paper', x: 100 * meanShare, y: 0.995, xanchor: 'left', yanchor: 'top', showarrow: false,
