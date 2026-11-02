@@ -1,0 +1,433 @@
+pid,name,region,country,dept,cf,ad,mi,tot
+P133610 (AF 2),BI-Jiji and Mulembwe Hydropower,AFE,Burundi,Energy and Extractives,100.0,1.5,28.5,30.0
+P148850 (AF 1),Ethiopia- Expressway Development Support Project,AFE,Ethiopia,Transport,10.5,3.4,0.5,37.0
+P149279 (AF 2),Southeastern Corridor Road Asset Management Project,AFW,Liberia,Transport,21.1,4.8,0.0,23.0
+P159974 (AF 1),Enhancement and Strengthening of Power Transmission Network in Eastern Region,SAR,Bangladesh,Energy and Extractives,17.6,2.7,2.6,30.0
+P160672 (AF 1),Lesotho Lowlands Water Development Project - Phase II,AFE,Lesotho,Water,57.8,6.7,0.3,12.2
+P161316 (AF 1),Renewable Energy Sector Development Project,LCR,St. Lucia,Energy and Extractives,100.0,0.0,8.5,8.5
+P161319 (AF 5),Tina River Hydropower Development Project,EAP,Solomon Islands,Energy and Extractives,100.0,0.8,24.2,25.0
+P161842 (AF 2),Sao Tome and Principe Transport Sector Development and Coastal Protection Project,AFE,Sao Tome and Principe,Transport,100.0,19.4,1.0,20.4
+P163399 (AF 1),East Africa Skills for Transformation and Regional Integration Project (EASTRIP),AFE,Eastern and Southern Africa,Education,29.5,0.3,4.1,15.0
+P163399 (AF 2),East Africa Skills for Transformation and Regional Integration Project (EASTRIP),AFE,Eastern and Southern Africa,Education,20.0,2.7,2.7,27.1
+P163562 (AF 1),Khyber Pakhtunkhwa Integrated Tourism Development Project,SAR,Pakistan,Finance Competitiveness and Innovation,11.8,3.0,0.5,30.0
+P163714 (AF 2),General Education Modernization Project,SAR,Sri Lanka,Education,8.0,3.7,0.3,50.0
+P163752 (AF 1),AFR RI-3A Tanzania-Zambia Transmission Interconnector,AFE,Tanzania,Energy and Extractives,62.2,10.7,82.7,150.0
+P163870 (AF 1),Madagascar - Least-Cost Electricity Access Development Project - LEAD,AFE,Madagascar,Energy and Extractives,45.0,0.0,5.0,11.0
+P164920 (AF 1),Tanzania Roads to Inclusion and Socioeconomic Opportunities (RISE) Project,AFE,Tanzania,Transport,50.0,45.0,5.0,100.0
+P165704,Mpatamanga Hydropower Storage Project,AFE,Malawi,Energy and Extractives,93.2,76.0,250.3,350.0
+P165782 (AF 1),Samoa Climate Resilient Transport Project,EAP,Samoa,Transport,100.0,12.0,0.0,12.0
+P165870 (AF 3),Strengthening DRM and Climate Resilience Project,LCR,Haiti,Urban Resilience and Land,100.0,4.3,0.2,4.5
+P165982 (AF 1),Pakistan Raises Revenue,SAR,Pakistan,Macroeconomics Trade and Investment,2.5,1.8,0.0,70.0
+P166059 (AF 2),Expanding Opportunities for Learning,MNA,Djibouti,Education,11.5,0.4,0.3,6.5
+P166697 (AF 1),Kingdom of Eswatini: Water Supply and Sanitation Access Project,AFE,Eswatini,Water,50.0,4.0,0.0,8.0
+P167416 (AF 3),Social Safety Net Project,LCR,Ecuador,Social Protection and Jobs,8.8,8.8,0.0,100.0
+P167428 (AF 1),Kyrgyz Republic Regional Economic Development Project,ECA,Kyrgyz Republic,Urban Resilience and Land,20.0,0.9,0.9,8.5
+P167790 (AF 1),Higher Education Project,ECA,Moldova,Education,60.0,3.1,16.4,32.4
+P168052 (AF 2),Tajikistan Socio-Economic Resilience Strengthening Project,ECA,Tajikistan,Social Sustainability and Inclusion,45.3,9.2,2.1,25.0
+P169265 (AF 1),Harmonizing and Improving Statistics in West Africa,AFW,Western and Central Africa,Poverty and Equity,7.6,0.7,0.0,9.6
+P169265 (AF 2),Harmonizing and Improving Statistics in West Africa,AFW,Western and Central Africa,Poverty and Equity,8.0,0.5,0.0,6.2
+P169405 (AF 1),"Sustainable Procurement, Environmental and Social Standards Enhancement Project (SPESSE)",AFW,Nigeria,Governance,9.2,3.6,2.4,65.0
+P170132 (AF 3),Rural Electrification Project,ECA,Tajikistan,Energy and Extractives,100.0,0.0,7.0,7.0
+P170230 (AF 1),Electricity Distribution Efficiency Improvement Project,SAR,Pakistan,Energy and Extractives,100.0,2.8,52.3,55.0
+P170409 (AF 1),Nepal Strategic Road Connectivity and Trade Improvement Project,SAR,Nepal,Transport,48.0,76.0,20.0,200.0
+P170425 (AF 2),Benin Youth Inclusion Project,AFW,Benin,Social Protection and Jobs,42.7,17.6,0.0,41.3
+P170435 (AF 2),Tanzania Maternal and Child Health Investment Program,AFE,Tanzania,Health Nutrition and Population,4.8,0.1,1.5,35.0
+P170480 (AF 1),Tanzania Secondary Education Quality Improvement Project (SEQUIP),AFE,Tanzania,Education,10.0,1.8,1.8,35.0
+P170542 (AF 1),Learning for the Future Project,ECA,Kyrgyz Republic,Education,13.4,0.3,0.3,4.4
+P170718 (AF 1),Digital Federated States of Micronesia Project,EAP,"Micronesia, Federated States of",Digital Development,63.9,1.1,10.7,18.4
+P170922 (AF 7),Somalia Urban Resilience Project II,AFE,Somalia,Urban Resilience and Land,73.8,9.7,8.7,25.0
+P171056 (AF 2),Support for resilient livelihoods in the South of Madagascar,AFE,Madagascar,Social Sustainability and Inclusion,74.6,32.4,7.9,54.0
+P171059 (AF 2),Enhancing Sierra Leone Energy Access,AFW,Sierra Leone,Energy and Extractives,70.9,0.5,8.4,12.6
+P171099 (AF 1),Digital Cabo Verde Project,AFW,Cabo Verde,Digital Development,36.7,6.6,0.8,20.0
+P171158 (AF 2),Central African Republic Human Capital and Women and Girls' Empowerment (Maïngo) Project,AFW,Central African Republic,Health Nutrition and Population,0.0,0.0,0.0,10.0
+P171160 (AF 2),Somali Integrated Statistics and Economic Planning Capacity Building,AFE,Somalia,Poverty and Equity,19.8,6.9,0.0,35.0
+P171296 (AF 1),Electricity Sector Efficiency and Supply Reliability Program,MNA,Jordan,Energy and Extractives,65.6,1.4,162.6,250.0
+P171361 (AF 2),Comoros Post-Kenneth Recovery and Resilience Project,AFE,Comoros,Urban Resilience and Land,50.0,6.3,0.0,12.5
+P171422,Second Karachi Water and Sewerage Services Improvement Project (KWSSIP-2),SAR,Pakistan,Water,82.0,72.5,124.3,240.0
+P171528 (AF 1),Caribbean Digital Transformation Project,LCR,Caribbean,Digital Development,22.8,0.8,0.5,5.6
+P171627,Financial Sector Strengthening Project (FSSP),AFE,Ethiopia,Finance Competitiveness and Innovation,0.8,5.4,0.0,700.0
+P171658 (AF 1),Bamako Urban Resilience Project,AFW,Mali,Urban Resilience and Land,50.0,25.0,0.0,50.0
+P171793 (AF 1),ENHANCING NIGER NORTHEASTERN CONNECTIVITY,AFW,Niger,Transport,57.8,47.5,4.5,90.0
+P171833 (AF 2),Unleashing the Blue Economy of the Caribbean (UBEC),LCR,Caribbean,Environment Natural Resources and the Blue Economy,0.0,0.0,0.0,2.6
+P171973 (AF 1),Primary Education Improvement Project,ECA,North Macedonia,Education,15.7,1.3,1.3,16.9
+P172988 (AF 1),Burundi Transport Resilience Project,AFE,Burundi,Transport,50.0,2.5,0.0,5.0
+P173194,National Energy Access Transformation Project,EAP,Papua New Guinea,Energy and Extractives,85.5,35.7,135.3,200.0
+P173399 (AF 3),Actions to Strengthen Performance for Inclusive and Responsive Education Program,SAR,Pakistan,Education,2.7,0.9,0.0,33.0
+P173407 (AF 1),Lao PDR Global Partnership for Education III: Learning and Equity Acceleration Project,EAP,Lao People's Democratic Republic,Education,6.9,1.0,0.2,17.4
+P173711 (AF 1),Connecting Madagascar for Inclusive Growth,AFE,Madagascar,Transport,67.2,138.2,3.9,211.5
+P174111 (AF 1),Adaptive Social Protection for Increased Resilience Project,LCR,Haiti,Social Protection and Jobs,50.0,12.5,0.0,25.0
+P174114 (AF 3),NIGERIA: Community Action (for) Resilience and Economic Stimulus Program,AFW,Nigeria,Social Protection and Jobs,33.6,160.1,7.9,500.0
+P174684 (AF 1),Economic Transformation for Inclusive Growth Project,AFE,Madagascar,Finance Competitiveness and Innovation,13.2,4.8,4.6,71.0
+P174757 (AF 1),"Senegal Jobs, Economic Transformation & Recovery Program",AFW,Senegal,Finance Competitiveness and Innovation,15.4,5.2,4.8,65.0
+P175043 (AF 2),Gulf of Guinea Northern Regions Social Cohesion project,AFW,Western and Central Africa,Social Sustainability and Inclusion,45.1,10.2,4.6,33.0
+P175266 (AF 1),Mozambique Northern Urban Development Project,AFE,Mozambique,Urban Resilience and Land,50.0,19.5,0.5,40.0
+P175327 (AF 2),Cash for Jobs Project,AFE,Burundi,Social Protection and Jobs,48.6,37.0,1.4,79.0
+P175828 (AF 1),Cabo Verde Human Capital Project,AFW,Cabo Verde,Education,33.0,0.6,0.0,2.0
+P176306 (AF 1),Kiribati Health Systems Strengthening Project,EAP,Kiribati,Health Nutrition and Population,100.0,0.7,13.3,14.0
+P176317,Philippines Digital Infrastructure Project,EAP,Philippines,Digital Development,46.1,80.1,52.2,287.2
+P176429,Chattogram Water Supply Improvement Project,SAR,Bangladesh,Water,63.3,102.7,74.5,280.0
+P176450 (AF 1),CAR - Emergency Infrastructure and Connectivity Recovery Project,AFW,Central African Republic,Transport,47.4,14.2,0.0,30.0
+P176620 (AF 2),Senegal Energy Access Scale Up Project,AFW,Senegal,Energy and Extractives,0.0,0.0,0.0,5.9
+P176623,Dodoma Integrated and Sustainable Transport Project,AFE,Tanzania,Transport,68.9,51.3,86.5,200.0
+P176693 (AF 1),Sub-Saharan Africa Women’s Empowerment and Demographic Dividend Plus Project,AFW,Western and Central Africa,Health Nutrition and Population,7.8,5.0,1.2,80.0
+P176781 (AF 1),Promoting Better Jobs through Integrated Labor and Skills Programs,LCR,Argentina,Social Protection and Jobs,0.2,0.0,0.5,230.0
+P176885,Rwanda Urban Mobility Improvement Project,AFE,Rwanda,Transport,100.0,5.0,95.0,100.0
+P176924,The Gambia Public Administration Modernization for Citizen Centric Service Delivery,AFW,"Gambia, The",Governance,48.6,1.0,22.1,47.7
+P176948 (AF 1),Enhancing Connectivity in Northern Guinea-Bissau Project,AFW,Guinea-Bissau,Transport,57.9,8.0,0.5,14.7
+P177003 (AF 2),CAR Health Service Delivery and System Strengthening Project (SENI-Plus),AFW,Central African Republic,Health Nutrition and Population,0.0,0.0,0.0,20.0
+P177017,Mindanao Transport Connectivity Improvement Project,EAP,Philippines,Transport,59.0,147.9,120.7,454.9
+P177044 (AF 1),N’Djamena Urban Resilience Project,AFW,Chad,Urban Resilience and Land,83.3,41.7,0.0,50.0
+P177069 (AF 1),Khyber Pakhtunkhwa Rural Accessibility Project (KPRAP),SAR,Pakistan,Transport,50.0,35.1,3.9,78.0
+P177099 (AF 1),Access to Clean Resilient Electricity under the ASCENT Regional Program - Multi Programmatic Approach (MPA),AFE,Sao Tome and Principe,Energy and Extractives,100.0,0.4,7.6,8.0
+P177146,Urban Resilience Emergency Project,AFE,Burundi,Urban Resilience and Land,98.8,106.3,5.3,113.0
+P177372,Gabon Urban Development Project,AFW,Gabon,Urban Resilience and Land,82.9,104.0,20.4,150.0
+P177450,Sustainable Ecosystem Restoration and Biodiversity Conservation Project,EAP,China,Environment Natural Resources and the Blue Economy,94.4,27.5,67.0,100.0
+P177646 (AF 1),Comoros Solar Energy Access Project,AFE,Comoros,Energy and Extractives,87.4,1.1,3.2,5.0
+P177741 (AF 1),Guyana Strengthening Human Capital through Education Project,LCR,Guyana,Education,0.0,0.0,0.0,2.3
+P177816 (AF 2),Food Systems Resilience Program for Eastern and Southern Africa (Phase 3) FSRP,AFE,Eastern and Southern Africa,Agriculture and Food,57.1,49.5,4.5,94.6
+P178115,Second Serbia Green Transition Programmatic Development Policy Loan,ECA,Serbia,Macroeconomics Trade and Investment,71.9,26.0,89.0,160.0
+P178132 (AF 6),West Africa Food System Resilience Program (FSRP) Phase 2,AFW,Western and Central Africa,Agriculture and Food,100.0,118.8,6.3,125.0
+P178190,Third Energy Sector Project,EAP,Mongolia,Energy and Extractives,100.0,2.4,44.7,47.0
+P178237,Pacific Islands Regional Oceanscape Program - Second Phase for Economic Resilience: Federated States of Micronesia (FSM PROPER),EAP,"Micronesia, Federated States of",Environment Natural Resources and the Blue Economy,43.6,20.9,3.6,56.0
+P178253,Uttar Pradesh Agriculture Growth and Rural Enterprise Ecosystem Strengthening Project,SAR,India,Agriculture and Food,30.1,79.0,18.9,325.1
+P178254,Kerala Climate Resilient Agri- Value Chain Modernization (KERA) Project,SAR,India,Agriculture and Food,50.4,66.5,34.2,200.0
+P178280 (AF 3),Emergency Food Security Project,SAR,Afghanistan,Agriculture and Food,51.6,49.0,0.0,95.0
+P178497 (AF 1),Harmonizing and Improving Statistics in West and Central Africa - Series of Projects 1 (HISWACA - SOP 1),AFW,Western and Central Africa,Poverty and Equity,50.0,2.0,0.0,4.0
+P178573,Rural Infrastructure and Mobility for Good Living Program Project,LCR,Guatemala,Transport,68.5,208.9,65.2,400.0
+P178646,Montenegro First Resilient Fiscal and Sustainable Development DPF,ECA,Montenegro,Macroeconomics Trade and Investment,35.7,0.6,30.3,86.6
+P178687,"NEPAL SECOND GREEN, RESILIENT, AND INCLUSIVE PROGRAMMATIC DEVELOPMENT POLICY CREDIT",SAR,Nepal,Environment Natural Resources and the Blue Economy,75.0,43.8,31.3,100.0
+P178720 (AF 1),El Salvador Transport and Resilient Infrastructure Project,LCR,El Salvador,Transport,42.4,44.0,6.9,120.0
+P178768,Morocco Municipal Solid Waste Management Support Program,MNA,Morocco,Urban Resilience and Land,46.3,30.1,85.6,250.0
+P178774,CAR Inclusive and Resilient Cities Project,AFW,Central African Republic,Urban Resilience and Land,93.8,64.1,1.5,70.0
+P178775 (AF 2),AFGHANISTAN HEALTH EMERGENCY RESPONSE (HER) PROJECT,SAR,Afghanistan,Health Nutrition and Population,27.0,43.3,0.0,160.0
+P178808,Governance Modernization to Enable Efficient Service Delivery Project,AFE,Ethiopia,Governance,12.6,5.2,3.6,70.0
+P178819 (AF 1),Technical Assistance for Financing Framework for Rogun Hydropower Project,ECA,Tajikistan,Energy and Extractives,100.0,0.0,6.0,6.0
+P178842,Improving Lima Traffic Management and Supporting Sustainable Transport Project,LCR,Peru,Transport,51.4,2.7,74.5,150.0
+P178923,WAPP Ghana-Cote d'Ivoire Interconnection Project - Phase 1 WA-REMP MPA,AFW,Western and Central Africa,Energy and Extractives,56.8,55.9,122.5,314.0
+P178946 (AF 9),Public Expenditures for Administrative Capacity Endurance (PEACE) in Ukraine,ECA,Ukraine,Governance,0.0,0.0,0.0,4800.0
+P178986,"Africa Green, Resilient and Inclusive Housing De-Risking (GRIHD) Facility",AFE,Eastern and Southern Africa,Finance Competitiveness and Innovation,100.0,47.5,47.5,95.0
+P179017,Guinea Water and Sanitation Project,AFW,Guinea,Water,83.7,15.6,151.7,200.0
+P179128,Eastern Türkiye Middle Corridor Railway Development Project,ECA,Turkiye,Transport,100.0,165.0,495.0,660.0
+P179138,Togo Digital Acceleration Project,AFW,Togo,Digital Development,40.4,13.1,27.3,100.0
+P179211 (AF 1),Adaptive and Productive Social Safety Nets Project,AFW,Central African Republic,Social Protection and Jobs,54.0,11.5,0.4,22.0
+P179227,Balochistan Water Security and Productivity Improvement Project,SAR,Pakistan,Water,61.5,49.1,8.7,94.0
+P179284,Lao PDR Climate Resilient Road Connectivity Improvement Project,EAP,Lao People's Democratic Republic,Transport,49.6,27.8,0.0,56.0
+P179383,Development of Energy Resources and Mining Sector Support Phase 1 Project,AFW,Mauritania,Energy and Extractives,84.2,4.7,64.7,82.5
+P179397,Uganda Learning Acceleration Program (ULEARN),AFE,Uganda,Education,21.3,32.9,11.8,210.0
+P179509,Guinea-Bissau Human Capital Project,AFW,Guinea-Bissau,Health Nutrition and Population,18.6,3.7,0.0,20.0
+P179513,"Second Green, Resilient, Inclusive Growth and Diversification Development Policy Loan",AFE,Angola,Macroeconomics Trade and Investment,30.9,5.6,149.2,500.0
+P179519,Caribbean Efficient and Green-Energy Buildings Project,LCR,Caribbean,Energy and Extractives,100.0,25.2,78.8,104.0
+P179520,Belize Reliant and Resilient Energy System Project,LCR,Belize,Energy and Extractives,83.1,14.3,27.3,50.0
+P179550 (AF 1),"Côte d'Ivoire Health, Nutrition, and Early Childhood Development Program",AFW,Cote d'Ivoire,Health Nutrition and Population,15.0,10.6,1.2,79.0
+P179642,Kingston Waterfront Improvement Project - SOP 1,LCR,Jamaica,Urban Resilience and Land,30.0,2.1,1.5,12.0
+P179684,Sustainable Power and Irrigation for Nigeria Project,AFW,Nigeria,Water,85.1,158.5,266.9,500.0
+P179703,Serbia Railway Sector Modernization Phase 2,ECA,Serbia,Transport,96.9,0.0,63.0,65.0
+P179770,Southern Niger Connectivity and Integration Project,AFW,Niger,Transport,61.8,227.6,19.4,400.0
+P179904,Northern Uganda Social Action Fund IV Project,AFE,Uganda,Social Protection and Jobs,20.8,47.6,4.4,250.0
+P179909,First Fiscal and Climate Transparency and Sustainability Development Policy Financing,LCR,Honduras,Macroeconomics Trade and Investment,53.3,26.6,50.9,145.3
+P179913 (AF 1),District and Community Health Services Revitalization Operation,AFE,Mozambique,Health Nutrition and Population,28.5,2.3,0.2,8.7
+P179923,Improving MIDIS’s Information Services within the National Targeting System (SINAFO) at the National Level Project,LCR,Peru,Social Protection and Jobs,56.9,7.5,23.7,55.0
+P179935,Enhancing Landscape and Ecosystem Management (ELEMENT) Project,SAR,India,Environment Natural Resources and the Blue Economy,86.1,45.8,148.3,225.5
+P179969,Tanzania Scaling-up Sustainable Marine Fisheries and Aquaculture Management Project (TASFAM),AFE,Tanzania,Environment Natural Resources and the Blue Economy,25.6,16.3,12.4,112.0
+P179981 (AF 1),Sindh Flood Emergency Rehabilitation Project,SAR,Pakistan,Urban Resilience and Land,67.5,95.7,5.6,150.0
+P179990,Just Transition in Select Coal Regions of Bosnia and Herzegovina,ECA,Bosnia and Herzegovina,Energy and Extractives,100.0,0.3,82.8,83.1
+P180000,Chad Digital Transformation Project,AFW,Chad,Digital Development,62.7,6.2,51.6,92.2
+P180008 (AF 1),Sindh Flood Emergency Housing Reconstruction Project,SAR,Pakistan,Urban Resilience and Land,64.6,290.5,0.0,450.0
+P180017,"Cameroon Second Fiscal Sustainability, Inclusive and Sustainable Growth Development Policy Financing",AFW,Cameroon,Macroeconomics Trade and Investment,12.5,25.0,0.0,200.0
+P180171 (AF 1),Regional Climate Resilience Program for Eastern and Southern Africa Project,AFE,Eastern and Southern Africa,Water,43.3,46.6,0.9,109.5
+P180234,Cote d'Ivoire Investment for Growth DPF3/PBG/D4D,AFW,Cote d'Ivoire,Macroeconomics Trade and Investment,33.3,34.5,69.0,310.6
+P180253,Improving the Quality of Intersectoral Social Protection in Chile,LCR,Chile,Social Protection and Jobs,15.9,23.8,0.0,150.0
+P180260,Sahel Regional Engagement for Learning and Collaboration in Education Project,AFW,Western and Central Africa,Education,36.4,20.4,9.0,80.5
+P180283,"Health, Nutrition and Population Sector Development Program",SAR,Bangladesh,Health Nutrition and Population,26.4,100.1,0.0,379.0
+P180321,Cameroon Water Security Project,AFW,Cameroon,Water,65.2,85.3,45.0,200.0
+P180323 (AF 1),Integrated Flood Resilience and Adaptation Project,SAR,Pakistan,Water,50.0,16.0,0.0,32.0
+P180384,Haiti Strengthening Public Financial Management Project,LCR,Haiti,Governance,14.4,4.3,4.4,60.0
+P180398,Republic of Congo Third Fiscal Management and Inclusive Growth DPF,AFW,"Congo, Republic of",Macroeconomics Trade and Investment,1.3,1.0,0.0,80.0
+P180429,Bahia Sustainable Rural Development Project,LCR,Brazil,Agriculture and Food,69.0,47.3,21.6,100.0
+P180439,Second Bangladesh Green and Climate Resilient Development Credit,SAR,Bangladesh,Environment Natural Resources and the Blue Economy,61.0,52.5,252.5,500.0
+P180501,Lebanon Renewable Energy and System Reinforcement Project,MNA,Lebanon,Energy and Extractives,85.5,8.8,204.9,250.0
+P180539,Burkina Faso Strengthening Health System Performance and Resilience Project,AFW,Burkina Faso,Health Nutrition and Population,55.9,18.9,65.0,150.0
+P180544,BiH Second Health Sectors Programmatic Development Policy Loan,ECA,Bosnia and Herzegovina,Macroeconomics Trade and Investment,11.1,2.1,6.3,75.0
+P180549,"Sri Lanka Second Resilience, Stability and Economic Turnaround Development Policy Operation",SAR,Sri Lanka,Macroeconomics Trade and Investment,0.0,0.0,0.0,200.0
+P180554,Peru First Fiscal Policy and Sustainable Growth DPF-DDO,LCR,Peru,Macroeconomics Trade and Investment,16.7,27.8,55.6,500.0
+P180555,"Brazil Proactive, Safe, and Resilient Road Asset Management Program - State of Bahia",LCR,Brazil,Transport,58.4,80.4,7.2,150.0
+P180579,Grand Nokoué Sustainable Urban Mobility Project (GN-SUMP),AFW,Benin,Transport,75.9,40.1,111.7,200.0
+P180580,Sustainable Agricultural Transformation Program,AFW,Togo,Agriculture and Food,100.0,47.2,103.0,150.2
+P180640,Rural Access and Agricultural Marketing Project - Scale Up,AFW,Nigeria,Transport,55.2,260.9,14.9,500.0
+P180649,Philippines Civil Service Modernization Project,EAP,Philippines,Governance,60.3,2.6,38.0,67.3
+P180664,Second Higher Education Improvement Project,EAP,Cambodia,Education,14.4,5.7,5.7,80.0
+P180679,Second Resilience and Green Development DPL,ECA,Albania,Macroeconomics Trade and Investment,61.0,9.6,63.6,120.0
+P180696,Economic and Financial Governance Project,MNA,Djibouti,Governance,1.0,0.1,0.1,20.0
+P180699,Tamil Nadu Women Employment and Safety (TN WESAFE) Operation,SAR,India,Social Protection and Jobs,5.2,7.8,0.0,150.0
+P180708,Yemen Financial Market Infrastructure and Inclusion Project,MNA,"Yemen, Republic of",Finance Competitiveness and Innovation,58.1,0.0,11.6,20.0
+P180742,Scaling-up Locally Led Climate Action Program,AFE,Tanzania,Social Sustainability and Inclusion,100.0,52.9,47.1,100.0
+P180781,Türkiye Preparedness for Public Health Emergencies Project,ECA,Turkiye,Health Nutrition and Population,77.5,38.6,155.1,250.0
+P180807,Digitally Connected and Resilient Samoa Project,EAP,Samoa,Digital Development,58.2,3.8,7.8,20.1
+P180831,Caribbean Resilient Renewable Energy Infrastructure Investment Facility,LCR,Caribbean,Energy and Extractives,100.0,22.5,67.5,90.0
+P180849 (AF 1),Türkiye Earthquake Recovery and Reconstruction Project,ECA,Turkiye,Urban Resilience and Land,20.2,21.2,20.7,207.5
+P180860,Integrated Land Administration and Spatial Planning Project,EAP,Indonesia,Urban Resilience and Land,59.3,234.5,152.6,653.0
+P180864,Burundi Colline Climate Resilience Project,AFE,Burundi,Environment Natural Resources and the Blue Economy,78.5,26.2,28.7,70.0
+P180884,Sustainable Cities and Land Project,AFW,Cameroon,Urban Resilience and Land,60.7,93.4,27.9,200.0
+P180906,Guinea Kounki Fisheries and Aquaculture Project,AFW,Guinea,Environment Natural Resources and the Blue Economy,48.5,42.8,5.7,100.0
+P180909,National Community Initiatives Project,ECA,Kyrgyz Republic,Social Sustainability and Inclusion,51.6,6.2,6.8,25.0
+P180915,Chad Connectivity and Integration Project,AFW,Chad,Transport,64.9,67.1,43.2,170.0
+P180925,BDI Human Capital Development Project,AFE,Burundi,Education,24.0,21.2,26.9,200.0
+P180927,Equitable and Green Path Development Policy Financing II,LCR,Colombia,Poverty and Equity,40.0,13.1,266.9,700.0
+P180965,Health Enhancement and Resiliency in Tonga Project,EAP,Tonga,Health Nutrition and Population,66.5,8.8,11.2,30.0
+P180979,Fiji Critical Bridges Resilience Project,EAP,Fiji,Transport,100.0,47.5,2.5,50.0
+P180982 (AF 1),Coastal Resilience and Sustainable Tourism Project,AFE,Sao Tome and Principe,Environment Natural Resources and the Blue Economy,39.0,2.0,0.2,5.6
+P181014,Regional Emergency Preparedness & Access to Inclusive Recovery Project,AFE,Eastern and Southern Africa,Finance Competitiveness and Innovation,100.0,280.0,0.0,280.0
+P181029,Sustainable Financing for Rogun Hydropower Project,ECA,Tajikistan,Energy and Extractives,99.5,88.4,259.9,350.0
+P181037,Pakistan: Resilient and Accessible Microfinance (RAM) Project,SAR,Pakistan,Finance Competitiveness and Innovation,100.0,102.0,0.0,102.0
+P181050,Priority Skills for Growth and Youth Empowerment,AFE,Rwanda,Education,14.7,12.1,17.4,200.0
+P181064,Belize Blue Cities and Beyond Project,LCR,Belize,Environment Natural Resources and the Blue Economy,37.0,6.2,2.4,23.5
+P181081 (AF 1),"Investing in Social Protection for Inclusion, Resilience, and Efficiency (INSPIRE) Project",ECA,Ukraine,Social Protection and Jobs,2.5,0.0,16.6,662.0
+P181086 (AF 1),Technical Assistance for Kambarata 1 Hydropower Plant Project,ECA,Kyrgyz Republic,Energy and Extractives,100.0,0.6,10.5,11.0
+P181090,Second Additional Financing for Tonga Safe and Resilient Schools Project,EAP,Tonga,Urban Resilience and Land,74.1,10.4,0.7,15.0
+P181127,Philippines Second Digital Transformation DPL,EAP,Philippines,Finance Competitiveness and Innovation,11.3,54.7,29.7,750.0
+P181148,Ghana Second Resilient Recovery Development Policy Financing,AFW,Ghana,Macroeconomics Trade and Investment,15.3,5.0,50.0,360.0
+P181166,Honduras Sustainable Connectivity Project,LCR,Honduras,Transport,14.1,17.3,9.1,187.0
+P181174,Costa Rica Results in Education (CORE),LCR,Costa Rica,Education,52.4,7.1,97.6,200.0
+P181200 (AF 1),Housing Repair for People's Empowerment Project (HOPE),ECA,Ukraine,Urban Resilience and Land,10.0,0.0,8.4,84.0
+P181221,Renewable Energy Support and Access Accelerator Project,AFE,Botswana,Energy and Extractives,84.1,0.0,74.0,88.0
+P181237,Strengthening Public Financial Management II Project,EAP,"Micronesia, Federated States of",Governance,2.9,0.4,0.0,13.0
+P181238,Togo's Second Sustainable and Inclusive Development Policy Financing,AFW,Togo,Macroeconomics Trade and Investment,25.8,3.8,47.8,200.0
+P181250,Renewable Energy Generation and Access Increase Project,EAP,Marshall Islands,Energy and Extractives,89.5,8.2,45.4,60.0
+P181251,Financial Inclusion for Households and MSMEs in the WAEMU,AFW,Western and Central Africa,Finance Competitiveness and Innovation,22.5,1.8,44.3,205.0
+P181253,Access and Renewable Increase for Sustainable Energy Project,EAP,"Micronesia, Federated States of",Energy and Extractives,84.6,13.5,22.1,42.0
+P181256,Colombia - Fourth Disaster Risk Management Development Policy Loan with a Catastrophe Deferred Drawdown Option (Cat DDO IV),LCR,Colombia,Urban Resilience and Land,75.0,112.9,37.1,200.0
+P181259,Benin Land Tenure Management Program,AFW,Benin,Urban Resilience and Land,26.1,12.7,13.4,100.0
+P181263,Green and Resilient Development for a Decarbonized Economy in Peru,LCR,Peru,Energy and Extractives,92.9,232.1,232.1,500.0
+P181278,Accelerating Transport and Trade Connectivity in Eastern South Asia Phase 2 - Bhutan Project,SAR,Bhutan,Transport,46.9,128.2,12.6,300.0
+P181295,Community Access and Urban Services Enhancement Project II,EAP,Solomon Islands,Social Sustainability and Inclusion,45.5,8.9,0.3,20.2
+P181310,Cabo Verde Second Fiscal Space and Sustainable Growth Development Policy Financing,AFW,Cabo Verde,Macroeconomics Trade and Investment,30.4,3.3,4.3,25.0
+P181328 (AF 1),Accelerating Sustainable and Clean Energy Access Transformation - Regional Energy Access Financing Platform,AFE,Eastern and Southern Africa,Energy and Extractives,98.2,1.3,23.3,25.0
+P181344,Nepal Disaster Resilience Development Policy Credit with Cat DDO (NDRC),SAR,Nepal,Urban Resilience and Land,72.0,108.0,0.0,150.0
+P181372,Costa Rica Social Risk Management DPL DDO,LCR,Costa Rica,Social Protection and Jobs,16.7,33.3,0.0,200.0
+P181385 (AF 1),South Sudan Health Sector Transformation Project (HSTP),AFE,South Sudan,Health Nutrition and Population,55.5,21.9,0.3,40.0
+P181389,Philippines First Energy Transition and Climate Resilience DPL,EAP,Philippines,Energy and Extractives,85.0,120.0,560.0,800.0
+P181404,Additional Financing to the EAC Regional Statistics Program for Results,AFE,Eastern and Southern Africa,Poverty and Equity,14.9,1.9,1.1,20.0
+P181415,Horn of Africa Initiative: Djibouti Regional Economic Corridor AF,MNA,Djibouti,Transport,24.5,18.0,4.0,90.0
+P181428,Agriculture Sector Recovery in Türkiye's Earthquake-affected Provinces,ECA,Turkiye,Agriculture and Food,91.9,51.7,178.0,250.0
+P181432,Saint Lucia Disaster Risk Management Cat DDO,LCR,St. Lucia,Urban Resilience and Land,90.0,18.0,0.0,20.0
+P181456,Samoa Finance Sector Resilience and Development Project,EAP,Samoa,Finance Competitiveness and Innovation,20.8,4.4,0.0,21.0
+P181457,Benin Second Boosting Inclusive Growth and Resilience DPF and PBG,AFW,Benin,Macroeconomics Trade and Investment,31.7,43.3,4.2,150.0
+P181459,"One Health for Pandemic Prevention, Food Systems Resilience, and Ecosystem Health in Central Asia",ECA,Central Asia,Agriculture and Food,99.3,15.2,44.4,60.0
+P181463,Maharashtra Strengthening Institutional Capabilities in Districts for Enabling Growth Operation,SAR,India,Macroeconomics Trade and Investment,4.7,5.2,3.7,188.3
+P181476,Nigeria Human Capital Opportunities for Prosperity and Equity (HOPE) - Governance,AFW,Nigeria,Governance,0.1,0.7,0.0,500.0
+P181485,Second Additional Financing for the Serbia Accelerating Innovation and Growth Entrepreneurship Project,ECA,Serbia,Finance Competitiveness and Innovation,0.0,0.0,0.0,26.7
+P181490 (AF 2),Sudan Somoud - Enhancing Community Resilience Project,AFE,Sudan,Social Sustainability and Inclusion,60.0,25.0,5.0,50.0
+P181494 (AF 1),Accelerating Sustainable and Clean Energy Access Transformation in Burundi (ASCENT Burundi),AFE,Burundi,Energy and Extractives,60.3,10.4,19.7,50.0
+P181495,Enhancing the Social Protection System for Human Capital and Resilience Project,AFE,Angola,Social Protection and Jobs,45.3,161.9,19.5,400.0
+P181499,SIKASSO- KORHOGO-BOBO-DIOULASSO (SKBO) BASIN OF INTEGRATION PROJECT,AFW,Burkina Faso,Transport,68.5,86.1,61.8,216.0
+P181501,BR Enhancing Prosperity and Sustainability in the State of Sergipe Development Policy Financing,LCR,Brazil,Macroeconomics Trade and Investment,46.3,22.3,28.5,110.0
+P181517,Romania Fiscal Management and Green Growth Development Policy Loan,ECA,Romania,Macroeconomics Trade and Investment,68.2,14.8,428.4,650.0
+P181538,Mali Water Security Project,AFW,Mali,Water,57.9,43.6,14.3,100.0
+P181549,Productive Safety Net for Socioeconomic Opportunities Project Additional Financing,AFE,South Sudan,Social Protection and Jobs,77.4,51.9,2.3,70.0
+P181555,Accelerating Sustainable Energy Transition Program,EAP,East Asia and Pacific,Energy and Extractives,83.0,0.1,4.1,5.0
+P181555 (AF 1),Accelerating Sustainable Energy Transition Program,EAP,East Asia and Pacific,Energy and Extractives,64.0,0.6,4.3,7.7
+P181584,Additional Financing: Haiti Renewable Energy For All,LCR,Haiti,Energy and Extractives,100.0,1.0,19.0,20.0
+P181585,Second Solomon Islands Roads and Aviation Project - Additional Financing,EAP,Solomon Islands,Transport,48.8,23.9,1.1,51.2
+P181587,Transforming Agri-food Systems in Morocco,MNA,Morocco,Agriculture and Food,83.9,136.9,73.0,250.0
+P181591,Ethiopia First Sustainable and Inclusive Growth Development Policy Operation,AFE,Ethiopia,Macroeconomics Trade and Investment,25.5,67.5,315.0,1500.0
+P181608,Progestão Program - MPA Phase 1 State of Rio Grande do Sul,LCR,Brazil,Governance,0.0,0.0,0.0,50.0
+P181624,Additional Financing: Türkiye Irrigation Modernization Project,ECA,Turkiye,Water,100.0,23.8,71.3,95.0
+P181627,Uzbekistan - Khorezm Solar IPP Project,ECA,Uzbekistan,Energy and Extractives,100.0,0.2,3.3,3.5
+P181633,Third Additional Financing Yemen Emergency Human Capital Project,MNA,"Yemen, Republic of",Health Nutrition and Population,41.1,50.8,7.6,142.0
+P181643,Education Emergency Response in Afghanistan Additional Financing,SAR,Afghanistan,Education,5.7,2.7,1.3,70.0
+P181645,Additional Financing III Dominica Disaster Vulnerability Reduction Project,LCR,Dominica,Urban Resilience and Land,100.0,40.0,0.0,40.0
+P181649,Additional Financing for Employment Support Project,ECA,Azerbaijan,Social Protection and Jobs,47.3,70.9,0.0,150.0
+P181681,Additional Financing for Building Skills for Human Capital Development in South Sudan,AFE,South Sudan,Education,23.2,8.8,1.4,44.0
+P181682,CAR Public Sector Digital Governance - Additional Financing,AFW,Central African Republic,Digital Development,7.5,0.3,0.1,6.4
+P181702,Second Additional Financing to GAMA Sanitation and Water Project,AFW,Ghana,Water,60.5,3.2,15.0,30.0
+P181707,"Improving Equitable Access To High Standard, Sustainable Public Services At Central And Sub-National Level",ECA,Albania,Governance,15.9,7.6,5.0,80.0
+P181711,Second Additional Financing for Scaling-up Shock Responsive Social Protection Project,AFE,Zambia,Social Protection and Jobs,100.0,200.0,0.0,200.0
+P181736,Human Capital Recovery & Resilience Program (AF II),SAR,Bhutan,Social Protection and Jobs,12.1,2.9,2.7,46.2
+P181746,Benin Boosting Inclusive Growth and Resilience DPF2 FY25 Guarantee,AFW,Benin,Macroeconomics Trade and Investment,31.7,64.0,6.2,221.5
+P181752,Cote d'Ivoire DPO3 Guarantee,AFW,Cote d'Ivoire,Macroeconomics Trade and Investment,33.3,60.4,120.8,543.5
+P181797,Financing Adaptation for Growth,ECA,Turkiye,Finance Competitiveness and Innovation,100.0,409.0,0.0,409.0
+P181811,Energy Sector Security Enhancement Project,SAR,Bangladesh,Energy and Extractives,0.0,0.0,0.0,350.0
+P500469,"Brazil Proactive, Safe and Resilient Road Asset Management Program - State of Espirito Santo Project - Phase 2",LCR,Brazil,Transport,48.9,78.4,1.0,162.4
+P500471,Financial Access for Sustainable and Transformational (FAST) Growth Project,AFE,Tanzania,Finance Competitiveness and Innovation,40.5,30.3,30.3,150.0
+P500500,Building Institutional Foundations for an Effective Public Service Project,AFE,South Sudan,Governance,8.2,1.2,0.0,15.0
+P500501,Electrification and Improvement of the São Paulo Urban Transport Program,LCR,Brazil,Transport,99.8,0.4,247.4,248.3
+P500536,Bhutan Climate and Disaster Resilience Development Policy Financing with a Catastrophe Deferred Drawdown Option,SAR,Bhutan,Urban Resilience and Land,68.6,20.6,6.9,40.0
+P500553,South Sudan Resilient Livestock Sector Project,AFE,South Sudan,Agriculture and Food,62.8,8.7,16.4,40.0
+P500565,Transport Resilience and Connectivity Enhancement Project (Jezkazgan-Karagandy Section of TCITR (Middle Corridor)),ECA,Kazakhstan,Transport,71.5,445.5,19.4,650.0
+P500567,Guinea-Bissau Reform Advancement Development Policy Financing,AFW,Guinea- Bissau,Macroeconomics Trade and Investment,14.3,0.0,1.4,10.0
+P500570,Sergipe Efficient Digital Acceleration project,LCR,Brazil,Digital Development,75.5,3.5,36.9,53.6
+P500587,Lesotho Education Improvement Project,AFE,Lesotho,Education,38.2,5.7,1.9,20.0
+P500611,Second Real Estate Management Project,ECA,Serbia,Urban Resilience and Land,41.4,7.6,5.8,32.5
+P500614,BR State of Alagoas Sustainable Development Policy Loan,LCR,Brazil,Macroeconomics Trade and Investment,40.0,39.9,71.1,277.5
+P500620,Kyrgyz Republic: Water Supply and Sanitation Universal Access Program-1 Project,ECA,Kyrgyz Republic,Water,83.0,36.4,64.0,121.0
+P500964,Greater Casablanca Mobility and Logistics Hub,MNA,Morocco,Transport,77.1,14.8,254.9,350.0
+P501017,Ethiopia Education Transformation Operation for Learning,AFE,Ethiopia,Education,100.0,26.6,23.4,50.0
+P501037,Second Inclusive and Resilient Market Economy Development Policy Operation,ECA,Uzbekistan,Macroeconomics Trade and Investment,54.0,88.3,343.9,800.0
+P501217,Indonesia Sustainable Least-cost Electrification-2 (ISLE-2) Operation,EAP,Indonesia,Energy and Extractives,88.1,45.5,483.0,600.0
+P501648,Kenya Secondary Education Equity and Quality Improvement Program,AFE,Kenya,Education,24.3,46.4,14.4,250.0
+P501662,"Somalia productive, resilient, and inclusive growth (SPRING) project",AFE,Somalia,Finance Competitiveness and Innovation,25.4,23.3,0.8,95.0
+P501759,Integrated Transport Corridors Project,LCR,Guyana,Transport,81.4,111.2,15.9,156.0
+P501985,Electricity Supply Reliability Improvement Project,SAR,Nepal,Energy and Extractives,89.2,5.1,101.9,120.0
+P501988,First Somalia Economic Resilience Development Policy Financing,AFE,Somalia,Macroeconomics Trade and Investment,10.3,12.2,0.7,125.0
+P502012,The Gambia Second Boosting Resilience and Unlocking Productive Potential DPF,AFW,"Gambia, The",Macroeconomics Trade and Investment,15.6,4.3,0.3,30.0
+P502111,Romania Second Disaster Risk Management Development Policy Loan with a Cat DDO,ECA,Romania,Urban Resilience and Land,82.5,320.8,91.7,500.0
+P502464,Accelerating Sustainable and Clean Energy Access Transformation in Malawi,AFE,Malawi,Energy and Extractives,93.7,12.6,217.9,245.8
+P502472,Restoring Education System Performance and Improving Resilience Project,AFW,Burkina Faso,Education,44.0,29.3,36.6,150.0
+P502565,Liberia First Resilient and Inclusive Growth Development Policy Financing,AFW,Liberia,Macroeconomics Trade and Investment,28.9,14.0,3.3,60.0
+P502572,Bangladesh Clean Air Project,SAR,Bangladesh,Environment Natural Resources and the Blue Economy,62.7,6.2,175.7,290.0
+P502591,Pacific Strengthening Correspondent Banking Relationships Project,EAP,PNG & PI,Finance Competitiveness and Innovation,0.0,0.0,0.0,67.9
+P502591 (AF 1),Pacific Strengthening Correspondent Banking Relationships Project,EAP,PNG & PI,Finance Competitiveness and Innovation,0.0,0.0,0.0,9.0
+P502837,Türkiye Small Industrial Estates Reconstruction and Regional Economic Recovery Project,ECA,Turkiye,Finance Competitiveness and Innovation,63.9,47.5,336.0,600.0
+P502979,"Sustainable, Integrated and Safe Road Infrastructure Project",ECA,Bosnia and Herzegovina,Transport,54.4,42.2,4.1,85.0
+P503763,Philippines Health System Resilience Project,EAP,Philippines,Health Nutrition and Population,82.9,151.2,259.9,495.6
+P503941,Zambia Refugee and Host Communities Project - ZRHCP,AFE,Zambia,Social Sustainability and Inclusion,31.5,9.1,0.4,30.0
+P503960,Sierra Leone First Macro Stability and Resilience DPO with a Catastrophe Deferred Drawdown Option,AFW,Sierra Leone,Macroeconomics Trade and Investment,44.4,26.2,9.3,80.0
+P504033,Program for Sustainable and Competitive Agriculture in Costa Rica,LCR,Costa Rica,Agriculture and Food,69.3,34.1,49.0,120.0
+P504170,Second Greater Beirut Water Supply Project,MNA,Lebanon,Water,96.8,62.0,187.4,257.8
+P504171,Lifting Education Access and Resilience in times of Need in Ukraine Program,ECA,Ukraine,Education,26.6,21.5,80.9,385.0
+P504171 (AF 1),Lifting Education Access and Resilience in times of Need in Ukraine Program,ECA,Ukraine,Education,10.0,0.2,0.2,4.9
+P504218,Second Kenya Social and Economic Inclusion Project,AFE,Kenya,Social Protection and Jobs,50.2,63.1,0.9,127.5
+P504222,Resilient Productive Landscapes II,LCR,Haiti,Agriculture and Food,67.4,18.4,15.2,50.0
+P504253,"Brazil Proactive, Safe, and Resilient Road Asset Management Program - State of Santa Catarina Project - Phase 3",LCR,Brazil,Transport,49.9,136.0,13.8,300.0
+P504276,Green and Resilient SP Metro Line 2 Extension,LCR,Brazil,Transport,99.4,13.0,235.5,250.0
+P504278,Strengthening Moldova's Disaster Risk Management and Resilience Project,ECA,Moldova,Urban Resilience and Land,61.4,22.6,1.9,40.0
+P504281,"Innovative Systems to Promote Integrated, Resilient and Enhanced Responses to Women and Girls’ Health",AFE,Ethiopia,Health Nutrition and Population,85.4,6.0,45.3,60.0
+P504282,Armenia Tourism and Regional Infrastructure Project,ECA,Armenia,Urban Resilience and Land,39.9,7.2,32.8,100.2
+P504373,RMI Enhancing Fiscal Management and Building Disaster and Climate Resilience DPO with a Cat DDO,EAP,Marshall Islands,Macroeconomics Trade and Investment,54.0,10.9,0.4,21.0
+P504398,Morocco Second Identity and Targeting for Social Protection Project,MNA,Morocco,Social Protection and Jobs,10.6,7.4,0.0,70.0
+P504400,Ecuador Guayas: Resilient Rural Roads,LCR,Ecuador,Transport,53.9,49.1,4.8,100.0
+P504548,Suriname Preparedness and Enhancing Resilient Communities Project,LCR,Suriname,Urban Resilience and Land,71.2,15.8,0.0,22.2
+P504600,Water Efficiency and Conservation MPA - Uzbekistan National Irrigation and Energy Efficiency Improvement Project (Phase 1),ECA,Uzbekistan,Water,98.4,50.5,146.4,200.0
+P504629,Sudan Health Assistance and Response to Emergencies,AFE,Sudan,Health Nutrition and Population,52.1,39.1,3.6,82.0
+P504630,Electricity Distribution Improvement and Strengthening through Commercialization and Transformation,ECA,Uzbekistan,Energy and Extractives,90.0,3.5,86.5,100.0
+P504691 (AF 1),Comoros National Water Resilience Project,AFE,Comoros,Water,47.0,2.2,0.2,5.0
+P504693,Nigeria: Primary Healthcare Provision Strengthening Program,AFW,Nigeria,Health Nutrition and Population,54.1,138.3,132.2,500.0
+P504762,The Gambia Infrastructure Project,AFW,"Gambia, The",Transport,49.6,13.8,12.3,52.6
+P504773,Supporting Reconstruction through Smart Fiscal Governance (SURGE),ECA,Ukraine,Governance,36.8,196.4,79.8,750.0
+P504999,Delivering Resilient Infrastructure in Vulnerable Environments in Ukraine Project,ECA,Ukraine,Transport,18.3,77.1,0.0,421.8
+P505025,Mali Community Resilience and Inclusive Services Project - Malidenko,AFW,Mali,Social Sustainability and Inclusion,45.9,56.6,12.3,150.0
+P505030,"Improving Performance, Accountability and Transparency in Cameroon PforR",AFW,Cameroon,Governance,20.5,18.0,23.0,200.0
+P505052,"Secure, Affordable, and Sustainable Energy for Sri Lanka",SAR,Sri Lanka,Energy and Extractives,100.0,1.3,28.8,30.0
+P505158,Angola Youth Employment Opportunities Project,AFE,Angola,Social Protection and Jobs,13.2,15.8,17.3,250.0
+P505173,West Africa Regional Electricity Market Program (WA-REMP) MPA Phase 1 - Mauritania Transmission Corridor Project,AFW,Mauritania,Energy and Extractives,98.5,5.5,121.7,129.0
+P505179,Supporting the Federal Policy for Enhancing Foundational Literacy,LCR,Argentina,Education,2.8,11.9,1.9,500.0
+P505208,Azerbaijan Scaling-Up Renewable Energy Project,ECA,Azerbaijan,Energy and Extractives,100.0,8.7,164.8,173.5
+P505235,BR State of Rio Grande do Sul Sustainable Recovery and Climate Resilience Development Policy Loan,LCR,Brazil,Macroeconomics Trade and Investment,53.3,188.8,3.0,359.6
+P505241,Integrated Rurban Development and Climate Resilience Project,SAR,Sri Lanka,Agriculture and Food,63.4,36.5,26.9,100.0
+P505244,"Boosting Green Finance, Investment and Trade in Rwanda",AFE,Rwanda,Finance Competitiveness and Innovation,36.7,49.6,43.9,255.0
+P505267,Low-Carbon Agriculture and Soil Health Improvement Program,EAP,China,Agriculture and Food,100.0,14.5,135.5,150.0
+P505529,Learning Enhancement and Access Project,EAP,Papua New Guinea,Education,10.9,4.9,6.0,100.0
+P505590,"Brazil Proactive, Safe, and Resilient Road Asset Management Program - State of Mato Grosso do Sul - Phase 4",LCR,Brazil,Transport,49.1,94.8,3.4,200.0
+P505616,"Resilient, Inclusive and Sustainable Enterprise Program for Results",ECA,Ukraine,Finance Competitiveness and Innovation,38.7,43.5,182.3,583.0
+P505643,"Kyrgyz Republic Developing a Sustainable Finance Market for Micro-, Small-, or Medium Enterprises (MSMEs) project",ECA,Kyrgyz Republic,Finance Competitiveness and Innovation,50.0,30.0,30.0,120.0
+P505675,Integrated Early Childhood Development Project,LCR,Argentina,Social Protection and Jobs,7.0,34.8,0.0,500.0
+P505747,Ecuador Carbon-Conscious Fiscal and Growth Development Policy Financing,LCR,Ecuador,Macroeconomics Trade and Investment,29.6,8.6,198.6,700.0
+P505856,Renewable Energy Acceleration Program,AFE,Seychelles,Energy and Extractives,100.0,2.0,6.0,8.0
+P505866,BR Promoting Fiscal Management and Private Sector in the State of Pernambuco Development Policy Loan,LCR,Brazil,Macroeconomics Trade and Investment,38.6,33.4,72.7,275.0
+P505963,Sudan SANAD - Emergency Crisis Response Safety Net Project,AFE,Sudan,Social Protection and Jobs,50.0,50.0,0.0,100.0
+P505964,Montenegro Energy Sector Decarbonization Project,ECA,Montenegro,Energy and Extractives,100.0,1.7,32.9,34.6
+P506072,Guinea Enhancing Health System Transformation (GUEST) Project,AFW,Guinea,Health Nutrition and Population,38.6,29.2,3.6,85.0
+P506083,Transforming Healthcare through Reform and Investments in Efficiency,ECA,Ukraine,Health Nutrition and Population,29.4,10.2,122.0,449.0
+P506109,El Salvador Geothermal Energy for Sustainable and Inclusive Development,LCR,El Salvador,Energy and Extractives,98.9,37.3,111.0,150.0
+P506142,Santa Catarina Rural Development Project for Sustainability and Innovation,LCR,Brazil,Agriculture and Food,83.6,53.5,46.8,120.0
+P506269,Safeguarding Access to Fiscal and Educational Resources Project,AFE,Sao Tome and Principe,Energy and Extractives,0.9,0.0,0.2,24.0
+P506272,Karnataka Water Security and Resilience Program,SAR,India,Water,69.6,217.4,78.9,426.0
+P506285,Vanuatu Resilience Development Policy Financing with a Catastrophe Deferred Drawdown Option,EAP,Vanuatu,Macroeconomics Trade and Investment,22.9,6.9,0.0,30.0
+P506321,Bahia State Sustainable Infrastructure Program Development Policy Loan,LCR,Brazil,Energy and Extractives,85.7,28.6,142.9,200.0
+P506356,Tuvalu Second Climate and Disaster Resilience Development Policy Financing,EAP,Tuvalu,Macroeconomics Trade and Investment,70.0,4.8,0.1,7.0
+P506422,FSM and RMI: Implementation Capacity for Transformative Results (IMPACT),EAP,PNG & PI,Environment Natural Resources and the Blue Economy,10.0,1.5,0.0,15.2
+P506425,Kiribati Kiritimati Infrastructure Project,EAP,Kiribati,Transport,50.6,54.6,1.0,110.0
+P506430,Supporting the Transition to a Sustainable Electricity Sector in Argentina,LCR,Argentina,Energy and Extractives,100.0,0.0,500.0,500.0
+P506438,Inga 3 Development Program,AFE,"Congo, Democratic Republic of",Energy and Extractives,37.1,19.2,73.5,250.0
+P506443,Mauritania Public Spending Efficiency,AFW,Mauritania,Governance,25.0,4.1,8.4,50.0
+P506463,Second Growth Foundations Development Policy Operation,ECA,Ukraine,Macroeconomics Trade and Investment,43.0,26.3,425.7,1051.0
+P506486,Improving Health Care in El Salvador Project,LCR,El Salvador,Health Nutrition and Population,62.6,22.7,52.4,120.0
+P506528,Human Capital Protection Project,AFW,Burkina Faso,Governance,10.0,10.0,0.0,100.4
+P506551,Strengthening Tertiary Education for Employability Innovation and Resilience,MNA,Tunisia,Education,41.9,14.1,27.8,100.0
+P506569,Transforming Access and Learning in Madagascar,AFE,Madagascar,Education,37.9,17.5,39.3,150.0
+P506602,Low Carbon City Program,EAP,China,Urban Resilience and Land,100.0,9.0,241.0,250.0
+P506611,Tajikistan Digital Foundations Project,ECA,Tajikistan,Digital Development,56.3,2.4,14.5,30.0
+P506691,Strengthening Institutions for Transparency and Accountability (SITA),SAR,Bangladesh,Macroeconomics Trade and Investment,3.7,9.1,0.2,250.0
+P506803,Geospatial Infrastructure for Sustainable Territorial Development,ECA,Uzbekistan,Urban Resilience and Land,73.4,13.4,12.3,35.0
+P506807,Green Urban Development Project,EAP,China,Urban Resilience and Land,62.5,29.0,127.2,250.0
+P506815,DRC Transport and Connectivity Development Project,AFE,"Congo, Democratic Republic of",Transport,54.5,231.1,8.7,440.2
+P506825,Accelerate Bhutan’s Job Transformation through Renewable Natural Resource Value Chains,SAR,Bhutan,Agriculture and Food,54.0,8.5,7.6,29.8
+P506846,Support to the Sustainability and Equity of Public Transport Project,LCR,Argentina,Transport,100.0,0.0,500.0,500.0
+P506960,Seychelles First Sustainable and Inclusive Growth Development Policy Operation,AFE,Seychelles,Macroeconomics Trade and Investment,21.4,0.0,3.2,15.0
+P506969,Integrated Community Resilience Project,MNA,Djibouti,Social Sustainability and Inclusion,29.0,8.8,0.2,31.0
+P506997,Türkiye Second Irrigation Modernization and Water Efficiency Project,ECA,Turkiye,Water,99.8,409.5,408.1,819.0
+P507001,HOPE for Quality Basic Education for All,AFW,Nigeria,Education,11.7,31.4,27.0,500.0
+P507031,South Africa : Infrastructure Modernization DPL,AFE,South Africa,Macroeconomics Trade and Investment,72.2,0.0,1083.3,1500.0
+P507033,RETRADE-SA MPA Phase 1: Zambia - Tanzania Interconnector Project,AFE,Zambia,Energy and Extractives,100.0,61.3,183.8,245.0
+P507066,"Meghalaya Multisectoral Project for Adolescent Wellbeing, Empowerment and Resilience (MPOWER)",SAR,India,Social Protection and Jobs,10.0,3.0,0.5,35.0
+P507116,First Zambia Climate and Economic Resilience Programmatic DPF with Cat-DDO,AFE,Zambia,Macroeconomics Trade and Investment,50.0,25.8,24.2,100.0
+P507190,Barbados – Beryl Emergency Response and Recovery Project,LCR,Barbados,Urban Resilience and Land,56.4,30.4,0.0,54.0
+P507209,Tunisia Health System Strengthening Project,MNA,Tunisia,Health Nutrition and Population,65.7,11.6,59.4,108.0
+P507220,Advancing Innovative Methods to Promote Learning (AIM4Learning) in Eastern and Southern Africa MPA Program,AFE,Eastern and Southern Africa,Education,24.6,3.4,0.2,14.6
+P507248,Third Strengthening Human Capital for a Resilient Morocco DPF,MNA,Morocco,Health Nutrition and Population,49.3,231.4,64.3,600.0
+P507259,Sustainable and Resilient Recovery DPF and CAT DDO,LCR,Jamaica,Finance Competitiveness and Innovation,35.7,41.1,27.4,192.0
+P507276,Formal Employment Creation 2 Project,ECA,Turkiye,Social Protection and Jobs,10.0,50.0,0.0,500.0
+P507282,Iraq Railways Extension and Modernization Project,MNA,Iraq,Transport,99.6,44.7,881.7,930.0
+P507304,"Tunisia Energy Reliability, Efficiency, and Governance Improvement Program (TEREG)",MNA,Tunisia,Energy and Extractives,81.4,21.7,303.7,400.0
+P507316,Saint Vincent and the Grenadines: Beryl Emergency Resilient Recovery Project,LCR,St. Vincent and the Grenadines,Urban Resilience and Land,49.5,31.2,0.0,63.0
+P507322,"Brazil Increasing Productivity, Sustainability and Inclusion DPF",LCR,Brazil,Macroeconomics Trade and Investment,50.0,130.0,370.0,1000.0
+P507360,Eswatini Youth Employment Opportunities Project,AFE,Eswatini,Social Protection and Jobs,41.8,10.1,1.2,27.0
+P507373,Support to the Strengthening of Social Safety Nets for Human Development in Morocco Project,MNA,Morocco,Social Protection and Jobs,24.6,59.5,1.9,250.0
+P507382,Jordan Growth and Competitiveness DPFs,MNA,Jordan,Finance Competitiveness and Innovation,11.1,33.3,11.1,400.0
+P507433,Modernization of Rani Jamara Kulariya Irrigation Project - Phase 3,SAR,Nepal,Water,87.9,115.5,4.9,137.0
+P507508,Amaravati Integrated Urban Development Program,SAR,India,Urban Resilience and Land,61.8,207.4,287.4,800.0
+P507512,Getting Results: Access and Delivery of Quality Education Services in Balochistan,SAR,Pakistan,Education,20.6,14.2,6.4,100.0
+P507516,Third Bridges Improvement and Maintenance Program,SAR,Nepal,Transport,43.8,60.9,4.9,150.0
+P507576,Moldova Supporting Economic Opportunities and Climate Transition DPO,ECA,Moldova,Macroeconomics Trade and Investment,35.5,4.9,27.0,90.0
+P507659,Western Balkans Trade and Transport Facilitation 2.0,ECA,Kosovo,Finance Competitiveness and Innovation,19.1,1.7,5.5,37.7
+P507684,Jordan Innovative Startups and SMEs Fund 2.0,MNA,Jordan,Finance Competitiveness and Innovation,10.0,2.5,2.5,50.0
+P507759,Accelerating Sustainable and Clean Energy Access Transformation in Mozambique,AFE,Mozambique,Energy and Extractives,72.1,10.5,61.6,100.0
+P507760,Saint Vincent and the Grenadines Disaster Risk Management Cat-DDO,LCR,St. Vincent and the Grenadines,Urban Resilience and Land,90.0,16.0,2.0,20.0
+P507788,Accelerating Sustainable and Clean Energy and Digital Access Transformation in Sudan,AFE,Sudan,Energy and Extractives,58.5,7.1,37.5,76.3
+P507844,Dakar Sustainable Urban Mobility Project,AFW,Senegal,Transport,96.3,5.8,90.5,100.0
+P507861,"First DRC Governance, Transparency and Economic Resilience Development Policy Financing",AFE,"Congo, Democratic Republic of",Macroeconomics Trade and Investment,10.0,0.0,60.0,600.0
+P507881,Kosovo Financial Sector Development,ECA,Kosovo,Finance Competitiveness and Innovation,9.0,2.6,2.1,52.0
+P507912,United Republic of Tanzania - Development Policy Financing with Catastrophe Deferred Drawdown Option,AFE,Tanzania,Urban Resilience and Land,60.0,127.5,52.5,300.0
+P507916,Barbados Disaster Risk Management Cat DDO,LCR,Barbados,Urban Resilience and Land,90.0,26.4,0.6,30.0
+P507921,Mali Connectivity and Road Resilience Project (Mali-NSS),AFW,Mali,Transport,60.2,121.0,11.2,219.8
+P507935,Accelerating Nutrition Results in Nigeria 2.0,AFW,Nigeria,Health Nutrition and Population,49.8,38.5,1.3,80.0
+P508006,Myanmar Strengthening Community Resilience Project,EAP,Myanmar,Social Sustainability and Inclusion,47.0,21.2,3.5,52.5
+P508058,"Bangladesh Sustainable Recovery, Emergency Preparedness and Response Project",SAR,Bangladesh,Urban Resilience and Land,66.3,176.6,2.4,270.0
+P508089,Myanmar Health Assistance and Nutrition Support (HANS) Project,EAP,Myanmar,Health Nutrition and Population,50.0,20.0,0.0,40.0
+P508114,Dominica: Strengthening Fiscal and Climate Resilience DPC,LCR,Dominica,Macroeconomics Trade and Investment,60.0,4.8,9.6,24.0
+P508124,Armenia Water and Irrigation Services Enhancement Program - Phase 1 Project,ECA,Armenia,Water,86.2,46.6,22.4,80.0
+P508182,Gazetted Forests Management Project 2,AFW,Benin,Environment Natural Resources and the Blue Economy,100.0,0.0,80.7,80.7
+P508222,Punjab Clean Air Program,SAR,Pakistan,Transport,68.2,0.0,204.5,300.0
+P508225,Fiscal Management and Competitiveness Development Policy Loan,AFE,Eswatini,Macroeconomics Trade and Investment,18.8,15.6,3.1,100.0
+P508323,Indonesia Productive and Sustainable Investment Development Policy Loan,EAP,Indonesia,Finance Competitiveness and Innovation,41.3,365.6,253.1,1500.0
+P508408,"Bulsho: Strengthening Community and Local Institutions for Social Cohesion, Inclusion, and Resilience",AFE,Somalia,Social Sustainability and Inclusion,48.0,9.5,0.1,20.0
+P508410,DRC Urban Flood Resilience Project,AFE,"Congo, Democratic Republic of",Urban Resilience and Land,87.6,175.1,0.0,200.0
+P508519,"Strengthening Social Protection for Improved Resilience, Inclusion and Targeting",SAR,Bangladesh,Social Protection and Jobs,49.3,98.7,0.0,200.0
+P508608,First Sustainable and Inclusive Growth Development Policy Operation,ECA,Kyrgyz Republic,Macroeconomics Trade and Investment,41.0,9.6,32.0,101.5
+P508693,Guyana One Health Project,LCR,Guyana,Health Nutrition and Population,17.3,0.6,0.6,7.0
+P508708,Jordan: Resilient and Sustainable Social Protection Program for Results,MNA,Jordan,Social Protection and Jobs,23.2,92.7,0.0,400.0
+P508960,Accelerating Sustainable and Clean Energy Access Transformation in Eswatini (ASCENT Eswatini),AFE,Eswatini,Energy and Extractives,70.9,10.8,53.0,90.0
+P509222,Somalia Disaster Risk Management DPF with a Catastrophe Deferred Draw Down Option,AFE,Somalia,Urban Resilience and Land,65.0,13.0,0.0,20.0
+P509250,Uzbekistan Small Hydropower Development Project,ECA,Uzbekistan,Energy and Extractives,100.0,0.1,149.9,150.0
+P509428,Lebanon Emergency Assistance Project,MNA,Lebanon,Urban Resilience and Land,17.3,16.1,27.1,250.0
+P509550,Zambia Water Supply and Sanitation Services in Growth Centers Program,AFE,Zambia,Water,45.4,6.8,8.2,33.0
+P509552,Argentina: Fiscal Sustainability and Competitiveness DPF,LCR,Argentina,Macroeconomics Trade and Investment,25.0,0.0,375.0,1500.0
+P509601,Niger Food Security and Emergency Access to Essential Services Project,AFW,Niger,Governance,20.9,40.8,5.1,220.0
+P509677,Socio-economic Inclusion of Refugees & Host Communities in Rwanda Project Phase II,AFE,Rwanda,Social Sustainability and Inclusion,30.1,18.7,1.4,66.7
+P509685,Sustaining Education and Learning,MNA,"Yemen, Republic of",Education,7.8,0.4,0.4,10.0
+P509738,Kenya Watershed Services Improvement Project,AFE,Kenya,Environment Natural Resources and the Blue Economy,81.5,66.0,96.9,200.0
+P509760,"Tonga Second Fiscal, Disaster, and Climate Resilience Development Policy Operation",EAP,Tonga,Macroeconomics Trade and Investment,60.0,4.8,2.4,12.0
+P509826,Mozambique Human Development Integrated Project,AFE,Mozambique,Education,38.5,31.7,6.8,100.0
+P509890,Urban Water Security Project,AFE,Mozambique,Water,36.7,52.5,0.0,143.0
+P509948,Madagascar Second Equitable and Resilient Growth Development Policy Operation,AFE,Madagascar,Macroeconomics Trade and Investment,2.4,0.0,2.4,100.0
+P510198,Lao PDR Pollution and Waste Management Project,EAP,Lao People's Democratic Republic,Environment Natural Resources and the Blue Economy,10.2,2.5,1.0,34.5
+P510382,M300 Patient Capital Facility,AFW,Western and Central Africa,Energy and Extractives,100.0,1.3,23.8,25.0
+P510427,Transport Corridors for Economic Resilience Mozambique SOP 2 Project,AFE,Mozambique,Transport,42.7,46.9,5.7,123.3
+P510448,Excellence in Learning in Liberia,AFW,Liberia,Education,18.9,6.2,5.1,60.0
+P510476,Uganda Development Response to Displacement Impacts Project Phase II,AFE,Uganda,Social Sustainability and Inclusion,33.1,74.2,34.5,328.0
+P510613,Strengthening Senegal’s Fiscal Sustainability Program,AFW,Senegal,Governance,16.2,0.0,18.6,115.0
+P511072,Scaling Private Investments for Renewable Energy Transformation in Sri Lanka,SAR,Sri Lanka,Energy and Extractives,100.0,10.0,30.0,40.0
+P511201,Bangladesh: Strengthening Governance and Institutional Resilience,SAR,Bangladesh,Macroeconomics Trade and Investment,6.7,30.6,2.8,500.0
+P511407,Syria Electricity Emergency Project,MNA,Syrian Arab Republic,Energy and Extractives,97.1,7.0,134.7,146.0
+P511453,Guinea Electricity Access Scale Up Project-Phase 2,AFW,Guinea,Energy and Extractives,91.3,10.5,110.4,132.3
+P511558,"Mozambique Health Emergency Preparedness, Response and Resilience Project Using the Multiphase Programmatic Approach",AFE,Mozambique,Health Nutrition and Population,47.2,62.4,32.5,201.0

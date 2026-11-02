@@ -30,6 +30,7 @@ knitr:
 ---
 
 ```{r setup}
+invisible(Sys.setlocale("LC_CTYPE", "C.UTF-8"))
 library(data.table)
 library(ggplot2)
 library(scales)
@@ -429,3 +430,39 @@ Q&A prep:
 - "What about Trump / the US?" — In June 2026 the Bank dropped its 45% climate-finance target under US pressure; the climate action plan was extended. Climate projects continue, but there's no headline target.
 - "Does the Bank still fund fossil fuels?" — It stopped financing upstream oil & gas from 2019; in 2025 it lifted its ban on financing nuclear power and opened the door to upstream gas ("all of the above" energy).
 :::
+
+## Appendix: biggest World Bank climate-finance projects, FY25 {.smaller}
+
+```{r top-projects}
+pr <- fread("data/fy25_project_climate_finance.csv", encoding = "UTF-8")
+pr[, cf_m := ad + mi]
+pr <- pr[!is.na(cf_m)][order(-cf_m)]
+tot_cf <- sum(pr$cf_m)
+short <- c(
+  "South Africa : Infrastructure Modernization DPL" = "Infrastructure modernization (policy loan)",
+  "Iraq Railways Extension and Modernization Project" = "Railways extension and modernization",
+  "Türkiye Second Irrigation Modernization and Water Efficiency Project" = "Irrigation modernization and water efficiency",
+  "Philippines First Energy Transition and Climate Resilience DPL" = "Energy transition and climate resilience (policy loan)",
+  "Eastern Türkiye Middle Corridor Railway Development Project" = "Eastern Türkiye 'Middle Corridor' railway",
+  "Indonesia Productive and Sustainable Investment Development Policy Loan" = "Productive and sustainable investment (policy loan)",
+  "Indonesia Sustainable Least-cost Electrification-2 (ISLE-2) Operation" = "Least-cost electrification (ISLE-2)",
+  "Support to the Sustainability and Equity of Public Transport Project" = "Public transport sustainability and equity",
+  "Supporting the Transition to a Sustainable Electricity Sector in Argentina" = "Transition to a sustainable electricity sector",
+  "Brazil Increasing Productivity, Sustainability and Inclusion DPF" = "Productivity, sustainability and inclusion (policy loan)")
+top <- head(pr, 10)
+top[, Project := fifelse(name %in% names(short), short[name], name)]
+top[grepl("Irrigation Modernization", name), Project := "Irrigation modernization and water efficiency"]
+top[grepl("Middle Corridor Railway", name), Project := "Eastern Middle Corridor railway"]
+top[country == "Turkiye", country := "Türkiye"]
+knitr::kable(top[, .(`#` = .I, Project, Country = country,
+                     `Climate finance (US\\$m)` = format(round(cf_m), big.mark = ","),
+                     `% of project` = paste0(round(cf), "%"),
+                     `Adapt. / Mitig. (US\\$m)` = paste0(round(ad), " / ", round(mi)))],
+             align = "rlllrrr")
+top10 <- sum(top$cf_m) / tot_cf
+dpf_share <- pr[grepl("DPL|DPF|Development Policy|DPO", name), sum(cf_m)] / tot_cf
+```
+
+The top 10 make up **`r percent(top10)`** of the $39.2bn across `r nrow(pr)` projects. Four of them are **budget-support (policy) loans**, which account for `r percent(dpf_share)` of all climate finance — the "climate" part is the share of reforms judged climate-relevant (e.g. renewable auctions, subsidy reform).
+
+[Source: [World Bank, Climate Finance 2025 — project-level data](https://thedocs.worldbank.org/en/doc/af985cf92e8b967ba707f43fb2dd9de7-0320012025/original/FY25-Project-Level-WB-CCB-data.pdf) (IBRD + IDA; IFC and MIGA not included). Policy loans identified from project titles.]{.cite}
