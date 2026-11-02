@@ -407,7 +407,14 @@
     a.download = (window._fileTag || 'spillover_champions') + '.csv'; a.click();
   }
 
-  fetch('data/spillover_champions.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(d => {
+  // DATA_LAYOUT changes whenever the JSON structure changes; it busts the browser cache of the data file
+  // (GitHub Pages lets browsers keep it for a while), so a redeployed page never runs against a stale file.
+  const DATA_LAYOUT = 3;
+  fetch('data/spillover_champions.json?v=' + DATA_LAYOUT, { cache: 'no-cache' })
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status + ' -- the page needs to be served over http(s), e.g. from GitHub Pages'); return r.json(); })
+    .then(d => {
+    if (!d.firms || !d.firms.length || !d.firms[0].v || !d.meta || !d.meta.v_layout)
+      throw new Error('the data file is from an older build of this page; reload with the cache bypassed (Cmd/Ctrl-Shift-R) or regenerate it with export_spillover_champions()');
     DATA = d;
     const sectors = [...new Set(d.firms.map(f => f.sector).filter(Boolean))].sort();
     MS.sector = MultiSelect($('sector'), sectors, 'type to add a sector…', draw);
@@ -419,7 +426,7 @@
     for (const k of ['stat', 'topn', 'minn', 'green', 'hq', 'width']) ctl[k].addEventListener('change', draw);
     $('csv').addEventListener('click', downloadCSV);
     draw();
-  }).catch(e => { $('chart').innerHTML = '<p class="err">Could not load data/spillover_champions.json (' + esc(e.message) + '). The page needs to be served over http(s), e.g. from GitHub Pages.</p>'; });
+  }).catch(e => { console.error(e); $('chart').innerHTML = '<p class="err">Could not show the chart: ' + esc(e.message) + '.</p>'; });
 })();
 </script>
 </body>
