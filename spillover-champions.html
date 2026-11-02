@@ -14,57 +14,69 @@
   gtag('config', 'G-Q04C57850T');
 </script>
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic&display=swap" rel="stylesheet">
 <style>
-  :root { --ink:#1d1d1d; --muted:#666; --accent:#2b5a8c; --line:#e6e6e2; --green:#5a9e5a; --orange:#d4a24c; }
+  /* Same look as the R Markdown posts on KEVCE Insights (Bootstrap "flatly": Lato, #2c3e50 ink, #18bc9c links) */
+  :root { --ink:#2c3e50; --muted:#7b8a8b; --link:#18bc9c; --line:#ecf0f1; --border:#dce4ec; --bar:#18bc9c; --bar-dark:#128f76; --accent2:#f39c12; }
+  * { box-sizing: border-box; }
   body {
-    font-family: Georgia, "Iowan Old Style", "Source Serif Pro", serif;
-    color: var(--ink); background: #fdfdfb;
-    max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px;
-    line-height: 1.55; font-size: 16px;
+    font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 15px; line-height: 1.42857143; color: var(--ink); background: #fff;
+    max-width: 940px; margin: 0 auto; padding: 0 15px 60px;
   }
-  a { color: var(--accent); }
-  .crumb { font-family: "Source Sans Pro","Helvetica Neue",Helvetica,Arial,sans-serif; font-size: .9rem; color: var(--muted); margin-bottom: 18px; }
-  .crumb a { text-decoration: none; }
-  h1 { font-family: "Source Sans Pro","Helvetica Neue",Helvetica,Arial,sans-serif; font-weight: 600; font-size: 2.4rem; line-height: 1.1; letter-spacing: -0.01em; margin: 0 0 8px; }
-  .lede { color: var(--muted); font-size: 1.02rem; margin: 0 0 22px; max-width: 820px; }
+  a { color: var(--link); text-decoration: none; }
+  a:hover { color: #0f7864; text-decoration: underline; }
+  h1, h2, h3, h4 { font-family: inherit; font-weight: 400; line-height: 1.1; color: inherit; }
+  .crumb { font-size: 13px; color: var(--muted); margin: 18px 0 0; }
+  #header { margin-top: 26px; margin-bottom: 20px; }
+  h1.title { font-size: 39px; margin: 20px 0 10px; }
+  h4.author, h4.date { font-size: 19px; margin: 10px 0; }
+  h4.date { margin-bottom: 20px; }
+  .lede { margin: 0 0 20px; }
   .controls {
-    font-family: "Source Sans Pro","Helvetica Neue",Helvetica,Arial,sans-serif; font-size: .92rem;
-    display: flex; flex-wrap: wrap; gap: 12px 22px; align-items: flex-end;
-    border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 14px 0; margin-bottom: 6px;
-    position: sticky; top: 0; background: #fdfdfb; z-index: 5;
+    font-size: 14px; display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: flex-end;
+    background: var(--line); border-radius: 4px; padding: 14px 16px; margin-bottom: 8px;
+    position: sticky; top: 0; z-index: 5;
   }
   .ctl { display: flex; flex-direction: column; gap: 3px; }
-  .ctl label { color: var(--muted); font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; }
-  .ctl select, .ctl input[type=text] { font: inherit; font-size: .95rem; padding: 4px 6px; border: 1px solid #cfcfc9; border-radius: 4px; background: #fff; color: var(--ink); }
-  .ctl.check { flex-direction: row; align-items: center; gap: 6px; padding-bottom: 5px; }
-  .ctl.check label { text-transform: none; letter-spacing: 0; font-size: .92rem; color: var(--ink); }
+  .ctl label { color: var(--ink); font-size: 13px; font-weight: 700; }
+  .ctl label span { font-weight: 400; color: var(--muted); }
+  .ctl select, .ctl input[type=text] { font: inherit; font-size: 14px; padding: 5px 8px; border: 1px solid var(--border); border-radius: 4px; background: #fff; color: var(--ink); }
+  .ctl select:focus, .ctl input[type=text]:focus { outline: 0; border-color: var(--ink); }
+  .ctl.check { flex-direction: row; align-items: center; gap: 6px; padding-bottom: 6px; }
+  .ctl.check label { font-weight: 400; font-size: 14px; }
   #chart { width: 100%; }
-  .summary { font-family: "Source Sans Pro","Helvetica Neue",Helvetica,Arial,sans-serif; font-size: .9rem; color: var(--muted); margin: 4px 0 0; }
-  .notes { border-top: 1px solid var(--line); margin-top: 28px; padding-top: 18px; font-size: .95rem; color: #333; max-width: 860px; }
-  .notes h2 { font-family: "Source Sans Pro","Helvetica Neue",Helvetica,Arial,sans-serif; font-weight: 600; font-size: 1.15rem; margin: 0 0 8px; }
-  .notes dt { font-weight: bold; margin-top: 8px; }
-  .notes dd { margin: 0 0 0 0; color: #444; }
-  button.dl { font: inherit; font-family: "Source Sans Pro","Helvetica Neue",Helvetica,Arial,sans-serif; font-size: .9rem; padding: 5px 10px; border: 1px solid #cfcfc9; border-radius: 4px; background: #fff; cursor: pointer; }
-  button.dl:hover { border-color: var(--accent); color: var(--accent); }
+  .summary { font-size: 14px; color: var(--muted); margin: 6px 0 0; }
+  .notes { border-top: 1px solid var(--line); margin-top: 28px; padding-top: 10px; }
+  .notes h2 { font-size: 32px; margin: 20px 0 10px; }
+  .notes dt { font-weight: 700; margin-top: 10px; }
+  .notes dd { margin: 0; }
+  button.dl { font: inherit; font-size: 14px; padding: 6px 12px; border: 1px solid #95a5a6; border-radius: 4px; background: #95a5a6; color: #fff; cursor: pointer; }
+  button.dl:hover { background: #798d8f; border-color: #798d8f; }
+  .err { color: #e74c3c; }
   .ms { position: relative; min-width: 230px; max-width: 360px; }
-  .ms .box { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; min-height: 29px; padding: 2px 4px; border: 1px solid #cfcfc9; border-radius: 4px; background: #fff; cursor: text; }
-  .ms .box:focus-within { border-color: var(--accent); }
-  .ms .chip { display: inline-flex; align-items: center; gap: 4px; background: #eef3ea; border: 1px solid #cfdcc8; border-radius: 3px; padding: 0 4px 0 6px; font-size: .82rem; line-height: 1.5; max-width: 200px; }
+  .ms .box { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; min-height: 31px; padding: 2px 4px; border: 1px solid var(--border); border-radius: 4px; background: #fff; cursor: text; }
+  .ms .box:focus-within { border-color: var(--ink); }
+  .ms .chip { display: inline-flex; align-items: center; gap: 4px; background: var(--line); border: 1px solid var(--border); border-radius: 3px; padding: 0 4px 0 6px; font-size: 12.5px; line-height: 1.6; max-width: 200px; }
   .ms .chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .ms .chip b { cursor: pointer; font-weight: normal; color: var(--muted); padding: 0 2px; }
-  .ms .chip b:hover { color: #a33; }
-  .ms input { flex: 1 1 60px; min-width: 60px; border: 0 !important; outline: 0; padding: 2px 3px !important; font-size: .9rem !important; background: transparent; }
-  .ms .list { position: absolute; left: 0; right: 0; top: 100%; z-index: 20; max-height: 260px; overflow-y: auto; background: #fff; border: 1px solid #cfcfc9; border-radius: 0 0 4px 4px; box-shadow: 0 6px 16px rgba(0,0,0,.08); display: none; }
-  .ms .list div { padding: 4px 8px; font-size: .9rem; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .ms .list div:hover, .ms .list div.hl { background: #eef3ea; }
+  .ms .chip b:hover { color: #e74c3c; }
+  .ms input { flex: 1 1 60px; min-width: 60px; border: 0 !important; outline: 0; padding: 3px !important; font-size: 14px !important; background: transparent; }
+  .ms .list { position: absolute; left: 0; right: 0; top: 100%; z-index: 20; max-height: 260px; overflow-y: auto; background: #fff; border: 1px solid var(--border); border-radius: 0 0 4px 4px; box-shadow: 0 6px 16px rgba(0,0,0,.08); display: none; }
+  .ms .list div { padding: 4px 8px; font-size: 14px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ms .list div:hover, .ms .list div.hl { background: var(--line); }
   .ms .list .none { color: var(--muted); cursor: default; font-style: italic; }
-  .err { color: #a33; font-family: "Source Sans Pro",Helvetica,Arial,sans-serif; }
 </style>
 </head>
 <body>
 
-<div class="crumb"><a href="index.html">KEVCE Insights</a> · Global R&amp;D firms and EMDE innovation</div>
-<h1>Spillover champions</h1>
+<div class="crumb"><a href="index.html">&larr; KEVCE Insights</a></div>
+<div id="header">
+<h1 class="title">Spillover champions: which R&amp;D firms create the most knowledge for others?</h1>
+<h4 class="author">Innovation Strategy Explorer — insights</h4>
+<h4 class="date">2026-11-02</h4>
+</div>
 <p class="lede">Which of the world's top R&amp;D investors generate the most valuable knowledge spillovers — globally, to high-income countries, to emerging and developing economies, or to a particular country? Pick the scope and the measure (spillovers, marginal or average returns, private value), the statistic (mean, total or median over the firm's innovations), how many firms to show and the minimum portfolio size. Hover a bar for the firm's details; the chart's camera icon saves a PNG.</p>
 
 <div class="controls">
@@ -117,7 +129,7 @@
     <dt>Scope</dt><dd>Where the recipients of the knowledge flows are located: anywhere ("Global"), in high-income countries, in emerging and developing economies with or without China (and India), or in one of China, India, the UK, the US or the EU. The scopes are the same as in the <a href="https://iseapp.kevce.org">Innovation Strategy Explorer</a>; "EMDE (excl. China)" is the paper's main definition.</dd>
     <dt>Measure</dt><dd><i>Spillovers</i> are the expected value of the knowledge flows an innovation generates for later innovations located in the scope, in USD million, following the Patent Rank approach of <a href="https://cep.lse.ac.uk/pubs/download/dp2223.pdf">Martin, Verhoeven et al.</a>. <i>Marginal returns</i> relate those spillovers to the cost of the innovation: (α+1)/cost × spillovers, where α is Watson's estimate of how strongly the innovation's private value responds to its cost; the measure is set to zero for innovations whose private value already exceeds twice their cost, since no public support would be needed to bring them about. <i>Average returns</i> are (private value + spillovers)/cost, the total value created per dollar of R&amp;D cost. Both returns are shown in percent of cost. <i>Private value</i> is the expected private (stock-market) value of the innovation to its owner, USD million, independent of scope. Returns are missing for the few innovations without a Watson cost estimate and are then computed over the rest.</dd>
     <dt>Statistic</dt><dd>The bar shows, over the firm's innovations in the window, the mean per innovation (the default, and what the paper's firm-level analysis uses), the total (mean × number of innovations, so it rewards large portfolios; not offered for returns, which are ratios) or the median. Spillovers are very skewed — most innovations generate none in a given region — so regional medians are often exactly zero and the median ranking is only informative for global spillovers, private value and average returns.</dd>
-    <dt>Caveats</dt><dd>Averages over few innovations are noisy, which is why the minimum portfolio size defaults to 30. Firm names are the Scoreboard's; subsidiaries are folded into the parent where the Scoreboard lists them together. Pinned firms are drawn in a darker green and are shown whatever the filters (minimum portfolio size included), appended below the ranked top-N if they do not make it; set "Firms shown" to "Only pinned firms" to compare just those.</dd>
+    <dt>Caveats</dt><dd>Averages over few innovations are noisy, which is why the minimum portfolio size defaults to 30. Firm names are the Scoreboard's; subsidiaries are folded into the parent where the Scoreboard lists them together. Pinned firms are drawn in a darker shade and are shown whatever the filters (minimum portfolio size included), appended below the ranked top-N if they do not make it; set "Firms shown" to "Only pinned firms" to compare just those.</dd>
   </dl>
   <p id="vintage"></p>
   <p>Browse individual innovations behind these numbers in the <a href="emde-inno-examples.html">EMDE innovation examples</a> tool. Data file: <a href="data/spillover_champions.json">spillover_champions.json</a>.</p>
@@ -319,8 +331,8 @@
 
     const traces = [{
       type: 'bar', orientation: 'h', x: vals, y: pos, width: w.map(x => x * 0.72), name: STATW[st] + ' ' + lc(LAB),
-      marker: { color: shown.map(d => pinned.has(d.name) ? 'rgb(44,100,44)' : 'rgb(90,158,90)') },
-      text: vals.map(fmt), textposition: 'outside', constraintext: 'none', textfont: { size: 11, color: '#2f6b2f' },
+      marker: { color: shown.map(d => pinned.has(d.name) ? '#128f76' : '#18bc9c') },
+      text: vals.map(fmt), textposition: 'outside', constraintext: 'none', textfont: { size: 11, color: '#128f76' },
       cliponaxis: false, hovertemplate: hover, xaxis: 'x', yaxis: 'y'
     }];
     const shapes = [];
@@ -328,31 +340,31 @@
       traces.push({
         type: 'scatter', mode: 'markers', x: shares.map(x => x == null ? null : 100 * x), y: pos,
         name: shareLabel + ' (%)',
-        marker: { symbol: 'diamond', size: 11, color: 'rgb(212,162,76)', line: { color: '#fff', width: 1 } },
+        marker: { symbol: 'diamond', size: 11, color: '#f39c12', line: { color: '#fff', width: 1 } },
         hovertemplate: shown.map((d, i) => `<b>${esc(d.name)}</b><br>${shareLabel}: <b>${fmtPct(shares[i])}</b>` +
           `<br>${LAB}: ${fmtM(d.v[sc][0])} of ${fmtM(d.v.g[0])} global (mean per innovation)<extra></extra>`),
         xaxis: 'x2', yaxis: 'y'
       });
       if (meanShare != null)
         shapes.push({ type: 'line', xref: 'x2', yref: 'paper', x0: 100 * meanShare, x1: 100 * meanShare, y0: 0, y1: 1,
-                      line: { color: 'rgb(212,162,76)', width: 1.5, dash: 'dash' } });
+                      line: { color: '#f39c12', width: 1.5, dash: 'dash' } });
     }
     const height = Math.max(380, 140 + rowH * acc + (showShare ? 50 : 0));
     const xmax = Math.max(...vals, 0) * 1.18 || 1;
     const layout = {
       height, margin: { l: 10, r: 30, t: showShare ? 60 : 30, b: showShare ? 90 : 50 },
-      paper_bgcolor: '#fdfdfb', plot_bgcolor: '#fdfdfb',
-      font: { family: '"Source Sans Pro","Helvetica Neue",Helvetica,Arial,sans-serif', size: 13, color: '#1d1d1d' },
+      paper_bgcolor: '#fff', plot_bgcolor: '#fff',
+      font: { family: 'Lato,"Helvetica Neue",Helvetica,Arial,sans-serif', size: 13, color: '#2c3e50' },
       yaxis: { range: [acc + 0.1, -0.1], tickmode: 'array', tickvals: pos, ticktext: names, automargin: true,
                tickfont: { size: wmode === 'equal' ? 12 : 11 }, ticksuffix: '  ', fixedrange: true, showgrid: false, zeroline: false },
-      xaxis: { title: { text: STATW[st] + ' ' + lc(LAB) + ' (' + unitTxt(me, st) + ')', font: { size: 13, color: '#2f6b2f' } },
-               range: [0, xmax], gridcolor: '#ececea', zeroline: false, fixedrange: true },
+      xaxis: { title: { text: STATW[st] + ' ' + lc(LAB) + ' (' + unitTxt(me, st) + ')', font: { size: 13, color: '#128f76' } },
+               range: [0, xmax], gridcolor: '#ecf0f1', zeroline: false, fixedrange: true },
       showlegend: showShare, legend: { orientation: 'h', x: 0, y: -0.09, xanchor: 'left', yanchor: 'top', font: { size: 12 } },
       shapes,
       annotations: (showShare && meanShare != null) ? [{
         xref: 'x2', yref: 'paper', x: 100 * meanShare, y: 0.995, xanchor: 'left', yanchor: 'top', showarrow: false,
-        text: ' mean share ' + fmtPct(meanShare), font: { size: 11, color: 'rgb(180,130,40)' },
-        bgcolor: 'rgba(253,253,251,0.85)' }] : []
+        text: ' mean share ' + fmtPct(meanShare), font: { size: 11, color: '#c67f0c' },
+        bgcolor: 'rgba(255,255,255,0.85)' }] : []
     };
     if (!M.money) {            // returns: data are ratios, axis in percent of cost
       const step = [1, 2, 5].map(m => m * Math.pow(10, Math.floor(Math.log10(xmax / 5)))).find(sv => xmax / sv <= 7) || xmax / 5;
@@ -366,8 +378,8 @@
     if (showShare) {
       const smax = Math.max(...shares.map(x => 100 * (x || 0)), 100 * (meanShare || 0), 5) * 1.15;
       layout.xaxis2 = { overlaying: 'x', side: 'top', range: [0, Math.min(100, smax)], ticksuffix: '%',
-                        title: { text: shareLabel + ' (%)', font: { size: 12, color: 'rgb(180,130,40)' } },
-                        tickfont: { color: 'rgb(180,130,40)', size: 11 }, showgrid: false, zeroline: false, fixedrange: true };
+                        title: { text: shareLabel + ' (%)', font: { size: 12, color: '#c67f0c' } },
+                        tickfont: { color: '#c67f0c', size: 11 }, showgrid: false, zeroline: false, fixedrange: true };
     }
     const fileTag = 'spillover_champions_' + (me === 'pv' ? 'pv' : me + '_' + sc) + (st === 'mean' ? '' : '_' + st);
     Plotly.react('chart', traces, layout, { responsive: true, displaylogo: false,
