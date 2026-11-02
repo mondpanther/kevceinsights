@@ -50,6 +50,7 @@
   .summary { font-size: 14px; color: var(--muted); margin: 6px 0 0; }
   .notes { border-top: 1px solid var(--line); margin-top: 28px; padding-top: 10px; }
   .notes h2 { font-size: 32px; margin: 20px 0 10px; }
+  h2.sub { font-size: 26px; margin: 36px 0 6px; }
   .notes dt { font-weight: 700; margin-top: 10px; }
   .notes dd { margin: 0; }
   button.dl { font: inherit; font-size: 14px; padding: 6px 12px; border: 1px solid #95a5a6; border-radius: 4px; background: #95a5a6; color: #fff; cursor: pointer; }
@@ -124,6 +125,10 @@
 <p class="summary" id="summary"></p>
 <div id="chart"></div>
 
+<h2 class="sub">Where the champions sit on the inverted U</h2>
+<p class="summary" id="usummary"></p>
+<div id="uchart"></div>
+
 <div class="notes">
   <h2>What is shown</h2>
   <dl>
@@ -131,6 +136,7 @@
     <dt>Scope</dt><dd>Where the recipients of the knowledge flows are located: anywhere ("Global"), in high-income countries, in emerging and developing economies with or without China (and India), or in one of China, India, the UK, the US or the EU. The scopes are the same as in the <a href="https://iseapp.kevce.org">Innovation Strategy Explorer</a>; "EMDE (excl. China)" is the paper's main definition.</dd>
     <dt>Measure</dt><dd><i>Spillovers</i> are the expected value of the knowledge flows an innovation generates for later innovations located in the scope, in USD million, following the Patent Rank approach of <a href="https://cep.lse.ac.uk/pubs/download/dp2223.pdf">Martin, Verhoeven et al.</a>. <i>Marginal returns</i> relate those spillovers to the cost of the innovation: (α+1)/cost × spillovers, where α is Watson's estimate of how strongly the innovation's private value responds to its cost; the measure is set to zero for innovations whose private value already exceeds twice their cost, since no public support would be needed to bring them about. <i>Average returns</i> are (private value + spillovers)/cost, the total value created per dollar of R&amp;D cost. Both returns are shown in percent of cost. <i>Private value</i> is the expected private (stock-market) value of the innovation to its owner, USD million, independent of scope. Returns are missing for the few innovations without a Watson cost estimate and are then computed over the rest.</dd>
     <dt>Technologies</dt><dd>Restricts each firm to its innovations in the selected technologies (the 84 technology classes of the <a href="https://iseapp.kevce.org">Innovation Strategy Explorer</a>: green, battery, AI, defence, hard-to-abate decarbonisation and others, with "Any …" aggregates per group), so the bars then compare, say, firms' <i>green</i> innovations. The firm's number of innovations and the minimum-portfolio filter refer to that subset. With several technologies selected the statistics are pooled over them, counting an innovation once per selected technology it belongs to (the overlap between technologies is not removed); medians are not available with a technology filter, and firm–technology pairs with fewer than 10 innovations are left out.</dd>
+    <dt>Inverted U</dt><dd>The second chart reproduces the paper's Figure 5 for whichever scope and measure is selected: every firm is a bubble (area proportional to its number of innovations) at its EMDE innovation share — the share of its innovations with at least one inventor in an EMDE excluding China — and its mean outcome per innovation; the firms shown in the bar chart are labelled. The curve is the unweighted quadratic OLS fit with its 95% band, the dashed line its peak, the thin lines the mean and median share. As in the paper, the sample is every firm with a known share and positive global spillovers, subject to the firm, headquarters and sector filters but not to the minimum-portfolio or technology filters (the share is a firm-level quantity), and the y-axis is capped at the 97.5th percentile (the paper's $50M for global spillovers) with firms above it drawn at the cap. With global spillovers, spillovers to HICs or to EMDE (excl. China) selected, the fit is the paper's.</dd>
     <dt>Statistic</dt><dd>The bar shows, over the firm's innovations in the window, the mean per innovation (the default, and what the paper's firm-level analysis uses), the total (mean × number of innovations, so it rewards large portfolios; not offered for returns, which are ratios) or the median. Spillovers are very skewed — most innovations generate none in a given region — so regional medians are often exactly zero and the median ranking is only informative for global spillovers, private value and average returns.</dd>
     <dt>Caveats</dt><dd>Averages over few innovations are noisy, which is why the minimum portfolio size defaults to 30. Firm names are the Scoreboard's; subsidiaries are folded into the parent where the Scoreboard lists them together. Pinned firms are drawn in a darker shade and are shown whatever the filters (minimum portfolio size included), appended below the ranked top-N if they do not make it; set "Firms shown" to "Only pinned firms" to compare just those.</dd>
   </dl>
@@ -455,6 +461,113 @@
       (MS.tech.values.length && !TECH ? ' Loading the technology data…' : '');
     writeURL();
     window._shown = shown; window._fileTag = fileTag;
+    drawU(new Set(shown.map(d => d.name)), sc, me);
+  }
+
+  // ---- the inverted U: quadratic OLS of y on the EMDE innovation share with a 95% band
+  function quadFit(x, y) {
+    const n = x.length; if (n < 4) return null;
+    // normal equations for [1, x, x^2]
+    let S = [[0,0,0],[0,0,0],[0,0,0]], T = [0,0,0];
+    for (let i = 0; i < n; i++) {
+      const r = [1, x[i], x[i] * x[i]];
+      for (let a = 0; a < 3; a++) { T[a] += r[a] * y[i]; for (let b = 0; b < 3; b++) S[a][b] += r[a] * r[b]; }
+    }
+    // invert 3x3
+    const [a,b,c,d,e,f,g,h,k] = [S[0][0],S[0][1],S[0][2],S[1][0],S[1][1],S[1][2],S[2][0],S[2][1],S[2][2]];
+    const det = a*(e*k-f*h) - b*(d*k-f*g) + c*(d*h-e*g); if (!det) return null;
+    const inv = [[(e*k-f*h)/det, (c*h-b*k)/det, (b*f-c*e)/det], [(f*g-d*k)/det, (a*k-c*g)/det, (c*d-a*f)/det], [(d*h-e*g)/det, (b*g-a*h)/det, (a*e-b*d)/det]];
+    const beta = inv.map(row => row[0]*T[0] + row[1]*T[1] + row[2]*T[2]);
+    let rss = 0; for (let i = 0; i < n; i++) { const yh = beta[0] + beta[1]*x[i] + beta[2]*x[i]*x[i]; rss += (y[i]-yh)*(y[i]-yh); }
+    const s2 = rss / (n - 3), t = n > 200 ? 1.96 : 2.0;
+    const pred = x0 => { const r = [1, x0, x0*x0]; let v = 0; for (let a = 0; a < 3; a++) for (let b = 0; b < 3; b++) v += r[a]*inv[a][b]*r[b];
+                         const yh = beta[0] + beta[1]*x0 + beta[2]*x0*x0, se = Math.sqrt(Math.max(0, s2 * v)); return [yh, yh - t*se, yh + t*se]; };
+    return { beta, n, pred, peak: beta[2] < 0 ? -beta[1] / (2 * beta[2]) : null };
+  }
+  function drawU(shownNames, sc, me) {
+    const M = MEASURE[me], fmt = M.money ? fmtM : fmtRet, LAB = label(sc, me);
+    // the paper's sample: known share, positive total global spillovers; page filters except portfolio size / technology
+    let f = DATA.firms.filter(d => d.s != null && d.pv[0] != null && d.v.g[1] > 0 && val(d, sc, me, 'mean') != null);
+    if (ctl.green.value === 'green') f = f.filter(d => d.green);
+    if (ctl.hq.value !== 'all') f = f.filter(d => d.hqg === ctl.hq.value);
+    if (MS.sector.values.length) { const S = new Set(MS.sector.values); f = f.filter(d => S.has(d.sector)); }
+    if (f.length < 10) { Plotly.purge('uchart'); $('usummary').textContent = 'Too few firms for the fit with the current filters.'; return; }
+    const x = f.map(d => d.s), y = f.map(d => val(d, sc, me, 'mean'));
+    const fit = quadFit(x, y);
+    const ys = y.slice().sort((a, b) => a - b), cap = ys[Math.min(ys.length - 1, Math.floor(0.975 * ys.length))];   // = the paper's $50M cap for global spillovers
+    const nAbove = y.filter(v => v > cap).length;
+    const mean = x.reduce((a, v) => a + v, 0) / x.length, xs = x.slice().sort((a, b) => a - b), med = xs[Math.floor(xs.length / 2)];
+    const hi = f.filter(d => shownNames.has(d.name)), lo = f.filter(d => !shownNames.has(d.name));
+    const sz = d => 4 + 26 * Math.sqrt(d.n / 60000);
+    const hov = d => `<b>${esc(d.name)}</b><br>EMDE innovation share: ${fmtPct(d.s)}<br>${LAB}: ${fmt(val(d, sc, me, 'mean'))} per innovation` +
+                     `<br>Innovations: ${fmtN(d.n)}<extra></extra>`;
+    const yc = d => Math.min(cap, val(d, sc, me, 'mean'));
+    const traces = [
+      { type: 'scatter', mode: 'markers', x: lo.map(d => d.s), y: lo.map(yc), name: 'Other firms',
+        marker: { size: lo.map(sz), color: 'rgba(44,62,80,0.22)', line: { width: 0 } }, hovertemplate: lo.map(hov) },
+      { type: 'scatter', mode: 'markers', x: hi.map(d => d.s), y: hi.map(yc), name: 'Firms in the bar chart',
+        marker: { size: hi.map(sz), color: 'rgba(24,188,156,0.8)', line: { color: '#0f7864', width: 1 } }, hovertemplate: hi.map(hov) }
+    ];
+    const shapes = [], ann = [];
+    if (fit) {
+      const gx = [], gl = [], gu = [], gy = [];
+      for (let i = 0; i <= 60; i++) { const x0 = i / 60, [yh, l, u] = fit.pred(x0); gx.push(x0); gy.push(yh); gl.push(l); gu.push(u); }
+      traces.unshift(
+        { type: 'scatter', mode: 'lines', x: gx.concat(gx.slice().reverse()), y: gu.concat(gl.slice().reverse()), fill: 'toself',
+          fillcolor: 'rgba(52,152,219,0.15)', line: { width: 0 }, hoverinfo: 'skip', showlegend: false },
+        { type: 'scatter', mode: 'lines', x: gx, y: gy, name: 'Quadratic fit (95% band)', line: { color: '#3498db', width: 2.5 }, hoverinfo: 'skip' });
+      const vline = (x0, color, dash, w) => shapes.push({ type: 'line', xref: 'x', yref: 'paper', x0, x1: x0, y0: 0, y1: 1, line: { color, dash, width: w } });
+      const lab = (x0, yf, text, color, anchor) => ann.push({ xref: 'x', yref: 'paper', x: x0, y: yf, text, showarrow: false, xanchor: anchor || 'center',
+                                                           font: { size: 12, color }, bgcolor: 'rgba(255,255,255,0.85)' });
+      if (fit.peak != null && fit.peak > 0 && fit.peak < 1) { vline(fit.peak, '#e74c3c', 'dash', 1.5); lab(fit.peak, 0.97, 'peak = ' + fit.peak.toFixed(2), '#e74c3c'); }
+      vline(mean, '#2c3e50', 'solid', 1); lab(mean, 0.50, ' mean = ' + mean.toFixed(2), '#2c3e50', 'left');
+      vline(med, '#7b8a8b', 'dot', 1); lab(med, 0.44, ' median = ' + med.toFixed(2), '#7b8a8b', 'left');
+    }
+    // firm labels: leader-line annotations, pushed apart vertically where they would overlap
+    const W = Math.max(400, ($('uchart').clientWidth || 900) - 90), H = 440, xr = [-0.03, 1.03], ymax = cap * 1.08;
+    const toPx = d => [ (d.s - xr[0]) / (xr[1] - xr[0]) * W, (1 - yc(d) / ymax) * H ];
+    const placed = [];
+    // keep firm labels clear of the peak / mean / median labels
+    const xpx = x0 => (x0 - xr[0]) / (xr[1] - xr[0]) * W;
+    if (fit) {
+      if (fit.peak != null && fit.peak > 0 && fit.peak < 1) placed.push([xpx(fit.peak) - 45, xpx(fit.peak) + 45, 0.03 * H - 8, 0.03 * H + 8]);
+      placed.push([xpx(mean), xpx(mean) + 85, 0.50 * H - 8, 0.50 * H + 8], [xpx(med), xpx(med) + 95, 0.56 * H - 8, 0.56 * H + 8]);
+    }
+    hi.slice().sort((a, b) => yc(b) - yc(a)).forEach(d => {
+      const txt = d.name.length > 22 ? d.name.slice(0, 20) + '…' : d.name, tw = 6.6 * txt.length + 6;
+      const [px, py] = toPx(d), right = d.s < 0.6;
+      let ax = right ? 28 : -28, ay = -10;                      // default: label up-right (or up-left) of the bubble
+      const box = dy => { const x0 = right ? px + ax : px + ax - tw; return [x0, x0 + tw, py + dy - 7, py + dy + 7]; };
+      const clash = b => placed.some(q => b[0] < q[1] && b[1] > q[0] && b[2] < q[3] && b[3] > q[2]);
+      // candidate offsets: up, down, further up, further down, ... but only where the label stays inside the plot
+      const cands = [-10]; for (let k = 1; k <= 40; k++) cands.push(-10 + (k % 2 ? -1 : 1) * 15 * Math.ceil(k / 2));
+      const ok = cands.filter(dy => py + dy > 9 && py + dy < H - 9);
+      ay = (ok.find(dy => !clash(box(dy))) ?? ok[0] ?? -10);
+      placed.push(box(ay));
+      ann.push({ x: d.s, y: yc(d), xref: 'x', yref: 'y', text: txt, showarrow: true, arrowhead: 0, arrowwidth: 0.8, arrowcolor: '#128f76',
+                 ax, ay, xanchor: right ? 'left' : 'right', font: { size: 11, color: '#0f7864' }, bgcolor: 'rgba(255,255,255,0.75)', borderpad: 1 });
+    });
+    const layout = {
+      height: 520, margin: { l: 70, r: 20, t: 20, b: 60 }, paper_bgcolor: '#fff', plot_bgcolor: '#fff',
+      font: { family: 'Lato,"Helvetica Neue",Helvetica,Arial,sans-serif', size: 14, color: '#2c3e50' },
+      xaxis: { title: { text: 'EMDE innovation share' }, range: xr, gridcolor: '#ecf0f1', zeroline: false, fixedrange: true },
+      yaxis: { title: { text: LAB + ' (' + unitTxt(me, 'mean') + ')' }, range: [0, cap * 1.08], gridcolor: '#ecf0f1', zeroline: false, fixedrange: true },
+      showlegend: true, legend: { orientation: 'h', x: 0, y: -0.14, xanchor: 'left', yanchor: 'top', font: { size: 13 }, itemsizing: 'constant' },
+      shapes, annotations: ann, hovermode: 'closest'
+    };
+    if (!M.money) {
+      const step = [1, 2, 5].map(m => m * Math.pow(10, Math.floor(Math.log10(cap / 5)))).find(sv => cap / sv <= 7) || cap / 5;
+      const tv = []; for (let t = 0; t <= cap * 1.08; t += step) tv.push(t);
+      Object.assign(layout.yaxis, { tickmode: 'array', tickvals: tv, ticktext: tv.map(t => (100 * t).toFixed(0) + '%') });
+    } else Object.assign(layout.yaxis, { tickprefix: '$', ticksuffix: 'M' });
+    Plotly.react('uchart', traces, layout, { responsive: true, displaylogo: false,
+      modeBarButtonsToRemove: ['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d'],
+      toImageButtonOptions: { filename: 'inverted_u_' + (me === 'pv' ? 'pv' : me + '_' + sc), scale: 2 } });
+    $('usummary').textContent = `${fmtN(f.length)} firms; mean ${lc(LAB)} per innovation against the firm's EMDE innovation share. ` +
+      (fit ? (fit.peak != null && fit.peak > 0 && fit.peak < 1 ? `Quadratic fit peaks at a share of ${fit.peak.toFixed(2)}` : 'The quadratic fit has no interior peak') +
+             ` (mean share ${mean.toFixed(2)}, median ${med.toFixed(2)}). ` : '') +
+      (nAbove ? `${nAbove} firm${nAbove === 1 ? '' : 's'} above ${fmt(cap)} drawn at the cap. ` : '') +
+      `Labelled: the ${hi.length} firm${hi.length === 1 ? '' : 's'} currently in the bar chart.`;
   }
 
   function downloadCSV() {
