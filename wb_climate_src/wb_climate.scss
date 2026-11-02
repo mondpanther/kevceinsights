@@ -43,3 +43,7 @@ $presentation-heading-font-weight: 600;
 .reveal .coverrow p { margin: 0; }
 .reveal .coverrow img { margin: 0; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
 .reveal .coverrow p:last-child img { box-shadow: none; }
+.reveal .callout-box { position: relative; background: #fff4e5; border: 2px solid #e07b39; border-radius: 10px; padding: 0.5em 0.7em; font-size: 0.68em; line-height: 1.35; margin-top: 1.6em; margin-left: 0.3em; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+.reveal .callout-box p { margin: 0; }
+.reveal .callout-box::before { content: ""; position: absolute; left: -14px; top: 40%; border: 7px solid transparent; border-right-color: #e07b39; }
+.reveal .columns blockquote { width: auto; margin-left: 0; margin-right: 1.2em; }

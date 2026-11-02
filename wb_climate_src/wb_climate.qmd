@@ -73,25 +73,51 @@ sw <- ppi[sw == 1 & ppitype == "Greenfield project"]
 :::
 ::::
 
-<br>
+```{r lenders, fig.width=12.5, fig.height=3}
+lend <- data.table(
+  inst = c("China Development Bank (national, 2023)", "World Bank Group (FY25)",
+           "European Investment Bank Group (2025)", "Asian Development Bank (2025)"),
+  bn   = c(433, 118.5, 113, 29.3),
+  kind = c("national bank, mostly lends inside China",
+           "multilateral, lends only to developing countries",
+           "multilateral, but ~90% lent inside the EU",
+           "multilateral, Asia-Pacific"))
+lend[, inst := factor(inst, rev(inst))]
+ggplot(lend, aes(bn, inst)) +
+  geom_col(aes(fill = inst == "World Bank Group (FY25)"), width = .65) +
+  geom_text(aes(label = paste0("$", bn, "bn: ", kind)), hjust = -0.03, size = 4.6, colour = ink) +
+  scale_fill_manual(values = c(`TRUE` = accent, `FALSE` = "#bdbdbd"), guide = "none") +
+  scale_x_continuous(expand = expansion(mult = c(0, 1.05)), labels = NULL) +
+  labs(x = NULL, y = NULL, title = "How big? Annual lending commitments, US$ billion") +
+  theme_slides + theme(panel.grid.major = element_blank(), axis.text.y = element_text(size = 15),
+                       plot.title = element_text(size = 17), plot.title.position = "plot")
+```
 
-::: {.callout}
-189 member countries. Finance raised by borrowing on capital markets against members' capital, then lent on to developing countries.
-:::
+[189 member countries. EIB converted from €100bn. Sources: [World Bank FY25 financial summary](https://www.worldbank.org/en/about/annual-report/financial-summary) · [EIB key figures](https://www.eib.org/en/about/key-figures/) · [ADB 2025](https://www.donorplatform.org/post/adb-annual-report-2025/) · [CDB (SOAS)](https://www.soas.ac.uk/sites/default/files/2025-03/SOAS%20DLD%20Case%20Study%20China%20Development%20Bank.pdf)]{.cite}
 
 ::: notes
 - "World Bank" in the narrow sense = IBRD + IDA: governments borrow for roads, power grids, schools, policy reforms.
 - IFC is the private-sector arm. It doesn't lend to governments; it puts money into firms and projects, often as the first serious investor, and brings in commercial banks alongside.
 - I'll talk about the Group as a whole; my own work was at IFC.
+- Size: the WBG is the largest *multilateral* lender to developing countries. China Development Bank is far bigger overall but is a national bank lending mostly at home; around 2010–15 CDB and China Exim together lent more to developing countries each year than the World Bank, but Chinese overseas lending has since fallen sharply. The EIB lends about as much as the WBG but ~90% inside the EU.
 :::
 
 ## Mission: poverty *on a livable planet*
 
 <br>
 
+:::: {.columns}
+::: {.column width="66%"}
 > **"To end extreme poverty and boost shared prosperity on a livable planet."**
 >
 > — World Bank Group mission, adopted 2023 (the ["Evolution Roadmap"](https://consultations.worldbank.org/content/dam/sites/consultations/doc/2023/WBG-Evolution-roadmap.pdf))
+:::
+::: {.column width="34%"}
+::: {.callout-box}
+**Not new, though.** Climate has been part of the Bank's official strategy since **2008** ([Strategic Framework on Development and Climate Change](https://documents1.worldbank.org/curated/en/210721468139493088/pdf/478930v20Revis1evious0record10DCCSF.pdf)), building on an **Environment Department** set up in **1987**.
+:::
+:::
+::::
 
 <br>
 
