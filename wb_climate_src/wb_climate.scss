@@ -50,3 +50,6 @@ $presentation-heading-font-weight: 600;
 .reveal .slides section ol.aside-footnotes { font-size: 0.8em !important; line-height: 1.3; margin-bottom: 0; }
 .reveal .slides section ol.aside-footnotes li, .reveal .slides section ol.aside-footnotes p { font-size: inherit !important; }
 .reveal .tight { font-size: 0.85em; } .reveal .tight .bignum { margin-top: 0.1em; } .reveal .tight .bignum.small { margin-top: 0.3em; }
+.reveal table td { vertical-align: top; }
+.reveal table td:nth-child(2) { max-width: 640px; }
+.reveal table td:nth-child(n+4), .reveal table th:nth-child(n+4) { white-space: nowrap; }

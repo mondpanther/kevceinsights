@@ -431,38 +431,56 @@ Q&A prep:
 - "Does the Bank still fund fossil fuels?" — It stopped financing upstream oil & gas from 2019; in 2025 it lifted its ban on financing nuclear power and opened the door to upstream gas ("all of the above" energy).
 :::
 
-## Appendix: biggest World Bank climate-finance projects, FY25 {.smaller}
+## Appendix: biggest climate-finance projects, FY25 (1/2) {.smaller}
 
 ```{r top-projects}
 pr <- fread("data/fy25_project_climate_finance.csv", encoding = "UTF-8")
 pr[, cf_m := ad + mi]
-pr <- pr[!is.na(cf_m)][order(-cf_m)]
+pr <- pr[!is.na(cf_m)][order(-cf_m, pid)]
 tot_cf <- sum(pr$cf_m)
-short <- c(
-  "South Africa : Infrastructure Modernization DPL" = "Infrastructure modernization (policy loan)",
-  "Iraq Railways Extension and Modernization Project" = "Railways extension and modernization",
-  "Türkiye Second Irrigation Modernization and Water Efficiency Project" = "Irrigation modernization and water efficiency",
-  "Philippines First Energy Transition and Climate Resilience DPL" = "Energy transition and climate resilience (policy loan)",
-  "Eastern Türkiye Middle Corridor Railway Development Project" = "Eastern Türkiye 'Middle Corridor' railway",
-  "Indonesia Productive and Sustainable Investment Development Policy Loan" = "Productive and sustainable investment (policy loan)",
-  "Indonesia Sustainable Least-cost Electrification-2 (ISLE-2) Operation" = "Least-cost electrification (ISLE-2)",
-  "Support to the Sustainability and Equity of Public Transport Project" = "Public transport sustainability and equity",
-  "Supporting the Transition to a Sustainable Electricity Sector in Argentina" = "Transition to a sustainable electricity sector",
-  "Brazil Increasing Productivity, Sustainability and Inclusion DPF" = "Productivity, sustainability and inclusion (policy loan)")
 top <- head(pr, 10)
-top[, Project := fifelse(name %in% names(short), short[name], name)]
-top[grepl("Irrigation Modernization", name), Project := "Irrigation modernization and water efficiency"]
-top[grepl("Middle Corridor Railway", name), Project := "Eastern Middle Corridor railway"]
+info <- data.table(
+  pid = c("P507031", "P507282", "P506997", "P181389", "P179128",
+          "P508323", "P501217", "P506430", "P506846", "P507322"),
+  Project = c("Infrastructure modernization (policy loan, $1.5bn)",
+              "Railways extension and modernization",
+              "Irrigation modernization and water efficiency",
+              "Energy transition and climate resilience (policy loan)",
+              "Eastern 'Middle Corridor' railway",
+              "Productive and sustainable investment (policy loan, $1.5bn)",
+              "Least-cost electrification (ISLE-2)",
+              "Transition to a sustainable electricity sector",
+              "Public transport sustainability and equity",
+              "Productivity, sustainability and inclusion (policy loan, $1bn)"),
+  What = c("Reforms opening electricity to a competitive wholesale market and private transmission investment, private rail operators and port concessions (incl. Durban), and stronger water regulation.",
+           "Rehabilitates 1,047 km of railway from Umm Qasr port via Baghdad to Mosul, plus locomotives and rolling stock, to shift freight from trucks to rail.",
+           "Modernises irrigation on 72,000 ha in central Anatolia and Antalya to cut water lost from open canals; serves 50,000+ farms.",
+           "Reforms to procure 1,000 MW of offshore wind, raise renewables to 42% of capacity by 2027, let consumers choose their electricity supplier, and improve water governance.",
+           "Builds a fully electrified 660 km line from Divriği (Sivas) to Kars near the Georgian border, replacing diesel trains on the east-west trade route to Central Asia.",
+           "Deepens the financial sector (incl. accounting for climate and disaster risk), eases local-content rules that hold back renewable procurement, and greens industrial-estate standards.",
+           "Adds 540 MW of solar and wind and brings electricity to 3.5 million people in Kalimantan and Sumatra; expected to cut generation costs by 8%+.",
+           "Funds electricity-tariff subsidies for low-income households and better targeting through the energy-subsidy registry (RASE).",
+           "Funds a 55% public-transport fare discount for pensioners and benefit recipients in 61 cities, and discounted transfers in an integrated ticket system.",
+           "Tax and social-assistance reforms; the climate part is the Ecological Transformation Plan and restoring Bolsa Verde payments for forest conservation in the Amazon."))
+top <- merge(top, info, by = "pid", sort = FALSE)[order(-cf_m, pid)]
 top[country == "Turkiye", country := "Türkiye"]
-knitr::kable(top[, .(`#` = .I, Project, Country = country,
-                     `Climate finance (US\\$m)` = format(round(cf_m), big.mark = ","),
-                     `% of project` = paste0(round(cf), "%"),
-                     `Adapt. / Mitig. (US\\$m)` = paste0(round(ad), " / ", round(mi)))],
-             align = "rlllrrr")
+tab <- top[, .(`#` = .I, Project = paste0("**", Project, "**<br>", What), Country = country,
+               `Climate (US\\$m)` = format(round(cf_m), big.mark = ","),
+               `% of project` = paste0(round(cf), "%"),
+               `Adapt. / Mitig.` = paste0(round(ad), " / ", round(mi)))]
 top10 <- sum(top$cf_m) / tot_cf
 dpf_share <- pr[grepl("DPL|DPF|Development Policy|DPO", name), sum(cf_m)] / tot_cf
+knitr::kable(tab[1:5], align = "rllrrr", escape = FALSE)
 ```
 
-The top 10 make up **`r percent(top10)`** of the $39.2bn across `r nrow(pr)` projects. Four of them are **budget-support (policy) loans**, which account for `r percent(dpf_share)` of all climate finance — the "climate" part is the share of reforms judged climate-relevant (e.g. renewable auctions, subsidy reform).
+[Source: [World Bank, Climate Finance 2025 — project-level data](https://thedocs.worldbank.org/en/doc/af985cf92e8b967ba707f43fb2dd9de7-0320012025/original/FY25-Project-Level-WB-CCB-data.pdf) (IBRD + IDA only); descriptions from World Bank project announcements.]{.cite}
 
-[Source: [World Bank, Climate Finance 2025 — project-level data](https://thedocs.worldbank.org/en/doc/af985cf92e8b967ba707f43fb2dd9de7-0320012025/original/FY25-Project-Level-WB-CCB-data.pdf) (IBRD + IDA; IFC and MIGA not included). Policy loans identified from project titles.]{.cite}
+## Appendix: biggest climate-finance projects, FY25 (2/2) {.smaller}
+
+```{r top-projects-2}
+knitr::kable(tab[6:10], align = "rllrrr", escape = FALSE)
+```
+
+The top 10 make up **`r percent(top10)`** of the $39.2bn across `r nrow(pr)` projects. Four are **budget-support (policy) loans**, which account for `r percent(dpf_share)` of all climate finance: the "climate" part is the share of reforms judged climate-relevant. Note that both Argentine projects are tagged **100% mitigation** although they mainly fund targeted subsidies.
+
+[Policy loans identified from project titles.]{.cite}
