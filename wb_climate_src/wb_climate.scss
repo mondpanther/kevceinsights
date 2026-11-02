@@ -47,3 +47,6 @@ $presentation-heading-font-weight: 600;
 .reveal .callout-box p { margin: 0; }
 .reveal .callout-box::before { content: ""; position: absolute; left: -14px; top: 40%; border: 7px solid transparent; border-right-color: #e07b39; }
 .reveal .columns blockquote { width: auto; margin-left: 0; margin-right: 1.2em; }
+.reveal .slides section ol.aside-footnotes { font-size: 0.8em !important; line-height: 1.3; margin-bottom: 0; }
+.reveal .slides section ol.aside-footnotes li, .reveal .slides section ol.aside-footnotes p { font-size: inherit !important; }
+.reveal .tight { font-size: 0.85em; } .reveal .tight .bignum { margin-top: 0.1em; } .reveal .tight .bignum.small { margin-top: 0.3em; }
