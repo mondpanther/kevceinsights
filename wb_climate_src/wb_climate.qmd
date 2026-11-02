@@ -104,8 +104,6 @@ ggplot(lend, aes(bn, inst)) +
 
 ## Mission: poverty *on a livable planet*
 
-<br>
-
 :::: {.columns}
 ::: {.column width="66%"}
 > **"To end extreme poverty and boost shared prosperity on a livable planet."**
@@ -119,8 +117,6 @@ ggplot(lend, aes(bn, inst)) +
 :::
 ::::
 
-<br>
-
 :::: {.columns}
 ::: {.column width="33%"}
 #### Why climate is in it
@@ -132,7 +128,9 @@ Hundreds of millions still lack electricity. The question is *which* energy.
 :::
 ::: {.column width="33%"}
 #### Mainstreamed, not a silo
-In FY25, **97%** of World Bank projects had a climate component.
+In FY25, **97%** of World Bank projects had a climate component.[^cc]
+
+[^cc]: A project counts if *any* part of its financing is tagged as climate finance (see next slide). So 97% means "some climate share", not "97% climate projects".
 :::
 ::::
 
@@ -146,7 +144,7 @@ In FY25, **97%** of World Bank projects had a climate component.
 
 :::: {.columns}
 ::: {.column width="58%"}
-```{r cf, fig.width=7.2, fig.height=5}
+```{r cf, fig.width=7.2, fig.height=4.5}
 cf <- data.table(fy = paste0("FY", 21:25),
                  climate = c(21.2, 26.2, 29.4, 31.0, 39.2),
                  share   = c(.32, .37, .40, .45, .49))
@@ -161,14 +159,15 @@ ggplot(cf, aes(fy, climate)) +
   theme_slides + theme(panel.grid.major.y = element_blank())
 ```
 
-[Source: [World Bank FY25 Climate-Related Disclosures](https://thedocs.worldbank.org/en/doc/f8a2c887929c44d9dab187f3fc1ad293-0040012025/original/WB-FY25-Climate-Related-Disclosures.pdf)]{.cite}
 :::
 
-::: {.column width="42%"}
+::: {.column width="42%" .tight}
 ::: {.bignum}
 $50.8bn
 :::
-Group-wide climate finance in FY25
+Group-wide climate finance in FY25[^cf]
+
+[^cf]: "Climate finance" = the part of each project tagged as mitigation or adaptation under the joint methodology of the multilateral development banks, counted activity by activity (mitigation: activities on an agreed list, e.g. renewables; adaptation: activities addressing an identified climate vulnerability). Figures are new commitments (approvals), mostly loans to be repaid, not grants or money disbursed. Source: [World Bank FY25 Climate-Related Disclosures](https://thedocs.worldbank.org/en/doc/f8a2c887929c44d9dab187f3fc1ad293-0040012025/original/WB-FY25-Climate-Related-Disclosures.pdf)
 
 - IBRD $22.5bn · IDA $16.7bn
 - IFC $8.1bn · MIGA $3.5bn
