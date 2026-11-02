@@ -128,9 +128,9 @@ Hundreds of millions still lack electricity. The question is *which* energy.
 :::
 ::: {.column width="33%"}
 #### Mainstreamed, not a silo
-In FY25, **97%** of World Bank projects had a climate component.[^cc]
+In FY25, **97%** of World Bank projects had a climate component[^cc] — but climate finance was **49%** of the money committed.
 
-[^cc]: A project counts if *any* part of its financing is tagged as climate finance (see next slide). So 97% means "some climate share", not "97% climate projects".
+[^cc]: A project counts if *any* part of its financing is tagged as climate finance (see next slide). The 49% is $39.2bn of $80.8bn in new IBRD + IDA commitments; the Bank does not report the climate share of disbursements.
 :::
 ::::
 
