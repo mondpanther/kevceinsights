@@ -110,9 +110,11 @@
     <select id="green"><option value="all">All Scoreboard firms</option><option value="green">Green-innovation firms only</option></select></div>
   <div class="ctl"><label for="hq">Headquarters</label>
     <select id="hq"><option value="all">Anywhere</option><option value="HIC">High-income</option><option value="EMDE excl. China">EMDE (excl. China)</option><option value="China">China</option></select></div>
-  <div class="ctl"><label>Sectors <span style="text-transform:none;letter-spacing:0">(empty = all)</span></label>
+  <div class="ctl"><label>Sectors <span>(empty = all)</span></label>
     <div class="ms" id="sector"></div></div>
-  <div class="ctl"><label>Firms to pin <span style="text-transform:none;letter-spacing:0">(always shown)</span></label>
+  <div class="ctl"><label>Technologies <span>(empty = all)</span></label>
+    <div class="ms" id="tech"></div></div>
+  <div class="ctl"><label>Firms to pin <span>(always shown)</span></label>
     <div class="ms" id="firms"></div></div>
   <div class="ctl"><label for="width">Bar width</label>
     <select id="width"><option value="equal">Equal</option><option value="logn">∝ log number of innovations</option><option value="n">∝ number of innovations</option></select></div>
@@ -128,6 +130,7 @@
     <dt>Firms</dt><dd>Companies in the EU Industrial R&amp;D Scoreboard (the world's largest R&amp;D investors) matched to their patent families in PATSTAT; one bar per firm, computed over its innovations (patent families, patents of invention only, filed 2013–2022) with a Watson valuation. The diamonds (optional, top axis, spillovers only) show the selected scope's spillovers as a share of the firm's global spillovers, i.e. the fraction of the knowledge flows its innovations generate that is received in the region selected; the dashed line marks the mean of that share across all firms passing the filters, not only the top ones shown. Bar width can be set proportional to the firm's number of innovations in the window, or to its logarithm, so that firms whose averages rest on large portfolios stand out; very thin bars are widened slightly so that their labels stay legible.</dd>
     <dt>Scope</dt><dd>Where the recipients of the knowledge flows are located: anywhere ("Global"), in high-income countries, in emerging and developing economies with or without China (and India), or in one of China, India, the UK, the US or the EU. The scopes are the same as in the <a href="https://iseapp.kevce.org">Innovation Strategy Explorer</a>; "EMDE (excl. China)" is the paper's main definition.</dd>
     <dt>Measure</dt><dd><i>Spillovers</i> are the expected value of the knowledge flows an innovation generates for later innovations located in the scope, in USD million, following the Patent Rank approach of <a href="https://cep.lse.ac.uk/pubs/download/dp2223.pdf">Martin, Verhoeven et al.</a>. <i>Marginal returns</i> relate those spillovers to the cost of the innovation: (α+1)/cost × spillovers, where α is Watson's estimate of how strongly the innovation's private value responds to its cost; the measure is set to zero for innovations whose private value already exceeds twice their cost, since no public support would be needed to bring them about. <i>Average returns</i> are (private value + spillovers)/cost, the total value created per dollar of R&amp;D cost. Both returns are shown in percent of cost. <i>Private value</i> is the expected private (stock-market) value of the innovation to its owner, USD million, independent of scope. Returns are missing for the few innovations without a Watson cost estimate and are then computed over the rest.</dd>
+    <dt>Technologies</dt><dd>Restricts each firm to its innovations in the selected technologies (the 84 technology classes of the <a href="https://iseapp.kevce.org">Innovation Strategy Explorer</a>: green, battery, AI, defence, hard-to-abate decarbonisation and others, with "Any …" aggregates per group), so the bars then compare, say, firms' <i>green</i> innovations. The firm's number of innovations and the minimum-portfolio filter refer to that subset. With several technologies selected the statistics are pooled over them, counting an innovation once per selected technology it belongs to (the overlap between technologies is not removed); medians are not available with a technology filter, and firm–technology pairs with fewer than 10 innovations are left out.</dd>
     <dt>Statistic</dt><dd>The bar shows, over the firm's innovations in the window, the mean per innovation (the default, and what the paper's firm-level analysis uses), the total (mean × number of innovations, so it rewards large portfolios; not offered for returns, which are ratios) or the median. Spillovers are very skewed — most innovations generate none in a given region — so regional medians are often exactly zero and the median ranking is only informative for global spillovers, private value and average returns.</dd>
     <dt>Caveats</dt><dd>Averages over few innovations are noisy, which is why the minimum portfolio size defaults to 30. Firm names are the Scoreboard's; subsidiaries are folded into the parent where the Scoreboard lists them together. Pinned firms are drawn in a darker shade and are shown whatever the filters (minimum portfolio size included), appended below the ranked top-N if they do not make it; set "Firms shown" to "Only pinned firms" to compare just those.</dd>
   </dl>
@@ -167,8 +170,9 @@
   const $ = id => document.getElementById(id);
 
   // ---- minimal searchable multi-select (chips + filtered dropdown); no dependencies
-  function MultiSelect(el, options, placeholder, onChange) {
+  function MultiSelect(el, options, placeholder, onChange, loader) {
     const self = { values: [] };
+    let loaded = !loader, loading = false;   // loader: async () => options, called on first open
     el.innerHTML = '<div class="box"><input type="text" autocomplete="off"></div><div class="list"></div>';
     const box = el.querySelector('.box'), inp = el.querySelector('input'), list = el.querySelector('.list');
     inp.placeholder = placeholder;
@@ -184,6 +188,11 @@
       inp.placeholder = self.values.length ? '' : placeholder;
     }
     function renderList() {
+      if (!loaded) {
+        list.innerHTML = '<div class="none">loading…</div>'; list.style.display = 'block';
+        if (!loading) { loading = true; loader().then(o => { options = o; loaded = true; loading = false; if (document.activeElement === inp) renderList(); }); }
+        return;
+      }
       const q = inp.value.trim().toLowerCase();
       matches = options.filter(o => !self.values.includes(o) && (!q || o.toLowerCase().includes(q)));
       // prefer prefix matches
@@ -201,7 +210,7 @@
     }
     function add(v) { if (!self.values.includes(v)) self.values.push(v); inp.value = ''; renderChips(); renderList(); inp.focus(); onChange(); }
     function remove(v) { self.values = self.values.filter(x => x !== v); renderChips(); onChange(); }
-    self.set = arr => { self.values = arr.filter(v => options.includes(v)); renderChips(); };
+    self.set = arr => { self.values = loaded ? arr.filter(v => options.includes(v)) : arr.slice(); renderChips(); };
     box.addEventListener('mousedown', e => { if (e.target === box) { e.preventDefault(); inp.focus(); } });
     inp.addEventListener('focus', renderList);
     inp.addEventListener('input', renderList);
@@ -219,9 +228,46 @@
     return self;
   }
 
+  const DATA_LAYOUT = 3;
   const ctl = { scope: $('scope'), measure: $('measure'), stat: $('stat'), topn: $('topn'), minn: $('minn'), green: $('green'), hq: $('hq'), width: $('width'), share: $('share') };
   const KEYS = ['scope', 'measure', 'stat', 'topn', 'minn', 'green', 'hq', 'width'];
-  let MS = { sector: null, firms: null };   // multi-selects, built once the data is in
+  let MS = { sector: null, firms: null, tech: null };   // multi-selects, built once the data is in
+  let TECH = null, techLoad = null;                      // firm x technology means, fetched on first use
+  function loadTech() {
+    if (!techLoad) techLoad = fetch('data/spillover_champions_tech.json?v=' + DATA_LAYOUT, { cache: 'no-cache' })
+      .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status + ' loading the technology data'); return r.json(); })
+      .then(t => { TECH = t; return t; });
+    return techLoad;
+  }
+  // the firm list to rank: all firms, or -- with a technology filter -- each firm restricted to its innovations
+  // in the selected technologies, pooled over them (n-weighted means; totals = mean x n; no medians)
+  let effCache = { key: null, firms: null };
+  function effectiveFirms() {
+    const sel = MS.tech.values;
+    if (!sel.length || !TECH) return DATA.firms;
+    const key = sel.join(SEP);
+    if (effCache.key === key) return effCache.firms;
+    const SC = Object.keys(SCOPE), out = [];
+    for (const d of DATA.firms) {
+      const rec = TECH.firms[d.name]; if (!rec) continue;
+      const rows = sel.map(t => rec[t]).filter(Boolean); if (!rows.length) continue;
+      const n = rows.reduce((a, r) => a + r[0], 0), nc = rows.reduce((a, r) => a + r[1], 0);
+      const wmean = (off, w) => {   // weighted mean of column off (null if any part missing)
+        let num = 0, den = 0;
+        for (const r of rows) { const x = r[off], k = w === 'n' ? r[0] : r[1]; if (x == null || !k) continue; num += x * k; den += k; }
+        return den ? num / den : null;
+      };
+      const v = {};
+      SC.forEach((k, i) => {
+        const ev = wmean(2 + i, 'n');
+        v[k] = [ev, ev == null ? null : ev * n, null, wmean(12 + i, 'c'), null, wmean(22 + i, 'c'), null];
+      });
+      const pvm = wmean(32, 'n');
+      out.push(Object.assign({}, d, { n, nc, v, pv: [pvm, pvm == null ? null : pvm * n, null], techs: sel.length, nAll: d.n }));
+    }
+    effCache = { key, firms: out };
+    return out;
+  }
   const SEP = '|';
   let DATA = null, shareTouched = false;
   const setDisabled = (el, off, why) => { el.disabled = off; el.parentElement.style.opacity = off ? '0.45' : ''; el.parentElement.title = off ? why : ''; };
@@ -233,6 +279,10 @@
     sumOpt.disabled = (me === 'is' || me === 'av');
     sumOpt.title = sumOpt.disabled ? 'Returns are ratios; their total is not meaningful' : '';
     if (sumOpt.disabled && ctl.stat.value === 'sum') ctl.stat.value = 'mean';
+    const medOpt = [...ctl.stat.options].find(o => o.value === 'med');
+    medOpt.disabled = MS.tech && MS.tech.values.length > 0;
+    medOpt.title = medOpt.disabled ? 'Medians are not available with a technology filter' : '';
+    if (medOpt.disabled && ctl.stat.value === 'med') ctl.stat.value = 'mean';
     const ok = hasShare(ctl.scope.value, me);
     setDisabled(ctl.share, !ok, me === 'ev' ? 'Only defined for a regional scope' : 'Only defined for spillovers');
     if (!ok) ctl.share.checked = false;
@@ -253,6 +303,7 @@
     const sec = (p.get('sectors') || (p.get('sector') && p.get('sector') !== 'all' ? p.get('sector') : '')).split(SEP).filter(Boolean);
     MS.sector.set(sec);
     MS.firms.set((p.get('firms') || '').split(SEP).filter(Boolean));
+    MS.tech.set((p.get('techs') || '').split(SEP).filter(Boolean));
     if (p.has('share')) { ctl.share.checked = p.get('share') === '1'; shareTouched = true; }
     syncCtl();
   }
@@ -261,6 +312,7 @@
     for (const k of KEYS) p.set(k, ctl[k].value);
     if (MS.sector.values.length) p.set('sectors', MS.sector.values.join(SEP));
     if (MS.firms.values.length) p.set('firms', MS.firms.values.join(SEP));
+    if (MS.tech.values.length) p.set('techs', MS.tech.values.join(SEP));
     if (hasShare(ctl.scope.value, ctl.measure.value)) p.set('share', ctl.share.checked ? '1' : '0');
     history.replaceState(null, '', location.pathname + '?' + p.toString());
   }
@@ -276,7 +328,8 @@
   function selectFirms() {
     const sc = ctl.scope.value, me = ctl.measure.value, st = ctl.stat.value, n = +ctl.topn.value, minn = +ctl.minn.value;
     const v = d => val(d, sc, me, st);
-    let f = DATA.firms.filter(d => d.n >= minn && v(d) != null);
+    const base = effectiveFirms();
+    let f = base.filter(d => d.n >= minn && v(d) != null);
     if (ctl.green.value === 'green') f = f.filter(d => d.green);
     if (ctl.hq.value !== 'all') f = f.filter(d => d.hqg === ctl.hq.value);
     if (MS.sector.values.length) { const S = new Set(MS.sector.values); f = f.filter(d => S.has(d.sector)); }
@@ -290,7 +343,7 @@
     // pinned firms: always shown (whatever the filters), appended after the top-N if not already in it
     const pinned = new Set(MS.firms.values);
     let shown = n > 0 ? f.slice(0, n) : [];
-    const extra = DATA.firms.filter(d => pinned.has(d.name) && v(d) != null && !shown.includes(d)).sort((a, b) => v(b) - v(a));
+    const extra = base.filter(d => pinned.has(d.name) && v(d) != null && !shown.includes(d)).sort((a, b) => v(b) - v(a));
     shown = shown.concat(extra);
     return { shown, pool, meanShare, pinned };
   }
@@ -319,7 +372,7 @@
       `<b>${esc(d.name)}</b><br>${esc(d.sector || 'sector n/a')} · HQ ${esc(d.hq || '?')}` +
       `<br>${st === 'mean' ? LAB : STATW[st] + ' ' + lc(LAB)}: <b>${fmt(val(d, sc, me, st))}</b>${perTxt(me, st)}` +
       (st !== 'mean' ? `<br>${LAB}, mean per innovation: ${fmt(val(d, sc, me, 'mean'))}` : '') +
-      `<br>Innovations 2013–22: ${fmtN(d.n)}` +
+      `<br>Innovations 2013–22: ${fmtN(d.n)}` + (d.techs ? ` in the selected technolog${d.techs > 1 ? 'ies (pooled)' : 'y'} of ${fmtN(d.nAll)}` : '') +
       (hasShare(sc, me) ? `<br>Share of global spillovers: ${fmtPct(shareOf(d, sc, me))}` : '') +
       (me !== 'ev' && me !== 'pv' ? `<br>${label(sc, 'ev')} (mean): ${fmtM(d.v[sc][0])}` : '') +
       (!(me === 'ev' && sc === 'g') ? `<br>Global spillovers (mean): ${fmtM(d.v.g[0])}` : '') +
@@ -381,7 +434,7 @@
                         title: { text: shareLabel + ' (%)', font: { size: 13, color: '#c67f0c' } },
                         tickfont: { color: '#c67f0c', size: 12 }, showgrid: false, zeroline: false, fixedrange: true };
     }
-    const fileTag = 'spillover_champions_' + (me === 'pv' ? 'pv' : me + '_' + sc) + (st === 'mean' ? '' : '_' + st);
+    const fileTag = 'spillover_champions_' + (me === 'pv' ? 'pv' : me + '_' + sc) + (st === 'mean' ? '' : '_' + st) + (MS.tech.values.length ? '_tech' : '');
     Plotly.react('chart', traces, layout, { responsive: true, displaylogo: false,
       modeBarButtonsToRemove: ['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d'],
       toImageButtonOptions: { filename: fileTag, scale: 2 } });
@@ -390,14 +443,16 @@
     if (ctl.green.value === 'green') filt.push('green-innovation firms');
     if (ctl.hq.value !== 'all') filt.push('headquartered in ' + ctl.hq.options[ctl.hq.selectedIndex].text.toLowerCase());
     if (MS.sector.values.length) filt.push(MS.sector.values.length === 1 ? MS.sector.values[0] : MS.sector.values.length + ' sectors');
+    const techTxt = MS.tech.values.length ? ' in ' + (MS.tech.values.length <= 3 ? MS.tech.values.join(' + ') : MS.tech.values.length + ' technologies (pooled)') : '';
     const nTop = Math.min(+ctl.topn.value, pool), nPin = shown.length - (+ctl.topn.value > 0 ? nTop : 0);
     const rankedBy = `ranked by ${barLabel}${perTxt(me, st)}${M.money ? '' : ' (% of R&D cost)'}.`;
-    const poolTxt = `${fmtN(pool)} firms with at least ${fmtN(+ctl.minn.value)} innovations` + (filt.length ? ' (' + filt.join(', ') + ')' : '');
+    const poolTxt = `${fmtN(pool)} firms with at least ${fmtN(+ctl.minn.value)} innovations${techTxt}` + (filt.length ? ' (' + filt.join(', ') + ')' : '');
     $('summary').textContent = (+ctl.topn.value > 0 ? `Top ${nTop} of ${poolTxt}, ${rankedBy}`
         : (shown.length ? `${shown.length} pinned firm${shown.length === 1 ? '' : 's'}, ${rankedBy}` : 'No firms pinned: type a firm name in the "Firms to pin" box, or choose a number of firms to show.')) +
       (showShare && meanShare != null ? ` Diamonds: share of each firm's global spillovers received in ${SCOPE[sc]} (mean over the ${poolTxt}: ${fmtPct(meanShare)}).` : '') +
       (wmode !== 'equal' ? ` Bar width is proportional to the ${wmode === 'n' ? 'number' : 'log number'} of innovations.` : '') +
-      (+ctl.topn.value > 0 && nPin > 0 ? ` ${nPin} pinned firm${nPin === 1 ? '' : 's'} appended (darker bars).` : '');
+      (+ctl.topn.value > 0 && nPin > 0 ? ` ${nPin} pinned firm${nPin === 1 ? '' : 's'} appended (darker bars).` : '') +
+      (MS.tech.values.length && !TECH ? ' Loading the technology data…' : '');
     writeURL();
     window._shown = shown; window._fileTag = fileTag;
   }
@@ -405,7 +460,7 @@
   function downloadCSV() {
     const sc = ctl.scope.value, me = ctl.measure.value, st = ctl.stat.value, rows = window._shown || [];
     const cols = [['rank', (d, i) => i + 1], ['firm', d => d.name], ['sector', d => d.sector], ['hq_iso', d => d.hq], ['hq_group', d => d.hqg],
-      ['n_innovations_2013_2022', d => d.n], ['green_innovation_firm', d => d.green], ['pinned', d => MS.firms.values.includes(d.name)],
+      ['n_innovations_2013_2022', d => d.n], ['technologies', () => MS.tech.values.join('; ')], ['green_innovation_firm', d => d.green], ['pinned', d => MS.firms.values.includes(d.name)],
       ['shown_scope', () => me === 'pv' ? '' : SCOPE[sc]], ['shown_measure', () => label(sc, me)], ['shown_statistic', () => st],
       ['shown_value' + (MEASURE[me].money ? '_usd_m' : '_ratio'), d => val(d, sc, me, st)]];
     if (hasShare(sc, me)) cols.push(['share_of_global_spillovers', d => { const x = shareOf(d, sc, me); return x == null ? '' : x.toFixed(4); }]);
@@ -421,7 +476,6 @@
 
   // DATA_LAYOUT changes whenever the JSON structure changes; it busts the browser cache of the data file
   // (GitHub Pages lets browsers keep it for a while), so a redeployed page never runs against a stale file.
-  const DATA_LAYOUT = 3;
   fetch('data/spillover_champions.json?v=' + DATA_LAYOUT, { cache: 'no-cache' })
     .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status + ' -- the page needs to be served over http(s), e.g. from GitHub Pages'); return r.json(); })
     .then(d => {
@@ -431,7 +485,11 @@
     const sectors = [...new Set(d.firms.map(f => f.sector).filter(Boolean))].sort();
     MS.sector = MultiSelect($('sector'), sectors, 'type to add a sector…', draw);
     MS.firms  = MultiSelect($('firms'), d.firms.map(f => f.name).sort(), 'type a firm name…', draw);
+    const onTech = () => { syncCtl(); if (MS.tech.values.length && !TECH) { draw(); loadTech().then(draw); } else draw(); };
+    MS.tech = MultiSelect($('tech'), [], 'type a technology…', onTech,
+      () => loadTech().then(t => t.techs.map(x => x[0])));   // iseapp's order: grouped, "Any …" aggregates first
     readURL();
+    if (MS.tech.values.length) loadTech().then(() => { MS.tech.set(MS.tech.values); draw(); });
     $('vintage').textContent = `Data: ${fmtN(d.meta.n_firms)} Scoreboard firms, firm table built ${d.meta.firm_table_date} from PATSTAT 2025 and Watson valuations (window ${d.meta.window}); page data generated ${d.meta.built}.`;
     for (const k of ['scope', 'measure']) ctl[k].addEventListener('change', () => { syncCtl(); draw(); });
     ctl.share.addEventListener('change', () => { shareTouched = true; draw(); });
